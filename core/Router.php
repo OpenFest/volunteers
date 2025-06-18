@@ -39,7 +39,9 @@ class Router
             $page = trim($requestUri, '/');
             // Basic sanitization: only allow alphanumeric, hyphens, and underscores.
             // You might want more robust sanitization depending on your needs.
-            $page = preg_replace('/[^a-zA-Z0-9_-]/', '', $page);
+            $page = preg_replace('%[^a-zA-Z0-9_/-]%', '', $page);
+			//if there are slashes, replace them with underscores
+	        $page = str_replace('/', '_', $page);
         }
 
         return $page;
