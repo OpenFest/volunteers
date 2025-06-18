@@ -61,6 +61,7 @@ class View
     private function outputHtmlLayout(string $title, string $content)
     {
         $basePath = $this->router->getBasePath();
+        $style = file_get_contents(CORE_DIR . '/style.css');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,11 +70,7 @@ class View
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=htmlspecialchars($title)?></title>
     <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
-        nav a { margin-right: 15px; text-decoration: none; color: #333; }
-        nav a:hover { color: #007bff; }
-        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
+        <?php echo $style; ?>
     </style>
 </head>
 <body>
