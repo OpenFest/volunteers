@@ -4,6 +4,7 @@ class View
 {
  private $pagesDir;
     private $router; // To access base path for links
+    private $database; // Placeholder for future database integration
 
     /**
      * Constructor.
@@ -11,10 +12,11 @@ class View
      * @param string $pagesDir The directory where page content files are stored.
      * @param Router $router An instance of the Router to get the base path.
      */
-    public function __construct(string $pagesDir, Router $router)
+    public function __construct(string $pagesDir, Router $router, Database $database)
     {
         $this->pagesDir = rtrim($pagesDir, '/') . '/'; // Ensure trailing slash
         $this->router = $router;
+        $this->database = $database; // Initialize the database connection
     }
 
     /**
@@ -22,7 +24,7 @@ class View
      *
      * @param string $pageName The name of the page to render (e.g., 'home', 'about').
      */
-    public function render(string $pageName)
+    public function render(string $pageName, array $data = [])
     {
         $pageFile = $this->pagesDir . $pageName . '.php';
         $content = '';
@@ -30,6 +32,7 @@ class View
         if (!file_exists($pageFile)) {
             // Fallback to 404 page if requested page doesn't exist
             header("HTTP/1.0 404 Not Found");
+	        $pageName = '404';
             $pageFile = $this->pagesDir . '404.php';
         }
 
@@ -38,6 +41,7 @@ class View
             // If even 404.php is missing, display a simple error
             $content = '<h1>Error</h1><p>The requested page could not be found, and the 404 error page is missing.</p>';
         } else {
+            extract($data);
             // Use output buffering to capture the content of the page file
             ob_start();
             include $pageFile;
@@ -45,7 +49,8 @@ class View
         }
 
         // Now, output the full HTML structure with the page content
-        $this->outputHtmlLayout($content);
+        $title = ucfirst($pageName);
+        $this->outputHtmlLayout($title, $content);
     }
 
     /**
@@ -53,7 +58,7 @@ class View
      *
      * @param string $content The content to be placed within the layout.
      */
-    private function outputHtmlLayout(string $content)
+    private function outputHtmlLayout(string $title, string $content)
     {
         $basePath = $this->router->getBasePath();
 ?>
@@ -62,7 +67,7 @@ class View
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vanilla PHP App (OOP)</title>
+    <title><?=htmlspecialchars($title)?></title>
     <style>
         body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
         nav a { margin-right: 15px; text-decoration: none; color: #333; }

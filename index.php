@@ -1,6 +1,11 @@
 <?php
-
+//debug
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 //Front controller
+
+//import configuration
+require_once __DIR__ . '/config.php';
 
 // Define application paths
 define('BASE_PATH', '');  //keep empty if the app is in the web server root, or set to '/folder_name' if in a subdirectory
@@ -15,6 +20,8 @@ spl_autoload_register(function ($class) {
     }
 });
 
+$database = new Database();
+
 // Instantiate and run the application
-$app = new App(BASE_PATH, PAGES_DIR);
+$app = new App(BASE_PATH, PAGES_DIR, $database);
 $app->run();
