@@ -36,7 +36,7 @@ The codebase is built with vanilla PHP (developed on PHP 8.0, but may work on ea
 ### Internal routing
 The application uses a simple routing mechanism.
 
-All requests are directed to `index.php`, which handles the routing based on the URL path. No URI will lead to the `home.php` file directly. The rest of the files are used for specific functionalities and should not be accessed directly via URL, mached on their respective names. E.g., '/admin' will match `admin.php`, '/register' will match `register.php`, etc. 
+All requests are directed to `index.php`, which handles the routing based on the URL path. No URI will lead to the `home.php` file directly. The rest of the files are used for specific functionalities and should not be accessed directly via URL, but matched on their respective names. E.g., '/admin' will match `admin.php`, '/register' will match `register.php`, etc. 
 
 There is also "extended" routing mechanism that allows nested paths by replacing existing slashes in the URI with underscores in the filename. For example, `/admin/users` will match `admin_users.php`.
 
