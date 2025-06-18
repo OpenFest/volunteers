@@ -49,7 +49,7 @@ class View
 		}
 
 		// Now, output the full HTML structure with the page content
-		$title = ucfirst($pageName);
+		$title = ucwords(str_replace('_',' :: ', $pageName));
 		$this->outputHtmlLayout($title, $content);
 	}
 
