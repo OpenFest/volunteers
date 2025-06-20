@@ -26,6 +26,7 @@ class App
 	 */
 	public function run()
 	{
+		session_start();
 		$page = $this->router->getRequestedPage();
 		$this->view->render($page);
 	}

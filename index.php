@@ -5,7 +5,8 @@ ini_set('display_errors', 1);
 //Front controller
 
 //import configuration
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/config.php'; // Configuration file for a database and other settings
+require_once __DIR__ . '/helper.php'; // Helper functions for common tasks like dumping variables, etc.
 
 // Define application paths
 define('BASE_PATH', '');  //keep empty if the app is in the web server root, or set to '/folder_name' if in a subdirectory
