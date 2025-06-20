@@ -1,27 +1,19 @@
 <?php
 // volunteers_new.php
-//generate csrf token
-session_start();
-if (!isset($_SESSION['csrf_token'])) {
-    $token = bin2hex(random_bytes(32));
-    $_SESSION['csrf_token'] = $token;
-} else {
-	$token = $_SESSION['csrf_token'];
-}
+$token = bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $token;
 $activeConf = 'of-2025';
 
-
-$teams = $this->database->query("SELECT slug FROM teams WHERE conference = '$activeConf'");
+$teams = $this->database->query("SELECT slug, name FROM teams WHERE conference = :conference", ['conference' => $activeConf]);
 
 foreach ($teams as $row) {
-    $volunteerTeams[] = $row->slug;
+    $volunteerTeams[$row->slug] = $row->name;
 }
-
 
 ?>
 
    <h1>Кандидатствай за доброволец</h1>
-    <form class="new_volunteer" id="new_volunteer" novalidate="novalidate" enctype="multipart/form-data" action="/volunteers" accept-charset="UTF-8" method="post">
+    <form class="new_volunteer" id="new_volunteer" novalidate="novalidate" enctype="multipart/form-data" action="/volunteers/submit" accept-charset="UTF-8" method="post">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($token) ?>" />
         <div class="form-inputs">
             <div class="input">
@@ -49,13 +41,12 @@ foreach ($teams as $row) {
 
             <div class="input checkboxes-group">
                 <label><abbr title="Задължително поле">*</abbr> Екипи доброволци</label>
-                <input type="hidden" name="volunteer[volunteer_team_ids][]" value="" autocomplete="off" />
                 <div class="checkbox-options">
-                    <?php foreach ($volunteerTeams as $team) { ?>
+                    <?php foreach ($volunteerTeams as $team => $title) { ?>
                     <span class="checkbox">
                         <label for="volunteer_volunteer_team_ids_<?= htmlspecialchars($team) ?>">
                             <input type="checkbox" value="<?= htmlspecialchars($team) ?>" name="volunteer[volunteer_team_ids][]" id="volunteer_volunteer_team_ids_<?= htmlspecialchars($team) ?>" />
-                            <?= htmlspecialchars($team) ?>
+                            <?= htmlspecialchars($title) ?>
                         </label>
                     </span>
                     <?php } ?>
