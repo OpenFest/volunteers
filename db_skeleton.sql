@@ -4,6 +4,10 @@ CREATE TABLE IF NOT EXISTS users
     name varchar(240) not null,
     email varchar(60) unique not null,
     phone varchar(24) not null,
+    lang varchar(6) not null,
+    tshirt_size varchar(6) not null,
+    tshirt_cut varchar(6) not null,
+    food_preferences varchar(24) not null,
     active bool default false
 
     ); -- this is actually ldap
@@ -23,6 +27,7 @@ CREATE TABLE IF NOT EXISTS teams
 (
     conference  VARCHAR(60),
     slug        VARCHAR(60),
+    name        VARCHAR(240),
     description TEXT,
     PRIMARY KEY (conference, slug),
     FOREIGN KEY (conference) REFERENCES conferences (slug)
