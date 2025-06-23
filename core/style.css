@@ -190,3 +190,45 @@ h1 {
     margin-top: 10px;
 }
 
+/* Backbone page styles */
+.backbone-page {
+    display: flex;
+    flex-direction: row; /* Stacks the content vertically */
+    align-items: center; /* Centers the content horizontally */
+    gap: 20px; /* Spacing between sections */
+    padding: 20px;
+    background-color: #fff;
+    flex-wrap: wrap;
+
+    h1 {
+        color: #333;
+        margin-bottom: 20px; /* Space below the header */
+    }
+
+    .pane {
+
+        display: flex;
+        flex-direction: column; /* Stacks items vertically */
+        gap: 15px; /* Spacing between pane items */
+        width: 45%; /* Sets a fixed width for the pane */
+        .pane-header {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px; /* Space below the header */
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse; /* Removes space between table cells */
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd; /* Adds a border to table cells */
+            text-align: left; /* Aligns text to the left */
+        }
+        th {
+            background-color: #f4f4f4; /* Light background for header */
+            font-weight: bold; /* Makes header text bold */
+        }
+    }
+}
