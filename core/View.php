@@ -100,10 +100,27 @@ class View
     </style>
 </head>
 <body>
+<?php
+// If the user is logged in, show admin navigation, otherwise show public navigation
+    if (isset($_SESSION['user']) && $_SESSION['user']->isAdmin()) {
+?>
     <nav>
         <a class="nav-logo" href="<?php echo $basePath; ?>/">Home</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/backbone">Backbone</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Join Us</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<?php echo $_SESSION['user']->getEmail() ?>]</a>
     </nav>
+<?php
+    } else {
+        // Public navigation for non-admin users
+?>
+        <nav>
+            <a class="nav-logo" href="<?php echo $basePath; ?>/">Home</a>
+            <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Join Us</a>
+        </nav>
+<?php
+    }
+?>
     <hr>
     <div class="container">
         <?php echo $content; ?>
