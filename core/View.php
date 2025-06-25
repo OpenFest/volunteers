@@ -3,8 +3,8 @@
 class View
 {
 	private $pagesDir;
-	private $router; // To access base path for links
-	private $database; // Placeholder for future database integration
+	private $router; // To access the base path for the links
+	private $database; // Placeholder for future database usage
 
 	/**
 	 * Constructor.
@@ -95,9 +95,7 @@ class View
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=htmlspecialchars($title)?></title>
-    <style>
-        <?php echo $style; ?>
-    </style>
+    <style> <?php echo $style; ?></style>
 </head>
 <body>
 <?php
@@ -105,18 +103,17 @@ class View
     if (isset($_SESSION['user']) && $_SESSION['user']->isAdmin()) {
 ?>
     <nav>
-        <a class="nav-logo" href="<?php echo $basePath; ?>/">Home</a>
+        <a class="nav-logo" href="<?php echo $basePath; ?>/"><img src="/assets/img/logo-1.png" alt="OpenFest"></a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone">Backbone</a>
-        <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Join Us</a>
-        <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<?php echo $_SESSION['user']->getEmail() ?>]</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<span class="small"><?php echo $_SESSION['user']->getEmail() ?></span>]</a>
     </nav>
 <?php
     } else {
         // Public navigation for non-admin users
 ?>
         <nav>
-            <a class="nav-logo" href="<?php echo $basePath; ?>/">Home</a>
-            <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Join Us</a>
+            <a class="nav-logo" href="<?php echo $basePath; ?>/"><img src="/assets/img/logo-1.png" alt="OpenFest"></a>
+            <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Кандидатствай за доброволец</a>
         </nav>
 <?php
     }

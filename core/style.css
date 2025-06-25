@@ -1,3 +1,9 @@
+/* basic classes for the core application */
+/* Reset some default styles */
+html {
+    font-size: 14px; /* Base font size */
+}
+
 body {
     font-family: sans-serif;
     background-color: #f4f4f4;
@@ -5,16 +11,51 @@ body {
     margin: 20px auto;
 }
 
+.small {
+    font-size: 0.8em; /* Smaller font size */
+}
 nav {
-    text-align: center;
+    display: flex;
+    justify-content: flex-end;
+    /* align icon on the left and nav items on the right */
+    align-items: center; /* Center items vertically */
+    padding: 10px 20px; /* Padding around the nav */
+    /* Add blue transition background gradient vertical */
+    background: linear-gradient(to bottom, #f5fafd, #d6eafb); /* Blue gradient background */
     a {
         margin-right: 15px;
         text-decoration: none;
         color: #333;
+        display: inline-block;
+    }
+
+    .nav-item {
+        padding: 10px 15px;
+        border-radius: 4px;
+        background-color: #e9ecef; /* Light background for nav items */
+        color: #333;
+        flex: 0 0 auto; /* Prevents nav items from stretching */
 
         &:hover {
-            text-decoration: underline;
-            color: #007bff;
+            background-color: #007bff; /* Change background on hover */
+            color: white; /* Change text color on hover */
+        }
+    }
+
+    .nav-logo {
+        font-weight: bold;
+        color: #007bff; /* Logo color */
+        font-size: 1.2em; /* Slightly larger font size for logo */
+        background: url("/assets/img/logo-1.png") no-repeat left top;
+        flex: 1 0 auto; /* Takes up remaining space */
+    }
+
+    @media (max-width: 800px) {
+        flex-direction: column;
+        .nav-logo, .nav-item {
+            margin: 5px 0; /* Adjust margin for smaller screens */
+            text-align: center; /* Center text on smaller screens */
+            width: 100%; /* Full width for nav items */
         }
     }
 }
@@ -28,6 +69,13 @@ h1 {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 /* General Form Styling */
@@ -194,7 +242,7 @@ h1 {
 .backbone-page {
     display: flex;
     flex-direction: row; /* Stacks the content vertically */
-    align-items: center; /* Centers the content horizontally */
+    align-items: flex-start;   /* Aligns items to the top */
     gap: 20px; /* Spacing between sections */
     padding: 20px;
     background-color: #fff;
@@ -216,6 +264,11 @@ h1 {
             color: #333;
             margin-bottom: 10px; /* Space below the header */
         }
+
+        @media (max-width: 800px) {
+            flex-direction: column;
+            width: 100%; /* Full width on smaller screens */
+        }
     }
 
     table {
@@ -229,6 +282,10 @@ h1 {
         th {
             background-color: #f4f4f4; /* Light background for header */
             font-weight: bold; /* Makes header text bold */
+        }
+
+        @media (max-width: 800px) {
+            font-size: 0.8em;
         }
     }
 }

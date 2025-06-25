@@ -53,8 +53,9 @@ $voluteersTeams = $this->database->query(
 
 ?>
 <div class="backbone-page">
-	<h1>Backbone</h1>
-	<p>Welcome to the Backbone page. Here you can manage the volunteers and their data.</p>
+    <div class="page-title">
+        <h1>Backbone</h1>
+    </div>
 
 	<div class="pane">
 		<div class="pane-header">Last 10 Volunteers</div>
