@@ -23,14 +23,28 @@ The codebase is built with vanilla PHP (developed on PHP 8.0, but may work on ea
 
 6. Set up a web server (e.g., Apache or Nginx) to serve the project directory. Make sure to force every request to `index.php` for routing purposes (something similar to the following for Apache):
  ```apache
-   RewriteEngine On
-   RewriteCond %{REQUEST_FILENAME} !-f
-   RewriteCond %{REQUEST_FILENAME} !-d
-   RewriteRule ^ index.php [L]
-    
-   <Directory /path/to/your/project>
-       AllowOverride All
-   </Directory>
+  DocumentRoot path/to/your/project
+
+  RewriteEngine on                            
+  #LogLevel alert rewrite:trace6 #uncomment in case rerwriting does not work as expected
+
+  <Directory path/to/your/project>                                                                         
+    # Redirect all requests to index.php except for existing files/directories
+    RewriteBase /                                                                            
+    RewriteRule ^index\.php$ - [L]                                                           
+    RewriteCond %{REQUEST_FILENAME} !-f                                                      
+
+    RewriteRule ^(.*)$ /index.php [QSA,L]                                                    
+
+    Options +FollowSymLinks                                                                  
+    DirectoryIndex index.php                                                                 
+
+    Options -Indexes                                                                         
+
+    allowoverride all                                                                        
+    order allow,deny                                                                         
+    allow from all                                                                           
+  </Directory>                                
    ```
 
 ### Internal routing
