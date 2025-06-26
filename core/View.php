@@ -56,6 +56,8 @@ class View
 	private function loadStyle()
 	{
 
+        //Deprecated: This method is used to load the CSS file and minify it.
+
 		// Load and minify the CSS file
 		// Note: This is a simple minification.
 		// Load the CSS file and remove new lines and extra spaces
@@ -95,7 +97,7 @@ class View
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=htmlspecialchars($title)?></title>
-    <style> <?php echo $style; ?></style>
+    <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/style.css">
 </head>
 <body>
 <?php
@@ -105,6 +107,9 @@ class View
     <nav>
         <a class="nav-logo" href="<?php echo $basePath; ?>/"><img src="/assets/img/logo-1.png" alt="OpenFest"></a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone">Backbone</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/backbone/users">Users</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/backbone/volunteers">Volunteers</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/backbone/teams">Teams</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<span class="small"><?php echo $_SESSION['user']->getEmail() ?></span>]</a>
     </nav>
 <?php

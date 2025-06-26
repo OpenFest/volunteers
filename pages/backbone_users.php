@@ -1,0 +1,43 @@
+<?php
+
+if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
+	header('Location: /login');
+	exit;
+}
+
+$last10volunteers = $this->database->query(
+	'SELECT * FROM users ORDER BY uid DESC LIMIT 10'
+);
+
+?>
+<div class="backbone-page">
+    <div class="page-title">
+        <h1>Users</h1>
+    </div>
+
+	<div class="pane full-width">
+		<table>
+			<thead>
+				<tr>
+					<th>Email</th>
+					<th>Phone</th>
+					<th>Shirt Size</th>
+					<th>Shirt Cut</th>
+					<th>Food Preferences</th>
+					<th>Active</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($last10volunteers as $volunteer): ?>
+					<tr>
+						<td><?php echo htmlspecialchars($volunteer->email); ?></td>
+						<td><?php echo htmlspecialchars($volunteer->phone); ?></td>
+						<td><?php echo htmlspecialchars($volunteer->tshirt_size); ?></td>
+						<td><?php echo htmlspecialchars($volunteer->tshirt_cut); ?></td>
+						<td><?php echo htmlspecialchars($volunteer->food_preferences); ?></td>
+						<td><?php echo $volunteer->active ? 'Yes' : 'No'; ?></td>
+					</tr>
+				<?php endforeach; ?>
+		</table>
+	</div>
+</div>

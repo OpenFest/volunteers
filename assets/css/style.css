@@ -265,10 +265,15 @@ h1 {
             margin-bottom: 10px; /* Space below the header */
         }
 
+        &.full-width {
+            width: 100%; /* Full width for specific elements */
+        }
+
         @media (max-width: 800px) {
             flex-direction: column;
             width: 100%; /* Full width on smaller screens */
         }
+
     }
 
     table {
