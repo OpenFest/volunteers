@@ -6,6 +6,7 @@ $activeConf = 'of-2025';
 
 $teams = $this->database->query("SELECT slug, name FROM teams WHERE conference = :conference", ['conference' => $activeConf]);
 
+$volunteerTeams = [];
 foreach ($teams as $row) {
     $volunteerTeams[$row->slug] = $row->name;
 }
@@ -18,19 +19,20 @@ foreach ($teams as $row) {
         <div class="form-inputs">
             <div class="input">
                 <label for="volunteer_picture">Снимка</label>
-                <input data-direct-upload-url="https://vol.openfest.org/rails/active_storage/direct_uploads" type="file" name="volunteer[picture]" id="volunteer_picture" />
+                <input type="file" name="picture" id="volunteer_picture" accept="image/*" />
                 <p class="hint-text">Ваша снимка в jpeg, png или gif формат</p>
-            </div>
-            <div class="input">
-                <label for="volunteer_name"><abbr title="Задължително поле">*</abbr> Име</label>
-                <input autofocus="autofocus" type="text" name="volunteer[name]" id="volunteer_name" />
-                <span class="hint">Имайте предвид, че това име ще бъде изписано на грамотата ви за участие в конференцията</span>
             </div>
 
             <div class="input">
                 <label for="volunteer_email"><abbr title="Задължително поле">*</abbr> E-mail</label>
                 <input type="email" name="volunteer[email]" id="volunteer_email" />
                 <span class="hint">Е-mail адресът Ви, който ще бъде видим само от организаторите</span>
+            </div>
+
+            <div class="input">
+                <label for="volunteer_name"><abbr title="Задължително поле">*</abbr> Име</label>
+                <input autofocus="autofocus" type="text" name="volunteer[name]" id="volunteer_name" />
+                <span class="hint">Имайте предвид, че това име ще бъде изписано на грамотата ви за участие в конференцията</span>
             </div>
 
             <div class="input">
