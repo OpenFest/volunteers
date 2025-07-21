@@ -21,10 +21,6 @@ $last10volunteers = $this->database->query(
 				<tr>
 					<th>Email</th>
 					<th>Phone</th>
-					<th>Shirt Size</th>
-					<th>Shirt Cut</th>
-					<th>Food Preferences</th>
-					<th>Active</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -32,10 +28,6 @@ $last10volunteers = $this->database->query(
 					<tr>
 						<td><?php echo htmlspecialchars($volunteer->email); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->phone); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->tshirt_size); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->tshirt_cut); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->food_preferences); ?></td>
-						<td><?php echo $volunteer->active ? 'Yes' : 'No'; ?></td>
 					</tr>
 				<?php endforeach; ?>
 		</table>

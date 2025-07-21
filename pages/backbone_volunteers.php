@@ -6,7 +6,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 $volunteers = $this->database->query(
-	'SELECT * FROM volunteers ORDER BY user'
+	'SELECT * FROM volunteers v left join users u on v.user = u.uid ORDER BY user'
 );
 
 ?>
@@ -20,19 +20,27 @@ $volunteers = $this->database->query(
 		<table>
 			<thead>
 				<tr>
-					<th>Email</th>
-					<th>User ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>T-shirt Cut</th>
+                    <th>T-shirt Size</th>
+                    <th>Food Preferences</th>
 					<th>mugshot</th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php foreach ($volunteers as $volunteer): ?>
 					<tr>
-						<td><?php echo htmlspecialchars($volunteer->clarion_email ?? 'N/A'); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->user); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->tshirt_cut ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->tshirt_size ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->food_preferences ?? 'N/A'); ?></td>
 						<td>
 							<?php if ($volunteer->mugshot): ?>
-								<img src="<?php echo htmlspecialchars($volunteer->mugshot); ?>" alt="Mugshot" style="width: 50px; height: 50px;">
+								<img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" style="width: 50px; height: 50px;">
 							<?php else: ?>
 								 N/A
 							<?php endif; ?>
