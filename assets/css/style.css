@@ -46,7 +46,6 @@ nav {
         font-weight: bold;
         color: #007bff; /* Logo color */
         font-size: 1.2em; /* Slightly larger font size for logo */
-        background: url("/assets/img/logo-1.png") no-repeat left top;
         flex: 1 0 auto; /* Takes up remaining space */
     }
 
