@@ -7,7 +7,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 $last10volunteers = $this->database->query(
-	'SELECT v.name, u.email FROM volunteers v left join users u on v."user" = u.uid ORDER BY u.uid DESC LIMIT 10'
+	'SELECT v.name, u.email, v.registration_date FROM volunteers v left join users u on v."user" = u.uid ORDER BY v.registration_date DESC LIMIT 10'
 );
 
 // volunteers stats: shirt size, shirt cut, food preferences, lang, team
@@ -53,7 +53,7 @@ foreach ($volunteersStats as $volunteersStat) {
 }
 
 $voluteersTeams = $this->database->query(
-	'SELECT team, COUNT(*) as count FROM volunteer_teams GROUP BY team'
+	'SELECT team, COUNT(*) as count FROM volunteer_teams GROUP BY team order by count(*) DESC'
 );
 
 ?>
@@ -69,6 +69,7 @@ $voluteersTeams = $this->database->query(
             <tr>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Reg. Date</th>
             </tr>
             </thead>
             <tbody>
@@ -76,6 +77,7 @@ $voluteersTeams = $this->database->query(
                 <tr>
                     <td><?php echo htmlspecialchars($volunteer->name); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->email); ?></td>
+                    <td><?php echo date('Y-m-d H:i:s', strtotime($volunteer->registration_date)); ?></td>
                 </tr>
 			<?php endforeach; ?>
             </tbody>
@@ -105,7 +107,8 @@ $voluteersTeams = $this->database->query(
         <table>
             <thead>
             <tr>
-                <th>T-Shirt Size</th>
+                <th>T-Shirt (Female)</th>
+                <th>T-Shirt (Unisex)</th>
                 <th>Food Preferences</th>
                 <th>Language</th>
             </tr>
@@ -113,12 +116,16 @@ $voluteersTeams = $this->database->query(
             <tbody>
             <tr>
                 <td>
-					<?php foreach ($stats['tshirt'] as $cut => $intState): ?>
-						<?php foreach ($intState as $size => $count): ?>
+	                <?php foreach ($stats['tshirt']['female'] as $size => $count): ?>
 
-							<?php echo htmlspecialchars(ucfirst($cut)) . ' - ' . htmlspecialchars(strtoupper($size)) . ': ' . htmlspecialchars($count) . '<br>'; ?>
-						<?php endforeach; ?>
-					<?php endforeach; ?>
+		                <?php echo htmlspecialchars(strtoupper($size)) . ': ' . htmlspecialchars($count) . '<br>'; ?>
+	                <?php endforeach; ?>
+                </td>
+                <td>
+		            <?php foreach ($stats['tshirt']['unisex'] as $size => $count): ?>
+
+			            <?php echo htmlspecialchars(strtoupper($size)) . ': ' . htmlspecialchars($count) . '<br>'; ?>
+		            <?php endforeach; ?>
                 </td>
                 <td>
 					<?php foreach ($stats['food_preferences'] as $preference => $count): ?>
