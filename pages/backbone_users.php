@@ -5,8 +5,8 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 	exit;
 }
 
-$last10volunteers = $this->database->query(
-	'SELECT * FROM users ORDER BY uid DESC LIMIT 10'
+$users = $this->database->query(
+	'SELECT * FROM users ORDER BY name ASC'
 );
 
 ?>
@@ -25,11 +25,11 @@ $last10volunteers = $this->database->query(
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($last10volunteers as $volunteer): ?>
+				<?php foreach ($users as $user): ?>
 					<tr>
-                        <td><?php echo htmlspecialchars($volunteer->name); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->email); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->phone); ?></td>
+                        <td><?php echo htmlspecialchars($user->name); ?></td>
+						<td><?php echo htmlspecialchars($user->email); ?></td>
+						<td><?php echo htmlspecialchars($user->phone); ?></td>
 					</tr>
 				<?php endforeach; ?>
 		</table>

@@ -6,7 +6,11 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 $volunteers = $this->database->query(
-	'SELECT * FROM volunteers v left join users u on v.user = u.uid ORDER BY user'
+	"SELECT 
+	*, 
+	case when v.name <> u.name then concat(v.name, ' (', u.name, ')') else v.name end as name
+	FROM 
+	volunteers v left join users u on v.user = u.uid ORDER BY user"
 );
 
 ?>
