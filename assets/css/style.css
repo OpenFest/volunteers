@@ -9,6 +9,10 @@ body {
     background-color: #f4f4f4;
     max-width: 1200px;
     margin: 20px auto;
+    &:has(.backbone-page) {
+        max-width: 100%;
+        font-size: 0.9em; /* Smaller font size for Backbone pages */
+    }
 }
 
 .small {
