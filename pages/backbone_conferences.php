@@ -16,6 +16,11 @@ $conferences = $this->database->query(
     </div>
 
 	<div class="pane full-width">
+        <div class="add-new">
+            <button type="button" onclick="window.location.href='/backbone/conferences/new'" class="btn">
+                Add New Conference
+            </button>
+        </div>
 		<table>
 			<thead>
 				<tr>

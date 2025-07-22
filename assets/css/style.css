@@ -271,6 +271,23 @@ h1 {
         &.full-width {
             width: 100%; /* Full width for specific elements */
         }
+        .add-new {
+            display: flex;
+            justify-content: flex-end; /* Aligns the button to the right */
+            margin-top: 10px;
+            .btn {
+                padding: 10px 20px;
+                background-color: #007bff; /* Example button color */
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1em;
+                &:hover {
+                    background-color: #0056b3;
+                }
+            }
+        }
 
         @media (max-width: 800px) {
             flex-direction: column;
@@ -283,17 +300,90 @@ h1 {
         width: 100%;
         border-collapse: collapse; /* Removes space between table cells */
         th, td {
-            padding: 10px;
+            padding: 5px;
             border: 1px solid #ddd; /* Adds a border to table cells */
-            text-align: left; /* Aligns text to the left */
+            text-align: start; /* Aligns text to the left */
         }
         th {
             background-color: #f4f4f4; /* Light background for header */
             font-weight: bold; /* Makes header text bold */
         }
+        tr
+        {
+            &:nth-child(even) {
+                background-color: #f9f9f9; /* Zebra striping for rows */
+            }
+            &:hover {
+                background-color: #f1f1f1; /* Highlight row on hover */
+            }
+        }
+        .vol-mugshot {
+            width: 30px; /* Fixed width for mugshot */
+            height: 30px; /* Fixed height for mugshot */
+            border-radius: 50%; /* Makes the image circular */
+            object-fit: cover; /* Ensures the image covers the area without distortion */
+
+
+        }
 
         @media (max-width: 800px) {
             font-size: 0.8em;
+        }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column; /* Stacks the form inputs vertically */
+        gap: 15px; /* Spacing between form input groups */
+        max-width: 900px; /* Limit form width for readability */
+        width: 90vw;
+        margin: 0 auto; /* Center the form */
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+
+        @media (max-width: 800px) {
+            width: 100%; /* Full width on smaller screens */
+            padding: 0.5rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column; /* Label on top, input below */
+            gap: 5px; /* Spacing between label and input */
+            label {
+                font-weight: bold;
+                margin-bottom: 5px; /* Space between label and input field */
+            }
+            input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="file"] {
+                width: 100%;
+                padding: 8px 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            }
+            textarea {
+                resize: vertical; /* Allows vertical resizing only */
+                min-height: 150px; /* Minimum height for textareas */
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end; /* Aligns the button to the right */
+            margin-top: 20px;
+            .btn {
+                padding: 10px 20px;
+                background-color: #007bff; /* Example button color */
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1em;
+                &:hover {
+                    background-color: #0056b3;
+                }
+            }
         }
     }
 }

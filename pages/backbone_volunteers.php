@@ -30,7 +30,7 @@ $volunteers = $this->database->query(
                     <th>Email</th>
                     <th>T-shirt Cut</th>
                     <th>T-shirt Size</th>
-                    <th>Food Preferences</th>
+                    <th>Food Prefs</th>
                     <th>Previous Experience</th>
                     <th>Notes</th>
                     <th>Reg. Date</th>
@@ -41,7 +41,7 @@ $volunteers = $this->database->query(
 					<tr>
                         <td>
 							<?php if ($volunteer->mugshot): ?>
-                                <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" style="width: 50px; height: 50px;">
+                                <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot" />
 							<?php else: ?>
                                 N/A
 							<?php endif; ?>

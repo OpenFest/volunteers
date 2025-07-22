@@ -6,7 +6,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 $teams = $this->database->query(
-	'SELECT * FROM teams ORDER BY name'
+	'SELECT * FROM teams ORDER BY conference DESC'
 );
 ?>
 <div class="backbone-page">
@@ -15,6 +15,11 @@ $teams = $this->database->query(
 	</div>
 
 	<div class="pane full-width">
+        <div class="add-new">
+            <button type="button" onclick="window.location.href='/backbone/teams/new'" class="btn">
+                Add New Team
+            </button>
+        </div>
 		<table>
 			<thead>
 				<tr>
