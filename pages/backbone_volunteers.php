@@ -20,31 +20,37 @@ $volunteers = $this->database->query(
 		<table>
 			<thead>
 				<tr>
+                    <th>Mugshot</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
                     <th>T-shirt Cut</th>
                     <th>T-shirt Size</th>
                     <th>Food Preferences</th>
-					<th>mugshot</th>
+                    <th>Previous Experience</th>
+                    <th>Notes</th>
+                    <th>Reg. Date</th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php foreach ($volunteers as $volunteer): ?>
 					<tr>
+                        <td>
+							<?php if ($volunteer->mugshot): ?>
+                                <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" style="width: 50px; height: 50px;">
+							<?php else: ?>
+                                N/A
+							<?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->tshirt_cut ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->tshirt_size ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->food_preferences ?? 'N/A'); ?></td>
-						<td>
-							<?php if ($volunteer->mugshot): ?>
-								<img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" style="width: 50px; height: 50px;">
-							<?php else: ?>
-								 N/A
-							<?php endif; ?>
-						</td>
+                        <td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut ?? 'N/A')); ?></td>
+                        <td><?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size ?? 'N/A')); ?></td>
+                        <td><?php echo ucwords(htmlspecialchars($volunteer->food_preferences ?? 'N/A')); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>
+                        <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>

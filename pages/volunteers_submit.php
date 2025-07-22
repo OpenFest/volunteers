@@ -64,16 +64,14 @@ if (empty($volunteerData->food_preferences) || !in_array($volunteerData->food_pr
 if (empty($volunteerData->terms_accepted)) {
 	$errors[] = 'Моля, приемете условията за участие.';
 }
-if (!empty($volunteerData->picture)) {
+if (!empty($volunteerData->picture) && !empty($volunteerData->picture['tmp_name'])) {
     // Validate the uploaded picture
     $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
     $picture = $volunteerData->picture;
     if (!in_array($picture['type'], $allowedMimeTypes)) {
         $errors[] = 'Моля, качете валидна снимка (JPEG, PNG или GIF).';
-        $errors[] = $picture['type'];
     } elseif ($picture['size'] > 2 * 1024 * 1024) { // 2MB limit
         $errors[] = 'Снимката не трябва да е по-голяма от 2MB.';
-        $errors[] = $picture['size'];
     }
 }
 
@@ -95,7 +93,7 @@ if (!empty($errors)) {
 }
 // Process the form data:
 // 0. Store the picture if provided
-if (!empty($volunteerData->picture)) {
+if (!empty($volunteerData->picture) && !empty($volunteerData->picture['tmp_name'])) {
     $picture = $volunteerData->picture;
     $uploadDir = ASSETS_DIR . 'uploads/volunteers/';
     $fileName = uniqid('volunteer_', true) . '.' . pathinfo($picture['name'], PATHINFO_EXTENSION);
@@ -162,15 +160,18 @@ if (empty($existingUsers)) {
 $newVolunteer = $this->database->query(
 	'INSERT INTO 
 	volunteers 
-	(clarion_email, "user",  tshirt_size, tshirt_cut, food_preferences, mugshot) 
+	(clarion_email, "user",  tshirt_size, tshirt_cut, food_preferences, mugshot, name, previous_experience, notes)
 	VALUES 
-	(null, :userID, :tshirt_size, :tshirt_cut, :food_preferences, :mugshot) RETURNING id',
+	(null, :userID, :tshirt_size, :tshirt_cut, :food_preferences, :mugshot, :name, :previous_experience, :notes) RETURNING id',
 	[
 		':userID' => $userID,
 		':tshirt_size' => $volunteerData->tshirt_size,
 		':tshirt_cut' => $volunteerData->tshirt_cut,
 		':food_preferences' => $volunteerData->food_preferences,
         ':mugshot' => $volunteerData->mugshot ?? null,
+        ':name' => $volunteerData->name,
+        ':previous_experience' => $volunteerData->previous_experience ?? null,
+        ':notes' => $volunteerData->notes ?? null
 	]
 );
 

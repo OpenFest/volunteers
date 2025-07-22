@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS users
     email varchar(60) unique not null,
     phone varchar(24) not null,
     lang varchar(6) not null,
-
     active bool default false
 
     ); -- this is actually ldap
@@ -34,12 +33,16 @@ CREATE TABLE IF NOT EXISTS teams
 CREATE TABLE IF NOT EXISTS volunteers
 (
     id            serial PRIMARY KEY ,
+    name          VARCHAR(240) NOT NULL,
     clarion_email VARCHAR(60) NULL, -- not all users are clarion users
     "user"          VARCHAR(60) NULL, -- this may be a legacy volunteer from clarion
     mugshot      varchar(192)        NULL, -- could be a URL
     tshirt_size varchar(6) not null,
     tshirt_cut varchar(6) not null,
     food_preferences varchar(24) not null,
+    prev_experience text null,
+    notes        text            NULL,
+    registration_date timestamp without time zone NOT NULL DEFAULT now(),
     FOREIGN KEY (clarion_email) REFERENCES clarion_users (email),
     FOREIGN KEY ("user") REFERENCES users (uid)
     );

@@ -7,7 +7,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 $last10volunteers = $this->database->query(
-	'SELECT * FROM users ORDER BY uid DESC LIMIT 10'
+	'SELECT v.name, u.email FROM volunteers v left join users u on v."user" = u.uid ORDER BY u.uid DESC LIMIT 10'
 );
 
 // volunteers stats: shirt size, shirt cut, food preferences, lang, team

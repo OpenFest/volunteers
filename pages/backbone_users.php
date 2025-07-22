@@ -19,6 +19,7 @@ $last10volunteers = $this->database->query(
 		<table>
 			<thead>
 				<tr>
+                    <th>Name</th>
 					<th>Email</th>
 					<th>Phone</th>
 				</tr>
@@ -26,6 +27,7 @@ $last10volunteers = $this->database->query(
 			<tbody>
 				<?php foreach ($last10volunteers as $volunteer): ?>
 					<tr>
+                        <td><?php echo htmlspecialchars($volunteer->name); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->email); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->phone); ?></td>
 					</tr>
