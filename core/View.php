@@ -110,6 +110,7 @@ class View
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/users">Users</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/volunteers">Volunteers</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/teams">Teams</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/backbone/conferences">Conferences</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<span class="small"><?php echo $_SESSION['user']->getEmail() ?></span>]</a>
     </nav>
 <?php

@@ -2,9 +2,16 @@
 // volunteers_new.php
 $token = bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
-$activeConf = 'of-2025';
+$activeConf = $this->database->query('SELECT slug, title FROM conferences WHERE registration_open <= now() AND registration_close >= now() ORDER BY start_date DESC LIMIT 1');
 
-$teams = $this->database->query("SELECT slug, name FROM teams WHERE conference = :conference", ['conference' => $activeConf]);
+if (empty($activeConf)) {
+    echo "<h1>Регистрацията е затворена!</h1>";
+    echo "<p>Моля, опитайте отново по-късно.</p>";
+    return; // Stop further processing
+}
+$activeConf = $activeConf[0];
+
+$teams = $this->database->query("SELECT slug, name FROM teams WHERE conference = :conference", ['conference' => $activeConf->slug]);
 
 $volunteerTeams = [];
 foreach ($teams as $row) {
@@ -13,7 +20,7 @@ foreach ($teams as $row) {
 
 ?>
 
-   <h1>Кандидатствай за доброволец</h1>
+   <h1>Кандидатствай за доброволец (<?php echo htmlspecialchars($activeConf->title);?>)</h1>
     <form class="new_volunteer" id="new_volunteer" novalidate="novalidate" enctype="multipart/form-data" action="/volunteers/submit" accept-charset="UTF-8" method="post">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($token) ?>" />
         <div class="form-inputs">

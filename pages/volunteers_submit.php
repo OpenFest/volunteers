@@ -1,5 +1,4 @@
 <?php
-$activeConf = 'of-2025';
 
 if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
 	// CSRF token is missing or invalid
@@ -14,8 +13,17 @@ if (empty($_POST['volunteer'])) {
 	echo "<p>Моля, опитайте отново.</p>";
 	return; // Stop further processing
 }
+$activeConf = $this->database->query('SELECT slug FROM conferences WHERE registration_open <= now() AND registration_close >= now() ORDER BY start_date DESC LIMIT 1');
 
-$allTeams = $this->database->query("SELECT * FROM teams where conference = :conference", ['conference' => $activeConf]);
+if (empty($activeConf)) {
+    // No active conference found
+    echo "<h1>Грешка при изпращане на формуляра</h1>";
+    echo "<p>Моля, опитайте отново по-късно.</p>";
+    return; // Stop further processing
+}
+$activeConf = $activeConf[0];
+
+$allTeams = $this->database->query("SELECT * FROM teams where conference = :conference", ['conference' => $activeConf->slug]);
 $volunteerTeams = [];
 foreach ($allTeams as $row) {
 	$volunteerTeams[] = $row->slug;
@@ -182,7 +190,7 @@ if ($newVolunteer) {
 	foreach ($volunteerData->volunteer_team_ids as $team) {
 		$r = $r && $this->database->query(
 				'INSERT INTO volunteer_teams(volunteer, conference, team) VALUES (:volunteerID, :conference, :volunteerTeam)',
-				[':volunteerID' => $volunteerId, ':volunteerTeam' => $team, ':conference' => $activeConf]
+				[':volunteerID' => $volunteerId, ':volunteerTeam' => $team, ':conference' => $activeConf->slug]
 			);
 	}
 	if (!$r) {

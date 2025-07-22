@@ -17,7 +17,14 @@ CREATE TABLE IF NOT EXISTS clarion_users
 
 CREATE TABLE IF NOT EXISTS conferences
 (
-    slug VARCHAR(60) PRIMARY KEY
+    slug VARCHAR(60) PRIMARY KEY,
+    title VARCHAR(240) NOT NULL,
+    description TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    location VARCHAR(240) NOT NULL,
+    registration_open DATE NOT NULL,
+    registration_close DATE NOT NULL
     );
 
 CREATE TABLE IF NOT EXISTS teams
