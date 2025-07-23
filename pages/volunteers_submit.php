@@ -139,15 +139,14 @@ if (empty($existingUsers)) {
 	// Email not found in users' table, proceed to insert
 	$newUser = $this->database->query(
 		'INSERT INTO users 
-        (uid, email, name, phone, lang) 
+        (uid, email, name, phone) 
         VALUES 
-        (:uid, :email, :name, :phone, :lang) RETURNING uid',
+        (:uid, :email, :name, :phone) RETURNING uid',
 		[
 			':uid' => uuid(),
 			':email' => $volunteerData->email,
 			':name' => $volunteerData->name,
 			':phone' => $volunteerData->phone,
-			':lang' => $volunteerData->language,
 
 		]
 	);
@@ -168,9 +167,9 @@ if (empty($existingUsers)) {
 $newVolunteer = $this->database->query(
 	'INSERT INTO 
 	volunteers 
-	(clarion_email, "user",  tshirt_size, tshirt_cut, food_preferences, mugshot, name, previous_experience, notes)
+	(clarion_email, "user",  tshirt_size, tshirt_cut, food_preferences, mugshot, name, previous_experience, notes, lang)
 	VALUES 
-	(null, :userID, :tshirt_size, :tshirt_cut, :food_preferences, :mugshot, :name, :previous_experience, :notes) RETURNING id',
+	(null, :userID, :tshirt_size, :tshirt_cut, :food_preferences, :mugshot, :name, :previous_experience, :notes, :lang) RETURNING id',
 	[
 		':userID' => $userID,
 		':tshirt_size' => $volunteerData->tshirt_size,
@@ -178,6 +177,7 @@ $newVolunteer = $this->database->query(
 		':food_preferences' => $volunteerData->food_preferences,
         ':mugshot' => $volunteerData->mugshot ?? null,
         ':name' => $volunteerData->name,
+		':lang' => $volunteerData->language,
         ':previous_experience' => $volunteerData->previous_experience ?? null,
         ':notes' => $volunteerData->notes ?? null
 	]

@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS users
     name varchar(240) not null,
     email varchar(60) unique not null,
     phone varchar(24) default null,
-    lang varchar(6) not null,
     admin bool default false,
     active bool default false
 
@@ -45,6 +44,7 @@ CREATE TABLE IF NOT EXISTS volunteers
     name          VARCHAR(240) NOT NULL,
     clarion_email VARCHAR(60) NULL, -- not all users are clarion users
     "user"          VARCHAR(60) NULL, -- this may be a legacy volunteer from clarion
+    lang varchar(6) not null,
     mugshot      varchar(192)        NULL, -- could be a URL
     tshirt_size varchar(6) not null,
     tshirt_cut varchar(6) not null,
