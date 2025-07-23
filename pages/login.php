@@ -12,7 +12,7 @@ if (isset($_SESSION['user'])){
 }
 //if post request, process the login
 
-function handlePost($page)
+function handlePost($database)
 {
 	// Get the email and password from the POST request
 	$username = $_POST['username'] ?? '';
@@ -31,7 +31,7 @@ function handlePost($page)
 
 
 	// Check if the user exists in the database
-	$users = $page->database->query(
+	$users = $database->query(
 		'SELECT * FROM users WHERE username = :username OR email = :username AND active = true',
 		[':username' => $username]
 	);
@@ -48,7 +48,7 @@ function handlePost($page)
 		//TODO: sync the user data with the LDAP data (including permissions)
 		if ($user->email !== $userData->email || $user->name !== $userData->name . ' ' . $userData->sirName) {
 			//update the user data
-			$page->database->query(
+			$database->query(
 				'UPDATE users SET email = :email, name = :name WHERE uid = :uid',
 				[
 					':email' => $userData->email,
@@ -61,7 +61,7 @@ function handlePost($page)
 	if (!$user) {
 		//create the new user, based on the ldap data
 		$uuid = uuid();
-		$res = $page->database->query(
+		$res = $database->query(
 			'INSERT INTO users (uid, username, email, name, active) VALUES (:uid, :username, :email, :name, true)',
 			[
 				':uid' => $uuid,
@@ -92,7 +92,7 @@ function handlePost($page)
 
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	handlePost($this);
+	handlePost($this->database);
 }
 ?>
 <form action="/login" method="post" class="login-form">
