@@ -14,7 +14,7 @@ if (isset($_SESSION['user'])){
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	// Get the email and password from the POST request
-	$username = $_POST['email'] ?? '';
+	$username = $_POST['username'] ?? '';
 	$password = $_POST['password'] ?? '';
 
 	// Validate email and password
