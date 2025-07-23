@@ -57,6 +57,7 @@ function handlePost($database)
 				]
 			);
 		}
+		$user = new User($user->uid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
 	}
 	if (!$user) {
 		//create the new user, based on the ldap data
