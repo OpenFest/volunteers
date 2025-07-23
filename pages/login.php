@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	);
 	try {
         //fetch user from LDAP
-		$userData = (array) User::ldapGetUser($username);
+		$userData = iterator_to_array(User::ldapGetUser($username));
 	} catch (Exception $e) {
 		echo "<h1>Грешка в системата! Моля, опитайте по-късно!</h1>";
 		return; // Stop further processing
