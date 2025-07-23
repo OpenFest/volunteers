@@ -12,25 +12,26 @@ if (isset($_SESSION['user'])){
 }
 //if post request, process the login
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+function handlePost($page)
+{
 	// Get the email and password from the POST request
 	$username = $_POST['username'] ?? '';
 	$password = $_POST['password'] ?? '';
 
 	// Validate email and password
 	if (empty($username) || empty($password)) {
-		echo "<h1>Моля, въведете валидни данни за вход.</h1>";
+		echo "<h3 class='login-error'>Моля, въведете валидни данни за вход.</h3>";
 		return; // Stop further processing
 	}
 	//verify the password against ldap
 	if (!User::ldapTestPassword($username, $password)) {
-		echo "<h1>Грешен имейл или парола.</h1>";
+		echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
 		return; // Stop further processing
 	}
 
 
 	// Check if the user exists in the database
-	$users = $this->database->query(
+	$users = $page->database->query(
 		'SELECT * FROM users WHERE username = :username OR email = :username AND active = true',
 		[':username' => $username]
 	);
@@ -41,53 +42,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		echo "<h1>Хм... нещо се обърка...</h1>";
 		return; // Stop further processing
 	}
-    $user = NULL;
-    if (count($users) === 1) {
-        $user = $users[0];
-	    //TODO: sync the user data with the LDAP data (including permissions)
-        if ($user->email !== $userData->email || $user->name !== $userData->name . ' ' . $userData->sirName) {
-            //update the user data
-            $this->database->query(
-                'UPDATE users SET email = :email, name = :name WHERE uid = :uid',
-                [
-                    ':email' => $userData->email,
-                    ':name' => $userData->name . ' ' . $userData->sirName,
-                    ':uid' => $user->uid,
-                ]
-            );
-        }
-    }
-    if (!$user) {
-        //create the new user, based on the ldap data
-        $uuid = uuid();
-        $res = $this->database->query(
-            'INSERT INTO users (uid, username, email, name, active) VALUES (:uid, :username, :email, :name, true)',
-            [
-	            ':uid' => $uuid,
-                ':username' => $userData->uid,
-                ':email' => $userData->email,
-                ':name' => $userData->name . ' ' . $userData->sirName,
-            ]
-        );
-        if (!$res) {
-            echo "<h1>Грешка при създаване на потребител!</h1>";
-            return; // Stop further processing
-        }
-        $user = $res[0];
+	$user = NULL;
+	if (count($users) === 1) {
+		$user = $users[0];
+		//TODO: sync the user data with the LDAP data (including permissions)
+		if ($user->email !== $userData->email || $user->name !== $userData->name . ' ' . $userData->sirName) {
+			//update the user data
+			$page->database->query(
+				'UPDATE users SET email = :email, name = :name WHERE uid = :uid',
+				[
+					':email' => $userData->email,
+					':name' => $userData->name . ' ' . $userData->sirName,
+					':uid' => $user->uid,
+				]
+			);
+		}
+	}
+	if (!$user) {
+		//create the new user, based on the ldap data
+		$uuid = uuid();
+		$res = $page->database->query(
+			'INSERT INTO users (uid, username, email, name, active) VALUES (:uid, :username, :email, :name, true)',
+			[
+				':uid' => $uuid,
+				':username' => $userData->uid,
+				':email' => $userData->email,
+				':name' => $userData->name . ' ' . $userData->sirName,
+			]
+		);
+		if (!$res) {
+			echo "<h1>Грешка при създаване на потребител!</h1>";
+			return; // Stop further processing
+		}
+		$user = $res[0];
 
-	    $user = new User($uuid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
+		$user = new User($uuid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
 
-        $_SESSION['user'] = $user;
 
-        if ($user->isAdmin()) {
-            header('Location: /backbone');
-        } else {
-            header('Location: /');
-        }
-        exit;
-    }
+	}
 
-	echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
+	$_SESSION['user'] = $user;
+
+	if ($user->isAdmin()) {
+		header('Location: /backbone');
+	} else {
+		header('Location: /');
+	}
+	exit;
+
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	handlePost($this);
 }
 ?>
 <form action="/login" method="post" class="login-form">
