@@ -1,10 +1,12 @@
 CREATE TABLE IF NOT EXISTS users
 (
     uid VARCHAR(60) PRIMARY KEY,
+    username varchar(60) default null,
     name varchar(240) not null,
     email varchar(60) unique not null,
     phone varchar(24) not null,
     lang varchar(6) not null,
+    admin bool default false,
     active bool default false
 
     ); -- this is actually ldap
