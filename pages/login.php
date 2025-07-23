@@ -1,24 +1,30 @@
 <?php
 
-// If the user is already logged in and is admin, redirect to the backbone page, otherwise redirect to the home page
-if (isset($_SESSION['user'])){
-	if($_SESSION['user']->isAdmin()) {
-		header('Location: /backbone');
-		exit;
-	} else {
-		header('Location: /');
-		exit;
-	}
+/**
+ * If the user is already logged in and is admin, redirect to the backbone page,
+ * otherwise redirect to the home page
+ * @return void
+ */
+function redirectIfLoggedIn()
+{
+    if (isset($_SESSION['user'])) {
+        if ($_SESSION['user']->isAdmin()) {
+            header('Location: /backbone');
+        } else {
+            header('Location: /');
+        }
+        exit;
+    }
 }
-//if post request, process the login
+redirectIfLoggedIn();
 
 function handlePost($database)
 {
-	// Get the email and password from the POST request
+	// Get the username and password from the POST request
 	$username = $_POST['username'] ?? '';
 	$password = $_POST['password'] ?? '';
 
-	// Validate email and password
+	// Validate username and password
 	if (empty($username) || empty($password)) {
 		echo "<h3 class='login-error'>Моля, въведете валидни данни за вход.</h3>";
 		return; // Stop further processing
@@ -35,6 +41,7 @@ function handlePost($database)
 		'SELECT * FROM users WHERE username = :username OR email = :username AND active = true',
 		[':username' => $username]
 	);
+
 	//fetch user from LDAP
 	$userData = iterator_to_array(User::ldapGetUser($username));
 	$userData = array_shift($userData); //get the first element from the generator
@@ -42,6 +49,7 @@ function handlePost($database)
 		echo "<h1>Хм... нещо се обърка...</h1>";
 		return; // Stop further processing
 	}
+
 	$user = NULL;
 	if (count($users) === 1) {
 		$user = $users[0];
@@ -59,6 +67,7 @@ function handlePost($database)
 		}
 		$user = new User($user->uid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
 	}
+
 	if (!$user) {
 		//create the new user, based on the ldap data
 		$uuid = uuid();
@@ -75,23 +84,13 @@ function handlePost($database)
 			echo "<h1>Грешка при създаване на потребител!</h1>";
 			return; // Stop further processing
 		}
-		$user = $res[0];
-
 		$user = new User($uuid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
-
-
 	}
-
 	$_SESSION['user'] = $user;
-
-	if ($user->isAdmin()) {
-		header('Location: /backbone');
-	} else {
-		header('Location: /');
-	}
-	exit;
-
+    redirectIfLoggedIn();
 }
+
+//if post request, process the login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	handlePost($this->database);
 }
