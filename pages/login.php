@@ -23,17 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		return; // Stop further processing
 	}
 	//verify the password against ldap
-    try{
-	    if (!User::ldapTestPassword($username, $password)) {
-		    echo "<h1>Грешен имейл или парола.</h1>";
-		    return; // Stop further processing
-	    }
-    } catch (Exception $e) {
-        // If there is an error with LDAP, we can log it or handle it accordingly
-        // For now, we will just display a generic error message
-        echo "<h1>Грешка в системата! Моля, опитайте по-късно!</h1>";
-        return; // Stop further processing
-    }
+	if (!User::ldapTestPassword($username, $password)) {
+		echo "<h1>Грешен имейл или парола.</h1>";
+		return; // Stop further processing
+	}
 
 
 	// Check if the user exists in the database
@@ -41,13 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		'SELECT * FROM users WHERE username = :username OR email = :username AND active = true',
 		[':username' => $username]
 	);
-	try {
-        //fetch user from LDAP
-		$userData = iterator_to_array(User::ldapGetUser($username));
-	} catch (Exception $e) {
-		echo "<h1>Грешка в системата! Моля, опитайте по-късно!</h1>";
-		return; // Stop further processing
-	}
+	//fetch user from LDAP
+	$userData = iterator_to_array(User::ldapGetUser($username));
 	$userData = array_shift($userData); //get the first element from the generator
 	if (!$userData) {
 		echo "<h1>Хм... нещо се обърка...</h1>";

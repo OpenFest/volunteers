@@ -46,7 +46,6 @@ class User
 	 * @param string $dn
 	 * @param string $password
 	 * @return false|resource
-	 * @throws Exception
 	 */
 	public static function ldapShanoBind(string $server, string $dn, string $password)
 	{
@@ -54,7 +53,7 @@ class User
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         $bind = ldap_bind($ds, $dn, $password);
         if (!$bind) {
-			throw new Exception('LDAP bind failed: ' . ldap_error($ds));
+			return false;
         }
 
         return $ds;
@@ -64,18 +63,19 @@ class User
 	 * @param $username
 	 * @param $password
 	 * @return bool
-	 * @throws Exception
 	 */
 	public static function ldapTestPassword($username, $password): bool
 	{
 		$matches = [...self::ldapGetUser($username)]; // TODO: assert length of 1, err out otherwise
 
 		if (!($match = array_shift($matches))) {
-			throw new Exception('User not found in LDAP: ' . $username);
+			return false;
 		}
 		/** @var stdClass $match */
 		$ds = self::ldapShanoBind(LDAP_SERVER, $match->dn, $password);
-		ldap_close($ds);
+		if($ds) {
+			ldap_close($ds);
+		}
 
 		return !!$ds; // bool
 
@@ -86,7 +86,6 @@ class User
 	 * @property string $dn
 	 * @param $username
 	 * @return Generator
-	 * @throws Exception
 	 */
 	public static function ldapGetUser($username): Generator
 	{
@@ -114,20 +113,19 @@ class User
 
 	/**
 	 * @param $filter
-	 * @return array
-	 * @throws Exception
+	 * @return array|false
 	 */
-	public static function ldapGetEntries($filter): array
+	public static function ldapGetEntries($filter)
 	{
 		$ds = self::ldapShanoBind(LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
 		$search = ldap_search($ds, LDAP_BASE_DN, $filter);
-		if (!$search) {
-			throw new Exception('LDAP search failed: ' . ldap_error($ds));
+		if ($search === false) {
+			return false;
 		}
 
 		$results = ldap_get_entries($ds, $search);
 		if ($results === false) {
-			throw new Exception('LDAP get entries failed: ' . ldap_error($ds));
+			return false;
 		}
 
 		ldap_close($ds);
