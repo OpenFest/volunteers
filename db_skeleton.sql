@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users
     username varchar(60) default null,
     name varchar(240) not null,
     email varchar(60) unique not null,
-    phone varchar(24) not null,
+    phone varchar(24) default null,
     lang varchar(6) not null,
     admin bool default false,
     active bool default false
