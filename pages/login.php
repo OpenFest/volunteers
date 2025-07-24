@@ -66,7 +66,7 @@ function handlePost($database)
 				]
 			);
 		}
-		$user = new User($user->uid, $ldapUser->email, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
+		$user = new User($user->uid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
 	}
 
 	if (!$user) {
