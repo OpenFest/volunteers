@@ -33,10 +33,16 @@ function handlePost($database)
     // get ldap user
     $ldapUser = $ldap->getUser($username);
 	//verify the password against ldap
-	if (!$ldapUser || !$ldap->testBind($ldapUser, $password)) {
+	if (!$ldapUser) {
 		echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
 		return; // Stop further processing
 	}
+    try{
+        $ldap->testBind($ldapUser, $password);
+    } catch (Exception $e) {
+        echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
+        return; // Stop further processing
+    }
 	// Check if the user exists in the local database
 	$users = $database->query(
 		'SELECT * FROM users WHERE username = :username OR email = :username',
