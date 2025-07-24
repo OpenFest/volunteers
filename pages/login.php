@@ -20,6 +20,7 @@ redirectIfLoggedIn();
 
 function handlePost($database)
 {
+    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
 	// Get the username and password from the POST request
 	$username = $_POST['username'] ?? '';
 	$password = $_POST['password'] ?? '';
@@ -29,62 +30,63 @@ function handlePost($database)
 		echo "<h3 class='login-error'>Моля, въведете валидни данни за вход.</h3>";
 		return; // Stop further processing
 	}
+    // get ldap user
+    $ldapUser = $ldap->getUser($username);
 	//verify the password against ldap
-	if (!User::ldapTestPassword($username, $password)) {
+	if (!$ldapUser || !$ldap->testBind($ldapUser, $password)) {
 		echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
 		return; // Stop further processing
 	}
-
-
-	// Check if the user exists in the database
+	// Check if the user exists in the local database
 	$users = $database->query(
-		'SELECT * FROM users WHERE username = :username OR email = :username AND active = true',
+		'SELECT * FROM users WHERE username = :username OR email = :username',
 		[':username' => $username]
 	);
-
-	//fetch user from LDAP
-	$userData = iterator_to_array(User::ldapGetUser($username));
-	$userData = array_shift($userData); //get the first element from the generator
-	if (!$userData) {
-		echo "<h1>Хм... нещо се обърка...</h1>";
-		return; // Stop further processing
-	}
+    // check admin access flag
+    $userInCore = $ldap->isMember($ldapUser, ['Core','global admin']);
+    unset($ldap); // Free the LDAP connection
 
 	$user = NULL;
 	if (count($users) === 1) {
 		$user = $users[0];
 		//TODO: sync the user data with the LDAP data (including permissions)
-		if ($user->email !== $userData->email || $user->name !== $userData->name . ' ' . $userData->sirName) {
+		if (
+                $user->email !== $ldapUser->mail ||
+                $user->name !== $ldapUser->givenname . ' ' . $ldapUser->sn ||
+                $user->admin !== $userInCore
+        ) {
 			//update the user data
 			$database->query(
-				'UPDATE users SET email = :email, name = :name WHERE uid = :uid',
+				'UPDATE users SET email = :email, name = :name, admin = :admin WHERE uid = :uid',
 				[
-					':email' => $userData->email,
-					':name' => $userData->name . ' ' . $userData->sirName,
+					':email' => $ldapUser->mail,
+					':name' => $ldapUser->givenname . ' ' . $ldapUser->sn,
+                    ':admin' => $userInCore,
 					':uid' => $user->uid,
 				]
 			);
 		}
-		$user = new User($user->uid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
+		$user = new User($user->uid, $ldapUser->email, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
 	}
 
 	if (!$user) {
 		//create the new user, based on the ldap data
 		$uuid = uuid();
 		$res = $database->query(
-			'INSERT INTO users (uid, username, email, name, active) VALUES (:uid, :username, :email, :name, true)',
+			'INSERT INTO users (uid, username, email, name, active, admin) VALUES (:uid, :username, :email, :name, true, :admin)',
 			[
 				':uid' => $uuid,
-				':username' => $userData->uid,
-				':email' => $userData->email,
-				':name' => $userData->name . ' ' . $userData->sirName,
+				':username' => $ldapUser->uid,
+				':email' => $ldapUser->mail,
+				':name' => $ldapUser->givenname . ' ' . $ldapUser->sn,
+                ':admin' => $userInCore,
 			]
 		);
 		if (!$res) {
 			echo "<h1>Грешка при създаване на потребител!</h1>";
 			return; // Stop further processing
 		}
-		$user = new User($uuid, $userData->email, $userData->uid, $userData->name . ' ' . $userData->sirName, true);
+		$user = new User($uuid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
 	}
 	$_SESSION['user'] = $user;
     redirectIfLoggedIn();

@@ -19,17 +19,24 @@ $users = $this->database->query(
 		<table>
 			<thead>
 				<tr>
+                    <th>Username</th>
                     <th>Name</th>
 					<th>Email</th>
-					<th>Phone</th>
+                    <th>Phone</th>
+                    <th>Admin</th>
+                    <th>Active</th>
+
 				</tr>
 			</thead>
 			<tbody>
 				<?php foreach ($users as $user): ?>
 					<tr>
+                        <td><?php echo htmlspecialchars($user->username); ?></td>
                         <td><?php echo htmlspecialchars($user->name); ?></td>
 						<td><?php echo htmlspecialchars($user->email); ?></td>
 						<td><?php echo htmlspecialchars($user->phone); ?></td>
+                        <td><?php echo $user->admin ? 'Yes' : 'No'; ?></td>
+                        <td><?php echo $user->active ? 'Yes' : 'No'; ?></td>
 					</tr>
 				<?php endforeach; ?>
 		</table>
