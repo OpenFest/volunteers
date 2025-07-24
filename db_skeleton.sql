@@ -6,7 +6,10 @@ CREATE TABLE IF NOT EXISTS users
     email varchar(60) unique not null,
     phone varchar(24) default null,
     admin bool default false,
-    active bool default false
+    active bool default false,
+    token varchar(60) default null,
+    token_expiry timestamp without time zone default null,
+    created_at timestamp without time zone NOT NULL DEFAULT now()
 
     ); -- this is actually ldap
 
