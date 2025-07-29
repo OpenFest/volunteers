@@ -143,6 +143,7 @@ $existingUsers = $this->database->query(
 );
 //sha512 uuid to generate a verification token
 $verificationToken = hash('sha512', uuid() . $volunteerData->email . time());
+$verificationToken = substr($verificationToken, 0, 29) . '-' . substr($verificationToken, -30);
 
 if (empty($existingUsers)) {
 	// Email not found in users' table, proceed to insert
