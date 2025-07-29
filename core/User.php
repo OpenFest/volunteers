@@ -7,14 +7,16 @@ class User
 	private string $email;
 	private string $username;
 	private string $name;
+	private ?string $phone;
 	private bool $isAdmin;
 
-	public function __construct(string $id, string $email, string $username, string $name, bool $isAdmin = false)
+	public function __construct(string $id, string $email, string $username, string $name, ?string $phone, bool $isAdmin = false)
 	{
 		$this->id = $id;
 		$this->email = $email;
 		$this->username = $username;
 		$this->name = $name;
+		$this->phone = $phone;
 		$this->isAdmin = $isAdmin;
 	}
 
@@ -39,5 +41,11 @@ class User
 	public function getName(): string
 	{
 		return $this->name;
+	}
+
+	public function getPhone()
+	{
+		return $this->phone;
+
 	}
 }

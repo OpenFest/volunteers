@@ -11,7 +11,7 @@ function redirectIfLoggedIn()
         if ($_SESSION['user']->isAdmin()) {
             header('Location: /backbone');
         } else {
-            header('Location: /');
+            header('Location: /profile');
         }
         exit;
     }
@@ -82,7 +82,7 @@ function handlePost($database)
 			);
             _log("User data updated for user: " . $user->uid);
 		}
-		$user = new User($user->uid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
+		$user = new User($user->uid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $user->phone, $userInCore);
 	}
 
 	if (!$user) {
@@ -106,7 +106,7 @@ function handlePost($database)
 		}
         // If the user was created successfully, create a new User object
         _log("User created successfully: " . $uuid);
-		$user = new User($uuid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
+		$user = new User($uuid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, NULL, $userInCore);
 	}
 	$_SESSION['user'] = $user;
     redirectIfLoggedIn();

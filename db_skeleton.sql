@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS volunteers
     tshirt_size varchar(6) not null,
     tshirt_cut varchar(6) not null,
     food_preferences varchar(24) not null,
-    prev_experience text null,
+    previous_experience text null,
     notes        text            NULL,
     registration_date timestamp without time zone NOT NULL DEFAULT now(),
     FOREIGN KEY (clarion_email) REFERENCES clarion_users (email),
