@@ -58,7 +58,7 @@ function handlePost($database)
 		[':username' => $username]
 	);
     // check admin access flag
-    $userInCore = $ldap->isMember($ldapUser, ['Core','global admin']);
+    $userInCore = $ldap->isMember($ldapUser, ['core','global admin']);
     unset($ldap); // Free the LDAP connection
 
 	$user = NULL;
@@ -76,7 +76,7 @@ function handlePost($database)
 				[
 					':email' => $ldapUser->mail,
 					':name' => $ldapUser->givenname . ' ' . $ldapUser->sn,
-                    ':admin' => $userInCore,
+                    ':admin' => $userInCore ? 'true' : 'false',
 					':uid' => $user->uid,
 				]
 			);
