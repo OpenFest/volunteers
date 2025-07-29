@@ -35,3 +35,16 @@ if (!function_exists("uuid")) {
 		}
 	}
 }
+
+if (!function_exists('_log')) {
+	// Log a message to the syslog
+	function _log($message, $level = LOG_INFO) {
+		if (function_exists('syslog')) {
+			openlog('vol', LOG_PID | LOG_PERROR, LOG_USER);
+			syslog($level, $message);
+			closelog();
+		} else {
+			error_log($message);
+		}
+	}
+}

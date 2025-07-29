@@ -16,6 +16,7 @@ if (empty($_POST['volunteer'])) {
 $activeConf = $this->database->query('SELECT slug FROM conferences WHERE registration_open <= now() AND registration_close >= now() ORDER BY start_date DESC LIMIT 1');
 
 if (empty($activeConf)) {
+    _log("No active conference found during volunteer registration.", LOG_WARNING);
     // No active conference found
     echo "<h1>Грешка при изпращане на формуляра</h1>";
     echo "<p>Моля, опитайте отново по-късно.</p>";
@@ -33,6 +34,7 @@ foreach ($allTeams as $row) {
 $volunteerData = (object) $_POST['volunteer'];
 $volunteerData->picture = $_FILES['picture'] ?? NULL; // Handle file upload
 $errors = [];
+_log('Processing volunteer registration submission...');
 
 if (empty($volunteerData->name)) {
 	$errors[] = 'Името е задължително.';
@@ -84,12 +86,14 @@ if (!empty($volunteerData->picture) && !empty($volunteerData->picture['tmp_name'
 }
 
 if (!empty($errors)) {
+
 	// Display errors
 	?>
     <h1>Моля, корегирайте следните грешки:</h1>
     <ul>
 		<?php
 		foreach ($errors as $error) {
+            _log($error);
 			echo "<li>$error</li>";
 		}
 		?>
@@ -109,6 +113,7 @@ if (!empty($volunteerData->picture) && !empty($volunteerData->picture['tmp_name'
     // Ensure the upload directory exists
     if (!is_dir($uploadDir)) {
         if(!mkdir($uploadDir, 0755, true)) {
+            _log('Failed to create upload directory: ' . $uploadDir, LOG_ERR);
             echo "<h1>Грешка при създаване на директорията за качване</h1>";
             echo "<p>Моля, опитайте отново по-късно.</p>";
             return; // Stop further processing
@@ -121,6 +126,7 @@ if (!empty($volunteerData->picture) && !empty($volunteerData->picture['tmp_name'
         $volunteerData->mugshot = $fileName;
     } else {
         // Handle upload error
+        _log('Failed to move uploaded file to: ' . $filePath, LOG_ERR);
         echo "<h1>Грешка при качване на снимката</h1>";
         echo "<p>Моля, опитайте отново по-късно.</p>";
         return; // Stop further processing
@@ -153,6 +159,7 @@ if (empty($existingUsers)) {
 	if ($newUser) {
 		$userID = $newUser[0]->uid;
 	} else {
+        _log('Failed to insert new user with email: ' . $volunteerData->email, LOG_ERR);
 		// If there was an error inserting the user, show an error message
 		echo "<h1>Грешка при регистрацията</h1>";
 		echo "<p>Моля, опитайте отново по-късно.</p>";
@@ -160,6 +167,7 @@ if (empty($existingUsers)) {
 	}
 } else {
 	// Email already exists in users' table, use the existing user ID
+    _log('Using existing user with email: ' . $volunteerData->email);
 	$userID = $existingUsers[0]->uid;
 }
 
@@ -194,15 +202,18 @@ if ($newVolunteer) {
 			);
 	}
 	if (!$r) {
+        _log('Failed to insert volunteer teams for volunteer ID: ' . $volunteerId, LOG_ERR);
 		// If there was an error inserting into volunteers_teams, show an error message
 		echo "<h1>Грешка при регистрацията</h1>";
 		echo "<p>Моля, опитайте отново по-късно.</p>";
 		return; // Stop further processing
 	}
 	// If the volunteer was successfully added, you can redirect or show a success message
+    _log('New volunteer registered: ' . $volunteerData->name . ' (ID: ' . $volunteerId . ')');
 	echo "<h1>Благодарим ви за регистрацията!</h1>";
 	echo "<p>Вашата регистрация е успешна. Ще се свържем с вас скоро.</p>";
 } else {
+    _log('Failed to insert new volunteer for user ID: ' . $userID, LOG_ERR);
 	// If there was an error adding the volunteer, show an error message
 	echo "<h1>Грешка при регистрацията</h1>";
 	echo "<p>Моля, опитайте отново по-късно.</p>";

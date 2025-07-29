@@ -20,13 +20,20 @@ redirectIfLoggedIn();
 
 function handlePost($database)
 {
-    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+    try{
+	    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+    } catch (Exception $e) {
+        _log("LDAP connection failed: " . $e->getMessage(), LOG_ERR);
+        echo "<h3 class='login-error'>Грешка в системата. Моля, опитайте по-късно!</h3>";
+        return; // Stop further processing
+    }
 	// Get the username and password from the POST request
 	$username = $_POST['username'] ?? '';
 	$password = $_POST['password'] ?? '';
 
 	// Validate username and password
 	if (empty($username) || empty($password)) {
+        _log("Login attempt with empty username or password");
 		echo "<h3 class='login-error'>Моля, въведете валидни данни за вход.</h3>";
 		return; // Stop further processing
 	}
@@ -34,12 +41,14 @@ function handlePost($database)
     $ldapUser = $ldap->getUser($username);
 	//verify the password against ldap
 	if (!$ldapUser) {
+        _log("Login attempt with non-existing user: " . $username);
 		echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
 		return; // Stop further processing
 	}
     try{
         $ldap->testBind($ldapUser, $password);
     } catch (Exception $e) {
+        _log("LDAP bind failed for user: " . $username . " - " . $e->getMessage(), LOG_ERR);
         echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
         return; // Stop further processing
     }
@@ -71,12 +80,14 @@ function handlePost($database)
 					':uid' => $user->uid,
 				]
 			);
+            _log("User data updated for user: " . $user->uid);
 		}
 		$user = new User($user->uid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
 	}
 
 	if (!$user) {
 		//create the new user, based on the ldap data
+        _log("Creating new user: " . $ldapUser->uid);
 		$uuid = uuid();
 		$res = $database->query(
 			'INSERT INTO users (uid, username, email, name, active, admin) VALUES (:uid, :username, :email, :name, true, :admin)',
@@ -89,9 +100,12 @@ function handlePost($database)
 			]
 		);
 		if (!$res) {
+            _log("Failed to create user: " . $ldapUser->uid, LOG_ERR);
 			echo "<h1>Грешка при създаване на потребител!</h1>";
 			return; // Stop further processing
 		}
+        // If the user was created successfully, create a new User object
+        _log("User created successfully: " . $uuid);
 		$user = new User($uuid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, $userInCore);
 	}
 	$_SESSION['user'] = $user;

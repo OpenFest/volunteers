@@ -7,6 +7,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    _log('Processing new conference submission. User: ' . $_SESSION['user']->getUsername(), LOG_INFO);
     // Handle form submission to add a new conference
     $slug = $_POST['slug'];
     $title = $_POST['title'];
@@ -45,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Registration close date cannot be after start date.';
     }
     if (isset($error)) {
+        _log('Unable to add conference: ' . $error, LOG_ERR);
         echo "<div class='error'>$error</div>";
         return;
     }
@@ -63,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':registration_close' => $registration_close
         ]
     );
+    // Log the addition of the new conference
+    _log("New conference added: $slug", LOG_INFO);
 
     // Redirect to the conference overview page after adding
     header('Location: /backbone/conferences');

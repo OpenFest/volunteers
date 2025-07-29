@@ -6,6 +6,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    _log('Processing new team submission. User: ' . $_SESSION['user']->getUsername(), LOG_INFO);
     // Handle form submission to add a new team
     $conference = $_POST['conference'];
     $slug = $_POST['slug'];
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($error)) {
+        _log('Unable to add team: ' . $error, LOG_ERR);
         echo "<div class='error'>$error</div>";
         return;
     }
@@ -42,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':description' => $description
         ]
     );
+    _log('New team added: ' . $name . ' (Slug: ' . $slug . ') in conference: ' . $conference, LOG_INFO);
 
     header('Location: /backbone/teams');
     exit;
