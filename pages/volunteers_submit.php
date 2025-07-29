@@ -143,6 +143,27 @@ $existingUsers = $this->database->query(
 );
 if (empty($existingUsers)) {
 	// Email not found in users' table, proceed to insert
+
+	$email = $volunteerData->email;
+	$name = $volunteerData->name;
+	$phone = $volunteerData->phone;
+    $admin = FALSE;
+    $username = NULL;
+
+    //check ldap for existing user
+    $ldap = new LDAP(LDAP_SERVER,  LDAP_BASE_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+    $ldapUser = $ldap->getUser($volunteerData->email);
+    if ($ldapUser) {
+        _log('Detected LDAP user for email: ' . $volunteerData->email);
+        $email = $ldapUser->mail;
+        $name = $ldapUser->givenname . ' ' . $ldapUser->sn;
+        $admin = $ldap->isMember($ldapUser, ['core', 'global admin']);
+        $username = $ldapUser->uid ?? NULL; // Use uid if available
+    } else {
+        _log('LDAP user not found for email: ' . $volunteerData->email, LOG_WARNING);
+    }
+
+
 	$newUser = $this->database->query(
 		'INSERT INTO users 
         (uid, email, name, phone) 
@@ -150,10 +171,11 @@ if (empty($existingUsers)) {
         (:uid, :email, :name, :phone) RETURNING uid',
 		[
 			':uid' => uuid(),
-			':email' => $volunteerData->email,
-			':name' => $volunteerData->name,
-			':phone' => $volunteerData->phone,
-
+			':email' => $email,
+			':name' => $name,
+			':phone' => $phone,
+            ':admin' => $admin ? 'true' : 'false',
+            ':username' => $username,
 		]
 	);
 	if ($newUser) {

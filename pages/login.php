@@ -96,7 +96,7 @@ function handlePost($database)
 				':username' => $ldapUser->uid,
 				':email' => $ldapUser->mail,
 				':name' => $ldapUser->givenname . ' ' . $ldapUser->sn,
-                ':admin' => $userInCore,
+                ':admin' => $userInCore ? 'true' : 'false',
 			]
 		);
 		if (!$res) {
