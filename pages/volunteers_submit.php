@@ -141,6 +141,9 @@ $existingUsers = $this->database->query(
 	'SELECT uid FROM users WHERE email = :email',
 	[':email' => $volunteerData->email]
 );
+//sha512 uuid to generate a verification token
+$verificationToken = hash('sha512', uuid() . $volunteerData->email . time());
+
 if (empty($existingUsers)) {
 	// Email not found in users' table, proceed to insert
 
@@ -166,9 +169,9 @@ if (empty($existingUsers)) {
 
 	$newUser = $this->database->query(
 		'INSERT INTO users 
-        (uid, email, name, phone) 
+        (uid, email, name, phone, admin, username, token, token_expiry) 
         VALUES 
-        (:uid, :email, :name, :phone) RETURNING uid',
+        (:uid, :email, :name, :phone, :admin, :username, :token, now() + interval \'1 day\') RETURNING uid',
 		[
 			':uid' => uuid(),
 			':email' => $email,
@@ -176,6 +179,8 @@ if (empty($existingUsers)) {
 			':phone' => $phone,
             ':admin' => $admin ? 'true' : 'false',
             ':username' => $username,
+            ':token' => $verificationToken
+
 		]
 	);
 	if ($newUser) {
@@ -191,6 +196,12 @@ if (empty($existingUsers)) {
 	// Email already exists in users' table, use the existing user ID
     _log('Using existing user with email: ' . $volunteerData->email);
 	$userID = $existingUsers[0]->uid;
+    //reset the verification token and expiry for the existing user
+    $sql = 'UPDATE users SET token = :token, token_expiry = now() + interval \'1 day\' WHERE uid = :uid';
+    $this->database->query($sql, [
+        ':token' => $verificationToken,
+        ':uid' => $userID
+    ]);
 }
 
 
@@ -230,6 +241,28 @@ if ($newVolunteer) {
 		echo "<p>Моля, опитайте отново по-късно.</p>";
 		return; // Stop further processing
 	}
+    // Send verification email
+    $verificationLink = 'https://' . $_SERVER['HTTP_HOST'] . '/verify?token=' . urlencode($verificationToken);
+    $subject = 'Потвърждение на регистрацията като доброволец';
+    $message = "Здравейте, " . htmlspecialchars($volunteerData->name) . ",\n\n" .
+        "Благодарим ви, че се регистрирахте като доброволец за конференцията!\n\n" .
+        "Моля, потвърдете регистрацията си, като кликнете върху следния линк:\n" .
+        $verificationLink . "\n\n" .
+        "Ако не сте се регистрирали, моля, игнорирайте този имейл.\n\n" .
+        "Поздрави,\n" .
+        "Екипът на конференцията";
+    $headers = 'From: no-reply@openfest.org' . "\r\n" .
+        'Reply-To: no-reply@openfest.org' . "\r\n" .
+        'X-Mailer: PHP/' . phpversion();
+    if (mail($volunteerData->email, $subject, $message, $headers)) {
+        _log('Verification email sent to: ' . $volunteerData->email);
+    } else {
+        _log('Failed to send verification email to: ' . $volunteerData->email, LOG_ERR);
+        // If there was an error sending the email, show an error message
+        echo "<h1>Грешка при изпращане на имейла за потвърждение</h1>";
+        echo "<p>Моля, опитайте отново по-късно.</p>";
+        return; // Stop further processing
+    }
 	// If the volunteer was successfully added, you can redirect or show a success message
     _log('New volunteer registered: ' . $volunteerData->name . ' (ID: ' . $volunteerId . ')');
 	echo "<h1>Благодарим ви за регистрацията!</h1>";
