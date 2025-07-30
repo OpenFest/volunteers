@@ -1,7 +1,8 @@
 <?php
 
-if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
 	// CSRF token is missing or invalid
+    _log('CSRF token validation failed during volunteer registration submission.', LOG_WARNING);
 	echo "<h1>Грешка при изпращане на формуляра</h1>";
 	echo "<p>Моля, опитайте отново.</p>";
 	return; // Stop further processing
@@ -9,6 +10,7 @@ if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_toke
 
 if (empty($_POST['volunteer'])) {
 	// No volunteer data submitted
+    _log('No volunteer data submitted during registration.', LOG_WARNING);
 	echo "<h1>Грешка при изпращане на формуляра</h1>";
 	echo "<p>Моля, опитайте отново.</p>";
 	return; // Stop further processing
@@ -97,9 +99,10 @@ if (!empty($errors)) {
 			echo "<li>$error</li>";
 		}
 		?>
-
-        <a href="javascript:history.back()">Върнете се назад</a>
     </ul>
+    <br/>
+    <a href="javascript:history.back()">Върнете се назад</a><br/>
+    <span class="small red">(ако има прикачена снимка, ще трябва да се добави отново)</span>
 	<?php
 	return; // Stop further processing if there are errors (don't use exit, as template rendering won't work properly)
 }
@@ -266,8 +269,15 @@ if ($newVolunteer) {
     }
 	// If the volunteer was successfully added, you can redirect or show a success message
     _log('New volunteer registered: ' . $volunteerData->name . ' (ID: ' . $volunteerId . ')');
-	echo "<h1>Благодарим ви за регистрацията!</h1>";
-	echo "<p>Вашата регистрация е успешна. Ще се свържем с вас скоро.</p>";
+?>
+	<h1>Благодарим ви за регистрацията!</h1>
+	<p>Вашата регистрация е успешна. Моля, проверете имейла си за потвърждение.</p>
+    <script>
+        // Clear the localStorage key used for form submission
+        const storageKey = 'volunteerFormData';
+        localStorage.removeItem(storageKey);
+    </script>
+<?php
 } else {
     _log('Failed to insert new volunteer for user ID: ' . $userID, LOG_ERR);
 	// If there was an error adding the volunteer, show an error message

@@ -2,6 +2,7 @@
 // volunteers_new.php
 $token = bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
+
 $activeConf = $this->database->query('SELECT slug, title FROM conferences WHERE registration_open <= now() AND registration_close >= now() ORDER BY start_date DESC LIMIT 1');
 
 if (empty($activeConf)) {
@@ -26,6 +27,7 @@ foreach ($teams as $row) {
         <div class="form-inputs">
             <div class="input">
                 <label for="volunteer_picture">Снимка</label>
+                <img id="preview" alt="Image Preview" style="display:none;"/>
                 <input type="file" name="picture" id="volunteer_picture" accept="image/*" />
                 <p class="hint-text">Ваша снимка в jpeg, png или gif формат</p>
             </div>
@@ -107,16 +109,22 @@ foreach ($teams as $row) {
             <div class="input">
                 <label for="volunteer_previous_experience">Предишен опит</label>
                 <textarea name="volunteer[previous_experience]" id="volunteer_previous_experience"></textarea>
+                <span class="hint">Ако имате предишен опит като доброволец, моля, споделете го тук. Това не е задължително поле.</span>
             </div>
 
             <div class="input">
                 <label for="volunteer_notes">Бележки</label>
                 <textarea name="volunteer[notes]" id="volunteer_notes"></textarea>
+                <span class="hint">Тук можете да добавите допълнителна информация, която смятате, че е важна за вашата регистрация. Това не е задължително поле.</span>
             </div>
 
             <div class="input checkbox-alone">
                 <input value="0" autocomplete="off" type="hidden" name="volunteer[terms_accepted]" />
-                <label for="volunteer_terms_accepted"><input type="checkbox" value="1" name="volunteer[terms_accepted]" id="volunteer_terms_accepted" />Съгласен съм екипът да се свързва с мен</label>
+                <label for="volunteer_terms_accepted">
+                    <abbr title="Задължително поле">*</abbr>
+                    <input type="checkbox" value="1" name="volunteer[terms_accepted]" id="volunteer_terms_accepted" />
+                    Съгласен съм екипът да се свързва с мен
+                </label>
             </div>
         </div>
 
@@ -124,3 +132,73 @@ foreach ($teams as $row) {
             <input type="submit" name="commit" value="Изпрати кандидатура" class="btn" data-disable-with="Изпрати кандидатура" />
         </div>
     </form>
+<script>
+    const form = document.querySelector('#new_volunteer');
+    const storageKey = 'newVolunteerFormData';
+    const imageInput = form.querySelector('#volunteer_picture');
+    const preview = form.querySelector('#preview');
+
+    // Restore form data on load
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedData = localStorage.getItem(storageKey);
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            for (const [name, value] of Object.entries(data)) {
+                const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
+                if (!field) continue;
+
+                if (field.type === 'checkbox') {
+                    field.checked = value === true;
+                } else {
+                    field.value = value;
+                }
+            }
+        }
+    });
+
+    // Save form data on input/change
+    form.addEventListener('input', saveFormData);
+    form.addEventListener('change', saveFormData);
+    imageInput.addEventListener('change', previewImage);
+
+    function saveFormData() {
+        const formData = new FormData(form);
+        const data = {};
+
+        //store form data in localStorage
+        formData.forEach((value, key) => {
+            if (key === 'csrf_token') return; // Skip CSRF token
+            const field = form.querySelector(`[name="${CSS.escape(key)}"]`);
+            if (field && (field.type === 'checkbox' || field.type === 'radio')) {
+                data[key] = field.checked;
+            } else if (field && field.type === 'file') {
+                // Skip file inputs, as they cannot be stored in localStorage
+
+            } else {
+                data[key] = value;
+            }
+        });
+
+        localStorage.setItem(storageKey, JSON.stringify(data));
+    }
+
+    function previewImage()
+    {
+        const file = imageInput.files[0];
+
+        // Handle image preview
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+            preview.src = '#';
+        }
+    }
+</script>
