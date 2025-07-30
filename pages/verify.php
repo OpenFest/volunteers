@@ -24,8 +24,9 @@ $this->database->query(
 	'UPDATE users SET active = TRUE, token = NULL, token_expiry = NULL WHERE uid = :uid',
 	[':uid' => $user->uid]
 );
+
 // Set the user in the session
-$_SESSION['user'] = $user;
+$_SESSION['user'] = new User($user->uid, $user->email, $user->username, $user->name, $user->phone, $user->admin);
 header('Location: /profile');
 exit;
 
