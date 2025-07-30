@@ -61,7 +61,7 @@ if (empty($volunteerData->language) || !in_array($volunteerData->language, ['bg'
 	$errors[] = 'Моля, изберете валиден език.';
 }
 
-if (empty($volunteerData->tshirt_size) || !in_array($volunteerData->tshirt_size, ['xs', 's', 'm', 'l', 'xl', 'xxl'])) {
+if (empty($volunteerData->tshirt_size) || !in_array($volunteerData->tshirt_size, ['s', 'm', 'l', 'xl', 'xxl', 'xxxl'])) {
 	$errors[] = 'Моля, изберете валиден размер на тениската.';
 }
 
