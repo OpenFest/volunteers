@@ -54,7 +54,7 @@ function handlePost($database)
     }
 	// Check if the user exists in the local database
 	$users = $database->query(
-		'SELECT * FROM users WHERE username = :username OR email = :username',
+		'SELECT * FROM users WHERE lower(username) = lower(:username) OR lower(email) = lower(:username)',
 		[':username' => $username]
 	);
     // check admin access flag
