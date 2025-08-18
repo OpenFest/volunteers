@@ -53,7 +53,7 @@ foreach ($volunteersStats as $volunteersStat) {
 }
 
 $voluteersTeams = $this->database->query(
-	'SELECT team, COUNT(*) as count FROM volunteer_teams GROUP BY team order by count(*) DESC'
+	'SELECT conference, team, COUNT(*) as count FROM volunteer_teams GROUP BY conference, team order by count(*) DESC'
 );
 
 ?>
@@ -88,6 +88,7 @@ $voluteersTeams = $this->database->query(
         <table>
             <thead>
             <tr>
+                <th>Conference</th>
                 <th>Team</th>
                 <th>Count</th>
             </tr>
@@ -95,7 +96,8 @@ $voluteersTeams = $this->database->query(
             <tbody>
 			<?php foreach ($voluteersTeams as $team): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($team->team); ?></td>
+                    <td><?php echo htmlspecialchars($team->conference); ?></td>
+                    <td><a href="/backbone/team?c=<?php echo $team->conference;?>&t=<?php echo $team->team;?>"><?php echo htmlspecialchars($team->team); ?></a></td>
                     <td><?php echo htmlspecialchars($team->count); ?></td>
                 </tr>
 			<?php endforeach; ?>
