@@ -100,31 +100,32 @@ class View
     <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/style.css">
 </head>
 <body>
+    <nav>
+        <a class="nav-logo" href="<?php echo $basePath; ?>/"><img src="/assets/img/logo.png" alt="OpenFest"></a>
 <?php
 // If the user is logged in, show admin navigation, otherwise show public navigation
-    if (isset($_SESSION['user']) && $_SESSION['user']->isAdmin()) {
+    if (isset($_SESSION['user'])) {
+     if ($_SESSION['user']->isAdmin()) {
 ?>
-    <nav>
-        <a class="nav-logo" href="<?php echo $basePath; ?>/"><img src="/assets/img/logo-1.png" alt="OpenFest"></a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone">Backbone</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/users">Users</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/volunteers">Volunteers</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/teams">Teams</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/conferences">Conferences</a>
+<?php
+     }
+?>
         <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<span class="small"><?php echo $_SESSION['user']->getEmail() ?></span>]</a>
-    </nav>
 <?php
     } else {
         // Public navigation for non-admin users
 ?>
-        <nav>
-            <a class="nav-logo" href="<?php echo $basePath; ?>/"><img src="/assets/img/logo-1.png" alt="OpenFest"></a>
-            <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Кандидатствай за доброволец</a>
-        </nav>
+        <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Кандидатствай за доброволец</a>
 <?php
     }
 ?>
-    <hr>
+        </nav>
+    <div class="banner"></div>
     <div class="container">
         <?php echo $content; ?>
     </div>
