@@ -26,12 +26,13 @@ body {
 
 .banner {
     height: auto;
-    padding-top: 35.71%; /* Aspect ratio for the banner */
     background: url("/assets/img/banner.png") top center no-repeat;
     background-size: contain; /* Ensures the banner covers the entire area */
+    padding-top: 13.63%; /* Aspect ratio for the banner */
     @media (max-width: 800px) {
         background: url("/assets/img/banner-mobile.png") top center no-repeat; /* Mobile banner */
         background-size: contain; /* Ensures the banner covers the entire area */
+        padding-top: 35.71%; /* Aspect ratio for the banner */
     }
 
 }
