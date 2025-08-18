@@ -31,7 +31,7 @@ $users = $this->database->query(
 			<tbody>
 				<?php foreach ($users as $user): ?>
 					<tr>
-                        <td><?php echo htmlspecialchars($user->username); ?></td>
+                        <td><a href="/backbone/profile?user=<?php echo $user->uid; ?>"><?php echo htmlspecialchars($user->username); ?></a></td>
                         <td><?php echo htmlspecialchars($user->name); ?></td>
 						<td><?php echo htmlspecialchars($user->email); ?></td>
 						<td><?php echo htmlspecialchars($user->phone); ?></td>
