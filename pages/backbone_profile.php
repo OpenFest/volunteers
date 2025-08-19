@@ -61,9 +61,9 @@ $volunteers = $this->database->query(
         </div>
         <div class="profile-header">
             <?php if($volunteer->mugshot): ?>
-                <img class="profile-image" src="/assets/uploads/volunteers/<?php echo htmlspecialchars($volunteer->mugshot); ?>" alt="Profile Picture" class="profile-picture">
+                <img class="profile-image" src="/assets/uploads/volunteers/<?php echo htmlspecialchars($volunteer->mugshot); ?>" alt="Profile Picture">
             <?php else: ?>
-                <img src="/assets/img/default-profile.png" alt="Default Profile Picture" class="profile-picture">
+                <img class="profile-image" src="/assets/img/default-profile.png" alt="Default Profile Picture">
             <?php endif; ?>
             <h3><?php echo htmlspecialchars($volunteer->name)?></h3>
 
