@@ -52,7 +52,7 @@ $volunteers = $this->database->query(
             <?php if($volunteer->mugshot): ?>
                 <img class="profile-image" src="/assets/uploads/volunteers/<?php echo htmlspecialchars($volunteer->mugshot); ?>" alt="Profile Picture" class="profile-picture">
             <?php else: ?>
-                <img src="/assets/images/default-profile.png" alt="Default Profile Picture" class="profile-picture">
+                <img src="/assets/img/default-profile.png" alt="Default Profile Picture" class="profile-picture">
             <?php endif; ?>
             <h3><?php echo htmlspecialchars($volunteer->name)?></h3>
 
