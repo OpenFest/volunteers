@@ -13,6 +13,8 @@ class LDAP
 	];
 	private string $server;
 	private string $baseDN;
+	private string $groupsDN;
+	private string $volunteersDN;
 	private string $bindDN;
 	private string $bindPassword;
 	private mixed $ds;
@@ -21,6 +23,8 @@ class LDAP
 	{
 		$this->server = $server;
 		$this->baseDN = $baseDN;
+		$this->groupsDN = 'ou=Groups,' . $baseDN;
+		$this->volunteersDN = 'ou=Volunteers,' . $this->groupsDN;
 		$this->bindDN = $bindDN;
 		$this->bindPassword = $bindPassword;
 		$this->connect();
@@ -130,6 +134,42 @@ class LDAP
 
 		//single group check
 		return in_array($group, $ldapUser->memberof, TRUE);
+	}
+
+	public function addGroup(string $groupName, string $description = ''): bool
+	{
+		$groupDN = 'cn=' . ldap_escape($groupName, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
+		$entry = [
+			'objectClass' => ['top', 'groupOfNames'],
+			'cn' => $groupName,
+			'description' => $description,
+			'member' => ['cn=dummy,dc=example,dc=com'], // Placeholder member, can be changed later
+		];
+
+		if (!ldap_add($this->ds, $groupDN, $entry)) {
+			throw new Exception("Could not add group: " . ldap_error($this->ds));
+		}
+		return TRUE;
+	}
+
+	public function addMember(stdClass $ldapUser, string|array $group): bool
+	{
+		if (is_array($group)) {
+			// If $group is an array, add the user to each group
+			foreach ($group as $g) {
+				$this->addMember($ldapUser, $g);
+			}
+			return TRUE; // Successfully added to all groups
+		}
+
+		//single group check
+		if (!$this->isMember($ldapUser, $group)) {
+			$groupDN = 'cn=' . ldap_escape($group, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
+			if (!ldap_mod_add($this->ds, $groupDN, ['member' => $ldapUser->dn])) {
+				throw new Exception("Could not add member to group: " . ldap_error($this->ds));
+			}
+		}
+		return TRUE;
 	}
 
 	private function convertToObject($entry): object
