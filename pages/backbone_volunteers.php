@@ -10,7 +10,7 @@ $volunteers = $this->database->query(
 	*, 
 	case when v.name <> u.name then concat(v.name, ' (', u.name, ')') else v.name end as name
 	FROM 
-	volunteers v left join users u on v.user = u.uid ORDER BY user"
+	volunteers v left join users u on v.user = u.uid ORDER BY registration_date DESC"
 );
 
 ?>
@@ -25,6 +25,7 @@ $volunteers = $this->database->query(
 			<thead>
 				<tr>
                     <th>Mugshot</th>
+                    <th>Verified</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
@@ -38,7 +39,7 @@ $volunteers = $this->database->query(
 			</thead>
 			<tbody>
 				<?php foreach ($volunteers as $volunteer): ?>
-					<tr>
+					<tr <?php if (!$volunteer->active) echo 'class="red"'; ?>>
                         <td>
 							<?php if ($volunteer->mugshot): ?>
                                 <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot" />
@@ -46,6 +47,7 @@ $volunteers = $this->database->query(
                                 N/A
 							<?php endif; ?>
                         </td>
+                        <td><?php echo $volunteer->verified ? '<span class="green">✔</span>' : '<span class="red">✘</span>'; ?></td>
                         <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>

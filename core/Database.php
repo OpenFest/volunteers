@@ -3,6 +3,7 @@
 class Database
 {
 	private $pdo;
+	private static Database $instance;
 
 	public function __construct()
 	{
@@ -20,6 +21,12 @@ class Database
 			echo 'Database connection failed: ' . $e->getMessage();
 			exit;
 		}
+		self::$instance = $this;
+	}
+
+	public static function getInstance(): Database|static
+	{
+		return self::$instance;
 	}
 	 /**
      * Executes a prepared statement and returns the results.

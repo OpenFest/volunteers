@@ -13,7 +13,7 @@ $volunteers = $this->database->query(
     LEFT JOIN volunteer_teams vt ON v.id=vt.volunteer
     LEFT JOIN teams t ON vt.team = t.slug 
     LEFT JOIN conferences c ON vt.conference = c.slug
-    WHERE v.user = :uid group by v.id, vt.conference, v.registration_date, c.title ORDER BY v.registration_date',
+    WHERE v.user = :uid group by v.id, vt.conference, v.registration_date, c.title ORDER BY v.registration_date DESC',
     [':uid' => $user->getId()]
 );
 
@@ -23,7 +23,12 @@ $volunteers = $this->database->query(
     <div class="page-title">
         <h1>Профил</h1>
     </div>
-
+<?php
+if ($user->isActive() === false): ?>
+    <div class="login-error">
+        <p>Твоят акаунт все още не е активиран от администратор. Моля, изчакай потвърждение по имейл.</p>
+    </div>
+<?php endif; ?>
     <div class="pane full-width">
         <div class="pane-header">
             <h2>Здравей, <?php echo htmlspecialchars($user->getName()); ?>!</h2>

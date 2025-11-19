@@ -1,32 +1,42 @@
+<h1>Потвърждение на регистрация</h1>
 <?php
-
+function verify($database) {
 //verify token from volunteers submission
-if (empty($_GET['token'])) {
-	echo "<h3 class='login-error'>Невалиден токен.</h3>";
-	exit;
-}
-$token = $_GET['token'];
+	if (empty($_GET['token'])) {
+		echo "<h3 class='login-error'>Невалиден токен.</h3>";
+		return FALSE;
+	}
+	$token = $_GET['token'];
 // Check if the token is valid
-$user = $this->database->query(
-	'SELECT * from users where token = :token and token_expiry > NOW()',
-	[':token' => $token]
-);
+	$user = $database->query(
+		'SELECT * from users where token = :token and token_expiry > NOW()',
+		[':token' => $token]
+	);
 
-if (empty($user)) {
-	echo "<h3 class='login-error'>Невалиден токен.</h3>";
-	exit;
-}
+	if (empty($user)) {
+		echo "<h3 class='login-error'>Невалиден токен.</h3>";
+		return FALSE;
+	}
 
 // The user exists, log them in and set the active to true
-$user = $user[0];
+	$user = $user[0];
 // Set the user as active
-$this->database->query(
-	'UPDATE users SET active = TRUE, token = NULL, token_expiry = NULL WHERE uid = :uid',
-	[':uid' => $user->uid]
-);
+	$database->query(
+		'UPDATE users SET token = NULL, token_expiry = NULL WHERE uid = :uid',
+		[':uid' => $user->uid]
+	);
+//verify non-verified volunteers linked to this user
+	$database->query(
+		'UPDATE volunteers SET verified = TRUE WHERE "user" = :uid AND verified = FALSE',
+		[':uid' => $user->uid]
+	);
 
-// Set the user in the session
-$_SESSION['user'] = new User($user->uid, $user->email, $user->username, $user->name, $user->phone, $user->admin);
-header('Location: /profile');
-exit;
+	return $user;
+}
+if ($user = verify($this->database)) {
+	// Set the user in the session
+	$_SESSION['user'] = User::load($user);
+	header('Location: /profile');
+	exit;
+}
 

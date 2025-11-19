@@ -35,8 +35,8 @@ $users = $this->database->query(
                         <td><?php echo htmlspecialchars($user->name); ?></td>
 						<td><?php echo htmlspecialchars($user->email); ?></td>
 						<td><?php echo htmlspecialchars($user->phone); ?></td>
-                        <td><?php echo $user->admin ? 'Yes' : 'No'; ?></td>
-                        <td><?php echo $user->active ? 'Yes' : 'No'; ?></td>
+                        <td><?php echo $user->admin ? '<span class="green">✔</span>' : '<span class="red">✘</span>';?></td>
+                        <td><?php echo $user->active ? '<span class="green">✔</span>' : '<span class="red">✘</span>';?></td>
 					</tr>
 				<?php endforeach; ?>
 		</table>

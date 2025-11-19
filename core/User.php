@@ -8,9 +8,10 @@ class User
 	private string $username;
 	private string $name;
 	private ?string $phone;
+	private bool $isActive;
 	private bool $isAdmin;
 
-	public function __construct(string $id, string $email, string $username, string $name, ?string $phone, bool $isAdmin = false)
+	public function __construct(string $id, string $email, string $username, string $name, ?string $phone, bool $isAdmin = false, bool $isActive = true)
 	{
 		$this->id = $id;
 		$this->email = $email;
@@ -18,6 +19,7 @@ class User
 		$this->name = $name;
 		$this->phone = $phone;
 		$this->isAdmin = $isAdmin;
+		$this->isActive = $isActive;
 	}
 
 	public function getId(): string
@@ -30,6 +32,10 @@ class User
 		return $this->email;
 	}
 
+	public function isActive(): bool
+	{
+		return $this->isActive;
+	}
 	public function isAdmin(): bool
 	{
 		return $this->isAdmin;
@@ -47,5 +53,30 @@ class User
 	{
 		return $this->phone;
 
+	}
+
+
+	public static function load(object|string $user)
+	{
+		if (is_string($user)) {
+			$user = Database::getInstance()->query(
+				'SELECT * FROM users WHERE uid = :uid',
+				[':uid' => $user]
+			);
+			$user = $user[0] ?? null;
+		}
+
+		if (empty($user)) {
+			return null;
+		}
+		return new User(
+			$user->uid,
+			$user->email,
+			$user->username ?? '',
+			$user->name,
+			$user->phone,
+			(bool)$user->admin,
+			(bool)$user->active
+		);
 	}
 }

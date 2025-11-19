@@ -40,6 +40,9 @@ body {
 .small {
     font-size: 0.8em; /* Smaller font size */
 }
+.green {
+    color: green; /* Green text color */
+}
 .red {
     color: red; /* Red text color */
 }
