@@ -2,7 +2,7 @@
 
 class LDAP
 {
-	const attributes = [
+	const userAttributes = [
 		'uid',
 		'mail',
 		'givenname',
@@ -10,6 +10,12 @@ class LDAP
 		'cn',
 		'dn',
 		'memberof',
+	];
+	const groupAttributes = [
+		'cn',
+		'description',
+		'dn',
+		'member',
 	];
 	private string $server;
 	private string $baseUserDN;
@@ -48,10 +54,20 @@ class LDAP
 		return $ds;
 	}
 
-	public function getEntries($dn, $filter)
+	public function getEntries($dn, $filter, $type)
 	{
+		switch ($type) {
+			case 'user':
+				$attributes = self::userAttributes;
+				break;
+			case 'group':
+				$attributes = self::groupAttributes;
+				break;
+			default:
+				throw new Exception("Unknown LDAP entry type: " . $type);
+		}
 
-		$sr = ldap_search($this->ds, $dn, $filter, self::attributes);
+		$sr = ldap_search($this->ds, $dn, $filter, $attributes);
 		if (!$sr) {
 			throw new Exception("LDAP search failed: " . ldap_error($this->ds));
 		}
@@ -67,7 +83,11 @@ class LDAP
 			if (!is_array($entry) || !isset($entry['dn'])) {
 				continue; // Skip non-array entries or entries without 'dn'
 			}
-			$result[] = $this->convertToObject($entry);
+			$result[] = match ($type) {
+				'user' => $this->convertToUserObject($entry),
+				'group' => $this->convertToGroupObject($entry),
+				default => throw new Exception("Unknown LDAP entry type: " . $type),
+			};
 		}
 		return $result;
 
@@ -78,7 +98,8 @@ class LDAP
 		$username = ldap_escape($username, '', LDAP_ESCAPE_FILTER);
 		$entries = $this->getEntries(
 			$this->baseUserDN,
-			'(&(objectClass=person)(|(uid=' . $username . ')(mail=' . $username . ')(maillocaladdress=' . $username . ')))'
+			'(&(objectClass=person)(|(uid=' . $username . ')(mail=' . $username . ')(maillocaladdress=' . $username . ')))',
+			self::userAttributes
 		);
 
 		return array_shift($entries);
@@ -230,10 +251,10 @@ class LDAP
 		return TRUE;
 	}
 
-	private function convertToObject($entry): object
+	private function convertToUserObject($entry): object
 	{
 		$entryObj = new stdClass();
-		foreach(self::attributes as $attribute) {
+		foreach(self::userAttributes as $attribute) {
 			$entryObj->$attribute = NULL; // Initialize all attributes to NULL
 		}
 
@@ -262,5 +283,39 @@ class LDAP
 		}
 
 		return $entryObj;
+	}
+
+	private function convertToGroupObject($entry): object
+	{
+		$entryObj = new stdClass();
+		foreach(self::groupAttributes as $attribute) {
+			$entryObj->$attribute = NULL; // Initialize all attributes to NULL
+		}
+
+		foreach ($entry as $key => $value) {
+			if (is_int($key) || $key === 'count') continue;
+
+			if ($key === 'dn') {
+				$entryObj->dn = $value;
+			} else if ($key === 'member') {
+				$members = [];
+				for ($i = 0; $i < $entry['member']['count']; $i++) {
+					if (preg_match('/uid=([^,]+)/i', $entry['member'][$i], $matches)) {
+						$members[] = $matches[1];
+					}
+				}
+				$entryObj->$key = $members;
+			} else {
+				if (isset($value['count'])) {
+					if ($value['count'] === 1) {
+						$entryObj->$key = $value[0];
+					} else {
+						$entryObj->$key = array_slice($value, 0, $value['count']);
+					}
+				}
+			}
+		}
+		return $entryObj;
+
 	}
 }
