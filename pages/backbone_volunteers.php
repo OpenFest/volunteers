@@ -21,6 +21,9 @@ $volunteers = $this->database->query(
 	</div>
 
 	<div class="pane full-width">
+        <div class="red">
+            Red color = user not active yet.
+        </div>
 		<table>
 			<thead>
 				<tr>

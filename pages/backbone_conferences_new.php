@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]
     );
     // Log the addition of the new conference
-    _log("New conference added: $slug", LOG_INFO);
+    _log("New conference added: $slug");
 
     // Redirect to the conference overview page after adding
     header('Location: /backbone/conferences');

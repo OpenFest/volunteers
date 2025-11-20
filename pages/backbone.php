@@ -53,7 +53,7 @@ foreach ($volunteersStats as $volunteersStat) {
 }
 
 $voluteersTeams = $this->database->query(
-	'SELECT t.conference, vt.team, COUNT(*) as count FROM volunteer_teams vt LEFT JOIN teams t ON vt.team = t.slug GROUP BY t.conference, vt.team order by count(*) DESC'
+	'SELECT t.conference, vt.team, COUNT(*) as count FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) GROUP BY t.conference, vt.team order by count(*) DESC'
 );
 
 ?>

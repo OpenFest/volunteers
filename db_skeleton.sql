@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS volunteers
 CREATE TABLE IF NOT EXISTS volunteer_teams
 (
     volunteer  INT,
+    conference VARCHAR(60),
     team       VARCHAR(60),
     is_primary INT, -- boolean, may have more than one, or none
     PRIMARY KEY (volunteer, conference, team),
