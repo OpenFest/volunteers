@@ -17,6 +17,15 @@ class LDAP
 		'dn',
 		'member',
 	];
+	const userObjectClasses = [
+		'person',
+		'organizationalPerson',
+		'inetLocalMailRecipient',
+	];
+	const groupObjectClasses = [
+		'groupOfNames',
+		'inetLocalMailRecipient',
+	];
 	private string $server;
 	private string $baseUserDN;
 	private string $groupsDN;
@@ -64,7 +73,7 @@ class LDAP
 				$attributes = self::groupAttributes;
 				break;
 			default:
-				throw new Exception("Unknown LDAP entry type: " . $type);
+				throw new Exception("Unknown LDAP entry type: " . json_encode($type));
 		}
 
 		$sr = ldap_search($this->ds, $dn, $filter, $attributes);
@@ -99,7 +108,7 @@ class LDAP
 		$entries = $this->getEntries(
 			$this->baseUserDN,
 			'(&(objectClass=person)(|(uid=' . $username . ')(mail=' . $username . ')(maillocaladdress=' . $username . ')))',
-			self::userAttributes
+			'user'
 		);
 
 		return array_shift($entries);
@@ -167,7 +176,7 @@ class LDAP
 	{
 		$userDN = 'uid=' . ldap_escape($username, '', LDAP_ESCAPE_DN) . ',' . $this->volunteersDN;
 		$entry = [
-			'objectClass' => ['top', 'person', 'organizationalPerson', 'inetOrgPerson','inetLocalMailRecipient'],
+			'objectClass' => array_merge(['top'], self::userObjectClasses),
 			'uid' => $username,
 			'givenName' => $givenName,
 			'sn' => $sn,
@@ -190,7 +199,7 @@ class LDAP
 	{
 		$groupDN = 'cn=' . ldap_escape($groupName, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
 		$entry = [
-			'objectClass' => ['top', 'groupOfNames','inetLocalMailRecipient'],
+			'objectClass' => array_merge(['top'], self::groupObjectClasses),
 			'cn' => $groupName,
 			'description' => $description,
 			'member' => ['cn=empty-membership-placeholder'], // Placeholder member, can be changed later
