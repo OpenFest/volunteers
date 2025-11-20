@@ -158,7 +158,7 @@ if (empty($existingUsers)) {
     $username = NULL;
 
     //check ldap for existing user
-    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN,LDAP_BIND_DN, LDAP_BIND_PASSWORD);
     $ldapUser = $ldap->getUser($volunteerData->email);
     if ($ldapUser) {
         _log('Detected LDAP user for email: ' . $volunteerData->email);

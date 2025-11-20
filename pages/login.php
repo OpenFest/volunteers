@@ -21,7 +21,7 @@ redirectIfLoggedIn();
 function handlePost($database)
 {
     try{
-	    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+	    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
     } catch (Exception $e) {
         _log("LDAP connection failed: " . $e->getMessage(), LOG_ERR);
         echo "<h3 class='login-error'>Грешка в системата. Моля, опитайте по-късно!</h3>";

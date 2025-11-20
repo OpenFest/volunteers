@@ -12,19 +12,19 @@ class LDAP
 		'memberof',
 	];
 	private string $server;
-	private string $baseDN;
+	private string $baseUserDN;
 	private string $groupsDN;
 	private string $volunteersDN;
 	private string $bindDN;
 	private string $bindPassword;
 	private mixed $ds;
 
-	public function __construct($server, $baseDN, $bindDN, $bindPassword)
+	public function __construct($server, $baseUserDN, $baseGroupDN, $bindDN, $bindPassword)
 	{
 		$this->server = $server;
-		$this->baseDN = $baseDN;
-		$this->groupsDN = 'ou=Groups,' . $baseDN;
-		$this->volunteersDN = 'ou=Volunteers,' . $this->groupsDN;
+		$this->baseUserDN = $baseUserDN;
+		$this->groupsDN = 'ou=Volunteers,' . $baseGroupDN;
+		$this->volunteersDN = 'ou=Volunteers,' . $this->baseUserDN;
 		$this->bindDN = $bindDN;
 		$this->bindPassword = $bindPassword;
 		$this->connect();
@@ -48,10 +48,10 @@ class LDAP
 		return $ds;
 	}
 
-	public function getEntries($filter)
+	public function getEntries($dn, $filter)
 	{
 
-		$sr = ldap_search($this->ds, $this->baseDN, $filter, self::attributes);
+		$sr = ldap_search($this->ds, $dn, $filter, self::attributes);
 		if (!$sr) {
 			throw new Exception("LDAP search failed: " . ldap_error($this->ds));
 		}
@@ -77,6 +77,7 @@ class LDAP
 	{
 		$username = ldap_escape($username, '', LDAP_ESCAPE_FILTER);
 		$entries = $this->getEntries(
+			$this->baseUserDN,
 			'(&(objectClass=person)(|(uid=' . $username . ')(mail=' . $username . ')(maillocaladdress=' . $username . ')))'
 		);
 
@@ -104,11 +105,15 @@ class LDAP
 	{
 		$ds = ldap_connect($this->server);
 		if (!$ds) {
-			throw new Exception("Could not connect to LDAP server: " . $this->server);
+			$msg = "LDAP connect failed to server: " . $this->server;
+			_log($msg);
+			throw new Exception($msg);
 		}
 		ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
 		if (!ldap_bind($ds, $dn, $password)) {
-			throw new Exception("Could not bind to LDAP server with DN: " . $dn);
+			$msg = "Could not bind to LDAP server with DN: " . $dn;
+			_log($msg);
+			throw new Exception($msg);
 		}
 
 		return $ds;
@@ -123,12 +128,13 @@ class LDAP
 	public function isMember(stdClass $ldapUser, string|array $group): bool
 	{
 		if (is_array($group)) {
-			// If $group is an array, check if the user is a member of any of the groups
+			// If $group is an array, check if the user is a member of at least one of the groups
 			foreach ($group as $g) {
 				if ($this->isMember($ldapUser, $g)) {
 					return TRUE;
 				}
 			}
+			_log("Unable to find user " . $ldapUser->uid . " in any of the groups: " . implode(', ', $group));
 			return FALSE; // User is not a member of any group in the array
 		}
 
@@ -136,19 +142,45 @@ class LDAP
 		return in_array($group, $ldapUser->memberof, TRUE);
 	}
 
+	public function addUser($username, $password, $givenName, $sn, $mail): bool
+	{
+		$userDN = 'uid=' . ldap_escape($username, '', LDAP_ESCAPE_DN) . ',' . $this->volunteersDN;
+		$entry = [
+			'objectClass' => ['top', 'person', 'organizationalPerson', 'inetOrgPerson','inetLocalMailRecipient'],
+			'uid' => $username,
+			'givenName' => $givenName,
+			'sn' => $sn,
+			'cn' => $givenName . ' ' . $sn,
+			'mail' => $mail,
+			'userPassword' => $password,
+		];
+
+		if (!ldap_add($this->ds, $userDN, $entry)) {
+			$msg = "Could not add user: " . ldap_error($this->ds);
+			_log($msg);
+			throw new Exception($msg);
+		}
+		_log("LDAP user added: " . $username);
+		return TRUE;
+
+	}
+
 	public function addGroup(string $groupName, string $description = ''): bool
 	{
 		$groupDN = 'cn=' . ldap_escape($groupName, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
 		$entry = [
-			'objectClass' => ['top', 'groupOfNames'],
+			'objectClass' => ['top', 'groupOfNames','inetLocalMailRecipient'],
 			'cn' => $groupName,
 			'description' => $description,
-			'member' => ['cn=dummy,dc=example,dc=com'], // Placeholder member, can be changed later
+			'member' => ['cn=empty-membership-placeholder'], // Placeholder member, can be changed later
 		];
 
 		if (!ldap_add($this->ds, $groupDN, $entry)) {
-			throw new Exception("Could not add group: " . ldap_error($this->ds));
+			$msg = "Could not add group: " . ldap_error($this->ds);
+			_log($msg);
+			throw new Exception($msg);
 		}
+		_log("LDAP group added: " . $groupName);
 		return TRUE;
 	}
 
@@ -166,8 +198,34 @@ class LDAP
 		if (!$this->isMember($ldapUser, $group)) {
 			$groupDN = 'cn=' . ldap_escape($group, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
 			if (!ldap_mod_add($this->ds, $groupDN, ['member' => $ldapUser->dn])) {
+				$msg = "Could not add member $ldapUser->uid to group $group: " . ldap_error($this->ds);
+				_log($msg);
 				throw new Exception("Could not add member to group: " . ldap_error($this->ds));
 			}
+			_log("LDAP user " . $ldapUser->uid . " added to group: " . $group);
+		}
+		return TRUE;
+	}
+
+	public function removeMember(stdClass $ldapUser, string|array $group): bool
+	{
+		if (is_array($group)) {
+			// If $group is an array, remove the user from each group
+			foreach ($group as $g) {
+				$this->removeMember($ldapUser, $g);
+			}
+			return TRUE; // Successfully removed from all groups
+		}
+
+		//single group check
+		if ($this->isMember($ldapUser, $group)) {
+			$groupDN = 'cn=' . ldap_escape($group, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
+			if (!ldap_mod_del($this->ds, $groupDN, ['member' => $ldapUser->dn])) {
+				$msg = "Could not remove member $ldapUser->uid from group $group: " . ldap_error($this->ds);
+				_log($msg);
+				throw new Exception("Could not remove member from group: " . ldap_error($this->ds));
+			}
+			_log("LDAP user " . $ldapUser->uid . " removed from group: " . $group);
 		}
 		return TRUE;
 	}

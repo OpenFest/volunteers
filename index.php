@@ -3,7 +3,7 @@
 
 //import configuration
 require_once __DIR__ . '/config.php'; // Configuration file for a database and other settings
-require_once __DIR__ . '/helper.php'; // Helper functions for common tasks like dumping variables, etc.
+require_once __DIR__ . '/helper.php'; // Helper functions for common tasks like dumping variables, logging, etc.
 
 if (defined('DEBUG')) {
 	//debug
