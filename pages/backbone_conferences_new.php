@@ -65,6 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':registration_close' => $registration_close
         ]
     );
+
+    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+    // Create LDAP OU for conference volunteers
+    $ldap->addOrganizationalUnit($slug, 'Volunteers for conference ' . $title);
+
     // Log the addition of the new conference
     _log("New conference added: $slug");
 

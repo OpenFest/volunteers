@@ -195,15 +195,39 @@ class LDAP
 
 	}
 
-	public function addGroup(string $groupName, string $description = ''): bool
+	public function addOrganizationalUnit(string $ouName, string $description = ''): bool
 	{
-		$groupDN = 'cn=' . ldap_escape($groupName, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
+		$ouDN = 'ou=' . ldap_escape($ouName, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
+		_log('Adding LDAP organizational unit: ' . $ouDN);
+		$entry = [
+			'objectClass' => ['top', 'organizationalUnit'],
+			'ou' => $ouName,
+			'description' => $description,
+		];
+		_log('Adding LDAP organizational unit entry: ' . print_r($entry, TRUE));
+
+		if (!ldap_add($this->ds, $ouDN, $entry)) {
+			$msg = "Could not add organizational unit: " . ldap_error($this->ds);
+			_log($msg);
+			throw new Exception($msg);
+		}
+		_log("LDAP organizational unit added: " . $ouName);
+		return TRUE;
+
+
+	}
+
+	public function addGroup(string $groupName, $groupOU , string $description = ''): bool
+	{
+		$groupDN = 'cn=' . ldap_escape($groupName, '', LDAP_ESCAPE_DN) . ','. ($groupOU ? 'ou=' . $groupOU . ',' : '') . $this->groupsDN;
+		_log('Adding LDAP group: ' . $groupDN);
 		$entry = [
 			'objectClass' => array_merge(['top'], self::groupObjectClasses),
 			'cn' => $groupName,
 			'description' => $description,
 			'member' => ['cn=empty-membership-placeholder'], // Placeholder member, can be changed later
 		];
+		_log('Adding LDAP group entry: ' . print_r($entry, TRUE));
 
 		if (!ldap_add($this->ds, $groupDN, $entry)) {
 			$msg = "Could not add group: " . ldap_error($this->ds);

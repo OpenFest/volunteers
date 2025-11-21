@@ -44,6 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':description' => $description
         ]
     );
+    // insert LDAP group
+    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+    $ldap->addGroup($slug, $conference, $description);
+
     _log('New team added: ' . $name . ' (Slug: ' . $slug . ') in conference: ' . $conference, LOG_INFO);
 
     header('Location: /backbone/teams');
