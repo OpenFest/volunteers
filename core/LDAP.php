@@ -157,6 +157,10 @@ class LDAP
 	 */
 	public function isMember(stdClass $ldapUser, string|array $group): bool
 	{
+		if (!isset($ldapUser->memberof) || !is_array($ldapUser->memberof) || empty($ldapUser->memberof)) {
+			_log("User " . $ldapUser->uid . " has no group memberships.");
+			return FALSE;
+		}
 		if (is_array($group)) {
 			// If $group is an array, check if the user is a member of at least one of the groups
 			foreach ($group as $g) {
@@ -168,6 +172,8 @@ class LDAP
 			return FALSE; // User is not a member of any group in the array
 		}
 
+		_log('Looking for user ' . $ldapUser->uid . ' in group ' . $group);
+		_log('User details: ' . print_r($ldapUser, TRUE));
 		//single group check
 		return in_array($group, $ldapUser->memberof, TRUE);
 	}
@@ -238,25 +244,29 @@ class LDAP
 		return TRUE;
 	}
 
-	public function addMember(stdClass $ldapUser, string|array $group): bool
+	public function addMember(stdClass $ldapUser, string|array $group, $groupOU): bool
 	{
 		if (is_array($group)) {
 			// If $group is an array, add the user to each group
 			foreach ($group as $g) {
-				$this->addMember($ldapUser, $g);
+				$this->addMember($ldapUser, $g, $groupOU);
 			}
 			return TRUE; // Successfully added to all groups
 		}
 
+		_log("Adding LDAP member: " . $ldapUser ->uid . " to group: " . $group);
 		//single group check
 		if (!$this->isMember($ldapUser, $group)) {
-			$groupDN = 'cn=' . ldap_escape($group, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
+			_log('Not a member, proceeding to add.');
+			$groupDN = 'cn=' . ldap_escape($group, '', LDAP_ESCAPE_DN) . ',' . 'ou='. $groupOU . ',' . $this->groupsDN;
 			if (!ldap_mod_add($this->ds, $groupDN, ['member' => $ldapUser->dn])) {
 				$msg = "Could not add member $ldapUser->uid to group $group: " . ldap_error($this->ds);
 				_log($msg);
 				throw new Exception("Could not add member to group: " . ldap_error($this->ds));
 			}
 			_log("LDAP user " . $ldapUser->uid . " added to group: " . $group);
+		} else {
+			_log("LDAP user " . $ldapUser->uid . " is already a member of group: " . $group);
 		}
 		return TRUE;
 	}

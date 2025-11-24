@@ -79,4 +79,38 @@ class User
 			(bool)$user->active
 		);
 	}
+
+	public function addToLdapGroups($conference)
+	{
+		_log('Adding user ' . $this->username . ' to LDAP groups for conference ' . $conference);
+		$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+		$teams = Database::getInstance()->query(
+			'SELECT t.slug, t.conference FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) LEFT JOIN volunteers v ON (vt.volunteer = v.id) LEFT JOIN users u ON (v."user" = u.uid) WHERE u.uid= :uid and t.conference = :conference',
+			[':uid' => $this->id, ':conference' => $conference]
+		);
+		foreach ($teams as $team) {
+			$ldap->addMember($this->getLdapUser(), $team->slug, $team->conference);
+		}
+	}
+
+	public function toObject(): object
+	{
+		return (object)[
+			'uid' => $this->id,
+			'email' => $this->email,
+			'username' => $this->username,
+			'name' => $this->name,
+			'phone' => $this->phone,
+			'admin' => $this->isAdmin,
+			'active' => $this->isActive,
+		];
+
+	}
+
+	private function getLdapUser()
+	{
+		$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+		return $ldap->getUser($this->username);
+
+	}
 }

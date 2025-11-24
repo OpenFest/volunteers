@@ -31,11 +31,15 @@ function verify($database) {
 		[':uid' => $user->uid]
 	);
 
-	return $user;
+	return User::load($user);
 }
 if ($user = verify($this->database)) {
-	// Set the user in the session
-	$_SESSION['user'] = User::load($user);
+    if($user->isActive()) {
+        //add user to LDAP groups, based on team data
+        $user->addToLdapGroups(Conference::getActive()->getSlug());
+    }
+    // Set the user in the session
+    $_SESSION['user'] = $user;
 	header('Location: /profile');
 	exit;
 }
