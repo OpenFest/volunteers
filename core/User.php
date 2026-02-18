@@ -91,8 +91,12 @@ class User
 			'SELECT t.slug, t.conference FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) LEFT JOIN volunteers v ON (vt.volunteer = v.id) LEFT JOIN users u ON (v."user" = u.uid) WHERE u.uid= :uid and t.conference = :conference',
 			[':uid' => $this->id, ':conference' => $conference]
 		);
+		$ldapUser = $this->getLdapUser();
+		if (!$ldapUser) {
+			throw new Exception('User not found in LDAP');
+		}
 		foreach ($teams as $team) {
-			$ldap->addMember($this->getLdapUser(), $team->slug, $team->conference);
+			$ldap->addMember($ldapUser, $team->slug, $team->conference);
 		}
 	}
 
