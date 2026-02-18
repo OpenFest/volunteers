@@ -2,9 +2,9 @@
 
 class View
 {
-	private $pagesDir;
-	private $router; // To access the base path for the links
-	private $database; // Placeholder for future database usage
+	private string $pagesDir;
+	private Router $router; // To access the base path for the links
+	private Database $database; // Placeholder for future database usage
 
 	/**
 	 * Constructor.
@@ -24,8 +24,8 @@ class View
 	 *
 	 * @param string $pageName The name of the page to render (e.g., 'home', 'about').
 	 */
-	public function render(string $pageName, array $data = [])
-	{
+	public function render(string $pageName, array $data = []): void
+    {
 		$pageFile = $this->pagesDir . $pageName . '.php';
 		$content = '';
 
@@ -53,8 +53,8 @@ class View
 		$this->outputHtmlLayout($title, $content);
 	}
 
-	private function loadStyle()
-	{
+	private function loadStyle(): array|string|null
+    {
 
         //Deprecated: This method is used to load the CSS file and minify it.
 
@@ -76,8 +76,8 @@ class View
 		// Remove new lines and extra spaces around CSS rules
         $style = preg_replace('/\s+/', ' ', $style); // Remove extra spaces
         $style = preg_replace('/\s*([{};:,])\s*/', '$1', $style); // Remove spaces around braces, colons, and semicolons
-        $style = preg_replace('/;}/', '}', $style); // Remove semicolon before closing brace
-        return $style;
+        // Remove semicolon before closing brace
+        return preg_replace('/;}/', '}', $style);
 	}
 
 
@@ -86,10 +86,10 @@ class View
      *
      * @param string $content The content to be placed within the layout.
      */
-    private function outputHtmlLayout(string $title, string $content)
+    private function outputHtmlLayout(string $title, string $content): void
     {
         $basePath = $this->router->getBasePath();
-        $style = $this->loadStyle();
+//        $style = $this->loadStyle(); //maybe we can reuse this some day, but for now we will load the CSS file directly in the HTML head, to avoid issues with missing or unreadable CSS files.
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -124,7 +124,7 @@ class View
 <?php
     }
 ?>
-        </nav>
+    </nav>
     <div class="banner"></div>
     <div class="container">
         <?php echo $content; ?>

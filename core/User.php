@@ -49,14 +49,14 @@ class User
 		return $this->name;
 	}
 
-	public function getPhone()
+	public function getPhone(): ?string
 	{
 		return $this->phone;
 
 	}
 
 
-	public static function load(object|string $user)
+	public static function load(object|string $user): ?User
 	{
 		if (is_string($user)) {
 			$user = Database::getInstance()->query(
@@ -80,7 +80,10 @@ class User
 		);
 	}
 
-	public function addToLdapGroups($conference)
+	/**
+	 * @throws Exception
+	 */
+	public function addToLdapGroups($conference): void
 	{
 		_log('Adding user ' . $this->username . ' to LDAP groups for conference ' . $conference);
 		$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
@@ -107,6 +110,9 @@ class User
 
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function getLdapUser()
 	{
 		$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);

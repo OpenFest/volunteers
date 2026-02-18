@@ -1,13 +1,13 @@
 <?php
-define('DB_HOST', 'host');
-define('DB_NAME', 'db');
-define('DB_USER', 'user');
-define('DB_PASSWORD', 'pass');
-define('DB_PORT', 'port'); // Default PostgreSQL port
+const DB_HOST = 'host';
+const DB_NAME = 'db';
+const DB_USER = 'user';
+const DB_PASSWORD = 'pass';
+const DB_PORT = 'port'; // Default PostgreSQL port
 
-define('LDAP_SERVER', 'ldap-server-url');
-define('LDAP_BASE_USERS_DN', 'base-usr-dn');
-define('LDAP_BASE_GROUPS_DN', 'base-groups-dn');
-define('LDAP_BIND_DN', 'bind-dn');
-define('LDAP_BIND_PASSWORD', 'bind-passw');
-define('LDAP_USER_ATTRIBUTE', 'user-identifier');
+const LDAP_SERVER = 'ldap-server-url';
+const LDAP_BASE_USERS_DN = 'base-usr-dn';
+const LDAP_BASE_GROUPS_DN = 'base-groups-dn';
+const LDAP_BIND_DN = 'bind-dn';
+const LDAP_BIND_PASSWORD = 'bind-pass';
+const LDAP_USER_ATTRIBUTE = 'user-identifier';

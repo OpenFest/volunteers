@@ -1,5 +1,5 @@
 <?php
-//check if user is loogged in and has admin rights
+//check if user is logged in and has admin rights
 
 if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 	header('Location: /login');

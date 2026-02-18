@@ -1,6 +1,13 @@
 <?php
 // volunteers_new.php
-$token = bin2hex(random_bytes(32));
+try {
+    $token = bin2hex(random_bytes(32));
+} catch (Exception $e) {
+    _log('Cannot detect proper randomness source');
+    echo "<h1>Грешка в системата!</h1>";
+    echo "<p>Моля, опитайте отново по-късно.</p>";
+    return;
+}
 $_SESSION['csrf_token'] = $token;
 
 $activeConf = $this->database->query('SELECT slug, title FROM conferences WHERE registration_open <= now() AND registration_close >= now() ORDER BY start_date DESC LIMIT 1');
@@ -27,7 +34,7 @@ foreach ($teams as $row) {
         <div class="form-inputs">
             <div class="input">
                 <label for="volunteer_picture">Снимка</label>
-                <img id="preview" alt="Image Preview" style="display:none;"/>
+                <img id="preview" alt="Image Preview" style="display:none;" src=""/>
                 <input type="file" name="picture" id="volunteer_picture" accept="image/*" />
                 <p class="hint-text">Ваша снимка в jpeg, png или gif формат</p>
             </div>

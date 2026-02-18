@@ -34,6 +34,9 @@ class LDAP
 	private string $bindPassword;
 	private mixed $ds;
 
+	/**
+	 * @throws Exception
+	 */
 	public function __construct($server, $baseUserDN, $baseGroupDN, $bindDN, $bindPassword)
 	{
 		$this->server = $server;
@@ -53,6 +56,9 @@ class LDAP
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function connect()
 	{
 		$this->ds = NULL;
@@ -63,18 +69,16 @@ class LDAP
 		return $ds;
 	}
 
-	public function getEntries($dn, $filter, $type)
+	/**
+	 * @throws Exception
+	 */
+	public function getEntries($dn, $filter, $type): array
 	{
-		switch ($type) {
-			case 'user':
-				$attributes = self::userAttributes;
-				break;
-			case 'group':
-				$attributes = self::groupAttributes;
-				break;
-			default:
-				throw new Exception("Unknown LDAP entry type: " . json_encode($type));
-		}
+		$attributes = match ($type) {
+			'user' => self::userAttributes,
+			'group' => self::groupAttributes,
+			default => throw new Exception("Unknown LDAP entry type: " . json_encode($type)),
+		};
 
 		$sr = ldap_search($this->ds, $dn, $filter, $attributes);
 		if (!$sr) {
@@ -102,6 +106,9 @@ class LDAP
 
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function getUser($username)
 	{
 		$username = ldap_escape($username, '', LDAP_ESCAPE_FILTER);
@@ -115,7 +122,10 @@ class LDAP
 
 	}
 
-	public function testBind(string|stdClass $user, string $password)
+	/**
+	 * @throws Exception
+	 */
+	public function testBind(string|stdClass $user, string $password): bool
 	{
 		if (is_string($user)) {
 			$user = $this->getUser($user);
@@ -131,6 +141,9 @@ class LDAP
 
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function bind($dn, $password)
 	{
 		$ds = ldap_connect($this->server);
@@ -152,12 +165,12 @@ class LDAP
 	/**
 	 * Check if a user is a member of a specific group
 	 * @param stdClass $ldapUser
-	 * @param string $group
+	 * @param string|array $group
 	 * @return bool
 	 */
 	public function isMember(stdClass $ldapUser, string|array $group): bool
 	{
-		if (!isset($ldapUser->memberof) || !is_array($ldapUser->memberof) || empty($ldapUser->memberof)) {
+		if (empty($ldapUser->memberof) || !is_array($ldapUser->memberof)) {
 			_log("User " . $ldapUser->uid . " has no group memberships.");
 			return FALSE;
 		}
@@ -178,6 +191,9 @@ class LDAP
 		return in_array($group, $ldapUser->memberof, TRUE);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function addUser($username, $password, $givenName, $sn, $mail): bool
 	{
 		$userDN = 'uid=' . ldap_escape($username, '', LDAP_ESCAPE_DN) . ',' . $this->volunteersDN;
@@ -201,6 +217,9 @@ class LDAP
 
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function addOrganizationalUnit(string $ouName, string $description = ''): bool
 	{
 		$ouDN = 'ou=' . ldap_escape($ouName, '', LDAP_ESCAPE_DN) . ',' . $this->groupsDN;
@@ -223,6 +242,9 @@ class LDAP
 
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function addGroup(string $groupName, $groupOU , string $description = ''): bool
 	{
 		$groupDN = 'cn=' . ldap_escape($groupName, '', LDAP_ESCAPE_DN) . ','. ($groupOU ? 'ou=' . $groupOU . ',' : '') . $this->groupsDN;
@@ -244,6 +266,9 @@ class LDAP
 		return TRUE;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function addMember(stdClass $ldapUser, string|array $group, $groupOU): bool
 	{
 		if (is_array($group)) {
@@ -271,6 +296,9 @@ class LDAP
 		return TRUE;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function removeMember(stdClass $ldapUser, string|array $group): bool
 	{
 		if (is_array($group)) {

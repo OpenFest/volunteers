@@ -1,6 +1,7 @@
 <h1>Потвърждение на регистрация</h1>
 <?php
-function verify($database) {
+function verify($database): User|bool|null
+{
 //verify token from volunteers submission
 	if (empty($_GET['token'])) {
 		echo "<h3 class='login-error'>Невалиден токен.</h3>";
@@ -36,7 +37,11 @@ function verify($database) {
 if ($user = verify($this->database)) {
     if($user->isActive()) {
         //add user to LDAP groups, based on team data
-        $user->addToLdapGroups(Conference::getActive()->getSlug());
+        try {
+            $user->addToLdapGroups(Conference::getActive()->getSlug());
+        } catch (Exception $e) {
+            _log('Failed to add user to LDAP groups: ' . $user->getUsername() . ' - ' . $e->getMessage(), LOG_ERR);
+        }
     }
     // Set the user in the session
     $_SESSION['user'] = $user;

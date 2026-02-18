@@ -6,7 +6,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    _log('Processing new team submission. User: ' . $_SESSION['user']->getUsername(), LOG_INFO);
+    _log('Processing new team submission. User: ' . $_SESSION['user']->getUsername());
     // Handle form submission to add a new team
     $conference = $_POST['conference'];
     $slug = $_POST['slug'];
@@ -46,9 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
     // insert LDAP group
     $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
-    $ldap->addGroup($slug, $conference, $description);
-
-    _log('New team added: ' . $name . ' (Slug: ' . $slug . ') in conference: ' . $conference, LOG_INFO);
+    try {
+        $ldap->addGroup($slug, $conference, $description);
+        _log('New team added: ' . $name . ' (Slug: ' . $slug . ') in conference: ' . $conference);
+    } catch (Exception $e) {
+        _log('Failed to add LDAP group for team: ' . $name . ' (Slug: ' . $slug . ') in conference: ' . $conference . ' - ' . $e->getMessage(), LOG_ERR);
+        //log the error but continue, since the team is added to the database and can be fixed manually in LDAP
+    }
 
     header('Location: /backbone/teams');
     exit;

@@ -6,7 +6,7 @@ The codebase is built with vanilla PHP (developed on PHP 8.0, but may work on ea
 - Admin dashboard
 
 ## Installation
-1. Clone the reporsitory:
+1. Clone the repository:
    ```bash
    git clone https://github.com/OpenFest/volunteers.git
     ```

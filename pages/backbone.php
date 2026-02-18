@@ -1,5 +1,5 @@
 <?php
-//check if user is loogged in and has admin rights
+//check if user is logged in and has admin rights
 
 if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 	header('Location: /login');
@@ -52,7 +52,7 @@ foreach ($volunteersStats as $volunteersStat) {
 	$stats['lang'][$volunteersStat->lang] += $volunteersStat->count;
 }
 
-$voluteersTeams = $this->database->query(
+$volunteersTeams = $this->database->query(
 	'SELECT t.conference, vt.team, COUNT(*) as count FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) GROUP BY t.conference, vt.team order by count(*) DESC'
 );
 
@@ -94,7 +94,7 @@ $voluteersTeams = $this->database->query(
             </tr>
             </thead>
             <tbody>
-			<?php foreach ($voluteersTeams as $team): ?>
+			<?php foreach ($volunteersTeams as $team): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($team->conference); ?></td>
                     <td><a href="/backbone/team?c=<?php echo $team->conference;?>&t=<?php echo $team->team;?>"><?php echo htmlspecialchars($team->team); ?></a></td>

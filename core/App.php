@@ -2,9 +2,9 @@
 
 class App
 {
-	private $router;
-	private $view;
-	private $database; // Placeholder for future database integration
+	private Router $router;
+	private View $view;
+	private Database $database; // Placeholder for future database integration
 
 	/**
 	 * Constructor.
@@ -24,7 +24,7 @@ class App
 	 * Runs the application.
 	 * Determines the requested page and renders it.
 	 */
-	public function run()
+	public function run(): void
 	{
 		session_start();
 		$page = $this->router->getRequestedPage();

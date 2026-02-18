@@ -2,14 +2,14 @@
 
 class Conference
 {
-	private $slug;
-	private $title;
-	private $description;
-	private $startDate;
-	private $endDate;
-	private $location;
-	private $regOpen;
-	private $regClose;
+	private string $slug;
+	private string $title;
+	private string $description;
+	private string $startDate;
+	private string $endDate;
+	private string $location;
+	private string $regOpen;
+	private string $regClose;
 
 
 	public function __construct($slug, $title, $description, $startDate, $endDate, $location, $regOpen, $regClose)
@@ -39,7 +39,7 @@ class Conference
 		);
 		if ($result) {
 			$entry = $result[0];
-			return new Conference(
+			return new self(
 				$entry->slug,
 				$entry->title,
 				$entry->description,
@@ -68,25 +68,25 @@ class Conference
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
-	public function getSlug()
+	public function getSlug(): string
 	{
 		return $this->slug;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
-	public function getTitle()
+	public function getTitle(): string
 	{
 		return $this->title;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
-	public function getDescription()
+	public function getDescription(): string
 	{
 		return $this->description;
 	}

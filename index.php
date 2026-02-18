@@ -12,12 +12,12 @@ if (defined('DEBUG')) {
 }
 
 // Define application paths
-define('BASE_PATH', '');  //keep empty if the app is in the web server root, or set to '/folder_name' if in a subdirectory
-define('ASSETS_DIR', __DIR__ . '/assets/');
-define('CORE_DIR', __DIR__ . '/core/');
-define('PAGES_DIR', __DIR__ . '/pages/');
+const BASE_PATH = '';  //keep empty if the app is in the web server root, or set to '/folder_name' if in a subdirectory
+const ASSETS_DIR = __DIR__ . '/assets/';
+const CORE_DIR = __DIR__ . '/core/';
+const PAGES_DIR = __DIR__ . '/pages/';
 
-// Autoload core classes (a very simple autoloader for this example)
+// Autoload core classes (a very simple autoloader)
 spl_autoload_register(function ($class) {
     $file = CORE_DIR . str_replace('\\', '/', $class) . '.php'; // Adjust for namespaces if you add them later
     if (file_exists($file)) {

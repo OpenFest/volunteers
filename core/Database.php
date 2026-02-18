@@ -2,7 +2,7 @@
 
 class Database
 {
-	private $pdo;
+	private PDO $pdo;
 	private static Database $instance;
 
 	public function __construct()

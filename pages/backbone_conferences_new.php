@@ -7,7 +7,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    _log('Processing new conference submission. User: ' . $_SESSION['user']->getUsername(), LOG_INFO);
+    _log('Processing new conference submission. User: ' . $_SESSION['user']->getUsername());
     // Handle form submission to add a new conference
     $slug = $_POST['slug'];
     $title = $_POST['title'];
@@ -68,14 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
     // Create LDAP OU for conference volunteers
-    $ldap->addOrganizationalUnit($slug, 'Volunteers for conference ' . $title);
-
-    // Log the addition of the new conference
-    _log("New conference added: $slug");
-
+    try {
+        $ldap->addOrganizationalUnit($slug, 'Volunteers for conference ' . $title);
+        // Log the addition of the new conference
+        _log("New conference added: $slug");
+    } catch (Exception $e) {
+        //log the error but continue, as the conference is already added to the database
+        _log("Failed to create LDAP OU for conference $slug: " . $e->getMessage(), LOG_ERR);
+    }
     // Redirect to the conference overview page after adding
     header('Location: /backbone/conferences');
     exit;
+
 }
 
 ?>

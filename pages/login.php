@@ -5,7 +5,7 @@
  * otherwise redirect to the home page
  * @return void
  */
-function redirectIfLoggedIn()
+function redirectIfLoggedIn(): void
 {
     if (isset($_SESSION['user'])) {
         if ($_SESSION['user']->isAdmin()) {
@@ -18,7 +18,7 @@ function redirectIfLoggedIn()
 }
 redirectIfLoggedIn();
 
-function handlePost($database)
+function handlePost($database): void
 {
     try{
 	    $ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
@@ -38,7 +38,13 @@ function handlePost($database)
 		return; // Stop further processing
 	}
     // get ldap user
-    $ldapUser = $ldap->getUser($username);
+    try {
+        $ldapUser = $ldap->getUser($username);
+    } catch (Exception $e) {
+        _log("LDAP search failed for user: " . $username . " - " . $e->getMessage(), LOG_ERR);
+        $ldapUser = null;
+    }
+
 	//verify the password against ldap
 	if (!$ldapUser) {
         _log("Login attempt with non-existing user: " . $username);

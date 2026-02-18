@@ -2,7 +2,7 @@
 
 class Router
 {
- private $basePath;
+ private string $basePath;
 
     /**
      * Constructor.
@@ -28,7 +28,7 @@ class Router
         $requestUri = strtok($requestUri, '?');
 
         // Remove the base path if the app is in a subdirectory
-        if (!empty($this->basePath) && strpos($requestUri, $this->basePath) === 0) {
+        if (!empty($this->basePath) && str_starts_with($requestUri, $this->basePath)) {
             $requestUri = substr($requestUri, strlen($this->basePath));
         }
 
@@ -38,7 +38,6 @@ class Router
             // Remove leading slash and sanitize for file name (e.g., /about -> about)
             $page = trim($requestUri, '/');
             // Basic sanitization: only allow alphanumeric, hyphens, and underscores.
-            // You might want more robust sanitization depending on your needs.
             $page = preg_replace('%[^a-zA-Z0-9_/-]%', '', $page);
 			//if there are slashes, replace them with underscores
 	        $page = str_replace('/', '_', $page);

@@ -1,7 +1,9 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 if (!function_exists("dump")) {
-	function dump(...$args)
+	function dump(...$args): void
 	{
 		echo '<pre>'.PHP_EOL;
 		foreach ($args as $arg) {
@@ -12,7 +14,8 @@ if (!function_exists("dump")) {
 }
 
 if (!function_exists("dd")) {
-	function dd(...$args)
+	#[NoReturn]
+	function dd(...$args): void
 	{
 		dump(...$args);
 		exit;
@@ -20,7 +23,8 @@ if (!function_exists("dd")) {
 }
 
 if (!function_exists("uuid")) {
-	function uuid() {
+	function uuid(): string
+	{
 		if (function_exists('com_create_guid')) {
 			return trim(com_create_guid(), '{}');
 		} else {
@@ -38,7 +42,8 @@ if (!function_exists("uuid")) {
 
 if (!function_exists('_log')) {
 	// Log a message to the syslog
-	function _log($message, $level = LOG_INFO) {
+	function _log($message, $level = LOG_INFO): void
+	{
 		if (function_exists('syslog')) {
 			openlog('vol', LOG_PID | LOG_PERROR, LOG_USER);
 			syslog($level, $message);
