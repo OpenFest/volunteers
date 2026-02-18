@@ -267,7 +267,8 @@ h1 {
 
     .form-actions {
         display: flex;
-        justify-content: center; /* Center the button */
+        flex-direction: column;
+        align-items: center;
         margin-top: 20px;
         .btn {
             padding: 10px 20px;

@@ -135,5 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<br>
     <div class="form-actions">
         <button class="btn" type="submit">Вход</button>
+        <a href="/password-reset" class="btn-link">Забравена парола?</a>
     </div>
 </form>

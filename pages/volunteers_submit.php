@@ -144,9 +144,7 @@ $existingUsers = $this->database->query(
         'SELECT uid FROM users WHERE email = :email',
         [':email' => $volunteerData->email]
 );
-//sha512 uuid to generate a verification token
-$verificationToken = hash('sha512', uuid() . $volunteerData->email . time());
-$verificationToken = substr($verificationToken, 0, 29) . '-' . substr($verificationToken, -30);
+$verificationToken = User::generateToken($volunteerData->email);
 
 if (empty($existingUsers)) {
     // Email not found in users' table, proceed to insert
@@ -205,12 +203,9 @@ if (empty($existingUsers)) {
     // Email already exists in users' table, use the existing user ID
     _log('Using existing user with email: ' . $volunteerData->email);
     $userID = $existingUsers[0]->uid;
+    $user = User::load($userID);
     //reset the verification token and expiry for the existing user
-    $sql = 'UPDATE users SET token = :token, token_expiry = now() + interval \'1 day\' WHERE uid = :uid';
-    $this->database->query($sql, [
-            ':token' => $verificationToken,
-            ':uid' => $userID
-    ]);
+    $user->setToken($verificationToken, '1 day');
 }
 
 

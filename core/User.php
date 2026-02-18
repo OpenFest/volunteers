@@ -22,6 +22,14 @@ class User
 		$this->isActive = $isActive;
 	}
 
+	public static function generateToken($data): string
+	{
+		//sha512 uuid to generate a verification token
+		$verificationToken = hash('sha512', uuid() . $data . time());
+		return substr($verificationToken, 0, 29) . '-' . substr($verificationToken, -30);
+
+	}
+
 	public function getId(): string
 	{
 		return $this->id;
@@ -121,6 +129,29 @@ class User
 	{
 		$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
 		return $ldap->getUser($this->username);
+
+	}
+
+	public function isVerified()
+	{
+	}
+
+	/**
+	 * Sets a token for the user with a specified expiry interval.
+	 * @param string $token - the token to set for the user
+	 * @param string $validity - the interval for the token expiry (e.g. '1 day', '2 hours')
+	 * @return void
+	 */
+	public function setToken(string $token, string $validity): void
+	{
+		$end = strtotime('now + ' . $validity); // validate the validity format
+		$durInSec = $end - time();
+
+		$sql = 'UPDATE users SET token = :token, token_expiry = now() + interval \'' .$durInSec .' seconds\' WHERE uid = :uid';
+		Database::getInstance()->query($sql, [
+			':token' => $token,
+			':uid' => $this->id
+		]);
 
 	}
 }
