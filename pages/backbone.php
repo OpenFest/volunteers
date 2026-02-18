@@ -8,11 +8,14 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 
 //get conf from the url parmas
 $allConferences = Conference::getConferences();
+$activeConference = Conference::getActive();
 $_conf = $_REQUEST['conf'] ?? '';
 
 $conference = null;
 if (empty($_conf)) {
-    $conference = Conference::getActive()->toObject();
+    if ($activeConference) {
+        $conference = $activeConference->toObject();
+    }
 } else {
     foreach ($allConferences as $conf) {
         if ($conf->slug === $_conf) {
