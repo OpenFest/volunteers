@@ -6,13 +6,42 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
 	exit;
 }
 
+//get conf from the url parmas
+$allConferences = Conference::getConferences();
+$_conf = $_REQUEST['conf'] ?? '';
+
+$conference = null;
+if (empty($_conf)) {
+    $conference = Conference::getActive()->toObject();
+} else {
+    foreach ($allConferences as $conf) {
+        if ($conf->slug === $_conf) {
+            $conference = $conf;
+            break;
+        }
+    }
+}
+
 $last10volunteers = $this->database->query(
-	'SELECT v.name, u.email, v.registration_date FROM volunteers v left join users u on v."user" = u.uid ORDER BY v.registration_date DESC LIMIT 10'
+	'SELECT v.name, u.email, v.registration_date, vt.conference 
+	FROM volunteers v LEFT JOIN users u on v."user" = u.uid LEFT JOIN volunteer_teams vt ON v.id = vt.volunteer 
+	WHERE vt.conference = COALESCE(:conference, vt.conference)
+	GROUP BY v.name, u.email, v.registration_date, vt.conference 
+	ORDER BY v.registration_date DESC LIMIT 10',
+	[':conference' => $conference ? $conference->slug : null]
 );
 
 // volunteers stats: shirt size, shirt cut, food preferences, lang, team
 $volunteersStats = $this->database->query(
-	'SELECT tshirt_size, tshirt_cut, food_preferences, lang, COUNT(*) as count FROM volunteers v left join users u on v."user" = u.uid GROUP BY tshirt_size, tshirt_cut, food_preferences, lang'
+	'SELECT tshirt_size, tshirt_cut, food_preferences, lang, count(*) AS count 
+	FROM (
+	    SELECT v.id, tshirt_size, tshirt_cut, food_preferences, previous_experience, lang 
+	    FROM volunteers v LEFT JOIN users u ON v."user" = u.uid LEFT JOIN volunteer_teams vt ON v.id = vt.volunteer 
+	    WHERE vt.conference = COALESCE(:conference, vt.conference) 
+	    GROUP BY v.id, tshirt_size, tshirt_cut, food_preferences, previous_experience
+	) AS a 
+	GROUP BY a.tshirt_size, a.tshirt_cut, a.food_preferences, a.lang',
+    [':conference' => $conference ? $conference->slug : null]
 );
 
 // aggregate the data and flatten the array
@@ -53,13 +82,26 @@ foreach ($volunteersStats as $volunteersStat) {
 }
 
 $volunteersTeams = $this->database->query(
-	'SELECT t.conference, vt.team, COUNT(*) as count FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) GROUP BY t.conference, vt.team order by count(*) DESC'
+	'SELECT t.conference, vt.team, COUNT(*) as count FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) 
+	WHERE  t.conference = COALESCE(:conference, t.conference)
+	GROUP BY t.conference, vt.team order by count(*) DESC',
+	[':conference' => $conference ? $conference->slug : null]
 );
 
 ?>
 <div class="backbone-page">
     <div class="page-title">
         <h1>Backbone</h1>
+        <h3>
+            <label for="conference-select">Conference: </label><select name="conference" id="conference-select" onchange="window.location.href='/backbone?conf=' + this.value">
+                <option value="all">All Conferences</option>
+                <?php foreach ($allConferences as $conf): ?>
+                    <option value="<?php echo htmlspecialchars($conf->slug); ?>" <?php echo ($conference && $conference->slug === $conf->slug) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($conf->title); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </h3>
     </div>
 
     <div class="pane">
