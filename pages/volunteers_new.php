@@ -126,7 +126,6 @@ foreach ($teams as $row) {
             </div>
 
             <div class="input checkbox-alone">
-                <input value="0" autocomplete="off" type="hidden" name="volunteer[terms_accepted]" />
                 <label for="volunteer_terms_accepted">
                     <abbr title="Задължително поле">*</abbr>
                     <input type="checkbox" value="1" name="volunteer[terms_accepted]" id="volunteer_terms_accepted" />
