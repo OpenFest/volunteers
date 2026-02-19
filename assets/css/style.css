@@ -43,8 +43,39 @@ body {
 .green {
     color: green; /* Green text color */
 }
+.light-green {
+    color: darkseagreen; /* Light green text color */
+}
 .red {
     color: red; /* Red text color */
+}
+
+.bg-green {
+    background-color: darkseagreen; /* Green background color */
+    color: white; /* White text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.bg-red {
+    background-color: red; /* Red background color */
+    color: white; /* White text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.bg-yellow {
+    background-color: yellow; /* Yellow background color */
+    color: black; /* Black text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.bg-lightblue {
+    background-color: lightblue; /* Light blue background color */
+    color: black; /* Black text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
 }
 
 nav {
@@ -113,17 +144,103 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* General Form Styling */
-.new_volunteer {
+/* Shared form patterns */
+.new_volunteer,
+.login-form,
+form {
     display: flex;
     flex-direction: column; /* Stacks the form inputs vertically */
     gap: 15px; /* Spacing between form input groups */
-    max-width: 600px; /* Limit form width for readability */
     margin: 0 auto; /* Center the form */
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #fff;
+}
+
+.input,
+.input,
+form .form-group {
+    display: flex;
+    flex-direction: column; /* Label on top, input below */
+    gap: 5px; /* Spacing between label and input */
+}
+
+.input label,
+.input label,
+form .form-group label {
+    font-weight: bold;
+    margin-bottom: 5px; /* Space between label and input field */
+}
+
+.input input[type="text"],
+.input input[type="email"],
+.input input[type="tel"],
+.input textarea,
+.input input[type="file"],
+.input input[type="text"],
+.input input[type="password"],
+form .form-group input[type="text"],
+form .form-group input[type="email"],
+form .form-group input[type="tel"],
+form .form-group input[type="password"],
+form .form-group textarea,
+form .form-group input[type="file"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.input textarea,
+form .form-group textarea {
+    resize: vertical; /* Allows vertical resizing only */
+    min-height: 150px; /* Minimum height for textareas */
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Aligns the button to the right */
+    margin-top: 20px;
+}
+
+.form-actions .btn,
+.add-new .btn {
+    padding: 10px 20px;
+    background-color: #007bff; /* Example button color */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.form-actions .btn:hover,
+.add-new .btn:hover {
+    background-color: #0056b3;
+}
+
+.pane {
+    display: flex;
+    flex-direction: column; /* Stacks items vertically */
+    gap: 15px; /* Spacing between pane items */
+
+    .pane-header {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px; /* Space below the header */
+    }
+
+    &.full-width {
+        width: 100%; /* Full width for specific elements */
+    }
+}
+
+
+/* General Form Styling */
+.new_volunteer {
+    max-width: 600px; /* Limit form width for readability */
 
     img {
         width: 100px; /* Fixed width for profile image */
@@ -134,25 +251,7 @@ h1 {
     }
     /* Styling for each input group */
     .input {
-        display: flex;
-        flex-direction: column; /* Label on top, input below */
-        gap: 5px; /* Spacing between label and input */
         margin-bottom: 40px; /* Space between input groups */
-        label {
-            font-weight: bold;
-            margin-bottom: 5px; /* Space between label and input field */
-        }
-        input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="file"] {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
-        }
-        textarea {
-            resize: vertical; /* Allows vertical resizing only */
-            min-height: 150px; /* Minimum height for textareas */
-        }
     }
 
 
@@ -192,25 +291,6 @@ h1 {
         font-weight: normal;
     }
 
-    /* Form actions button */
-    .form-actions {
-        display: flex;
-        justify-content: flex-end; /* Aligns the button to the right */
-        margin-top: 20px;
-        .btn {
-            padding: 10px 20px;
-            background-color: #007bff; /* Example button color */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            &:hover {
-                background-color: #0056b3;
-            }
-        }
-    }
-
     abbr {
         text-decoration: none; /* Removes default underline */
         color: orangered;
@@ -220,6 +300,16 @@ h1 {
             text-decoration: underline; /* Underlines on hover for emphasis */
         }
     }
+}
+
+.team-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: rgba(98, 102, 108, 0.75); /* Example badge color */
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9em; /* Slightly smaller font size for badges */
+    margin-bottom: 10px; /* Space below the badge */
 }
 
 .teams-list{
@@ -235,53 +325,13 @@ h1 {
     }
 }
 
-
 /* Login form style */
 .login-form {
-    display: flex;
-    flex-direction: column; /* Stacks the form inputs vertically */
-    gap: 15px; /* Spacing between form input groups */
     max-width: 400px; /* Limit form width for readability */
-    margin: 0 auto; /* Center the form */
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-
-    .input {
-        display: flex;
-        flex-direction: column; /* Label on top, input below */
-        gap: 5px; /* Spacing between label and input */
-        label {
-            font-weight: bold;
-            margin-bottom: 5px; /* Space between label and input field */
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
-        }
-    }
 
     .form-actions {
-        display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 20px;
-        .btn {
-            padding: 10px 20px;
-            background-color: #007bff; /* Example button color */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            &:hover {
-                background-color: #0056b3;
-            }
-        }
     }
 }
 
@@ -307,16 +357,7 @@ h1 {
     }
 
     .pane {
-
-        display: flex;
-        flex-direction: column; /* Stacks items vertically */
-        gap: 15px; /* Spacing between pane items */
         width: 45%; /* Sets a fixed width for the pane */
-        .pane-header {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px; /* Space below the header */
-        }
 
         &.full-width {
             width: 100%; /* Full width for specific elements */
@@ -325,18 +366,6 @@ h1 {
             display: flex;
             justify-content: flex-end; /* Aligns the button to the right */
             margin-top: 10px;
-            .btn {
-                padding: 10px 20px;
-                background-color: #007bff; /* Example button color */
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 1em;
-                &:hover {
-                    background-color: #0056b3;
-                }
-            }
         }
 
         @media (max-width: 800px) {
@@ -382,58 +411,12 @@ h1 {
     }
 
     form {
-        display: flex;
-        flex-direction: column; /* Stacks the form inputs vertically */
-        gap: 15px; /* Spacing between form input groups */
         max-width: 900px; /* Limit form width for readability */
         width: 90vw;
-        margin: 0 auto; /* Center the form */
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background-color: #fff;
 
         @media (max-width: 800px) {
             width: 100%; /* Full width on smaller screens */
             padding: 0.5rem;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column; /* Label on top, input below */
-            gap: 5px; /* Spacing between label and input */
-            label {
-                font-weight: bold;
-                margin-bottom: 5px; /* Space between label and input field */
-            }
-            input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="file"] {
-                width: 100%;
-                padding: 8px 10px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                box-sizing: border-box; /* Include padding and border in the element's total width and height */
-            }
-            textarea {
-                resize: vertical; /* Allows vertical resizing only */
-                min-height: 150px; /* Minimum height for textareas */
-            }
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end; /* Aligns the button to the right */
-            margin-top: 20px;
-            .btn {
-                padding: 10px 20px;
-                background-color: #007bff; /* Example button color */
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 1em;
-                &:hover {
-                    background-color: #0056b3;
-                }
-            }
         }
     }
 }
@@ -449,22 +432,18 @@ h1 {
 
     .pane {
 
-        display: flex;
-        flex-direction: column; /* Stacks items vertically */
-        gap: 15px; /* Spacing between pane items */
         width: 47%; /* Sets a fixed width for the pane */
         padding: 0.5rem;
+        margin: 0.5rem 0;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for depth */
         @media (max-width: 800px) {
             width: 100%; /* Full width on smaller screens */
         }
 
-
-        .pane-header {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px; /* Space below the header */
+        &.full-width {
+            width: 100%; /* Full width for specific elements */
         }
+
 
         .profile-header {
             display: flex;
@@ -489,18 +468,14 @@ h1 {
                 }
             }
         }
-        &.full-width {
-            width: 100%; /* Full width for specific elements */
-        }
+    }
+    form {
+        max-width: 900px; /* Limit form width for readability */
+        width: 90vw;
 
-        .team-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: rgba(98, 102, 108, 0.75); /* Example badge color */
-            color: white;
-            border-radius: 4px;
-            font-size: 0.9em; /* Slightly smaller font size for badges */
-            margin-bottom: 10px; /* Space below the badge */
+        @media (max-width: 800px) {
+            width: 100%; /* Full width on smaller screens */
+            padding: 0.5rem;
         }
     }
 }
