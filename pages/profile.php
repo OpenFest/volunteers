@@ -7,6 +7,8 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
+//reload user
+$user = User::load($user->getId());
 
 $volunteers = $this->database->query(
     'SELECT v.*,  c.title, json_agg(t.name) as teams FROM volunteers v 
@@ -17,6 +19,7 @@ $volunteers = $this->database->query(
     [':uid' => $user->getId()]
 );
 
+$activeConference = Conference::getActive();
 ?>
 
 <div class="profile-page">
@@ -26,12 +29,13 @@ $volunteers = $this->database->query(
 <?php
 if ($user->isActive() === false): ?>
     <div class="login-error">
-        <p>Твоят акаунт все още не е активиран от администратор. Моля, изчакай потвърждение по имейл.</p>
+        <p>Този акаунт все още не е активиран от администратор. Моля, изчакайте потвърждение по имейл.</p>
     </div>
 <?php endif; ?>
-    <div class="pane full-width">
+    <div class="pane">
         <div class="pane-header">
             <h2>Здравей, <?php echo htmlspecialchars($user->getName()); ?>!</h2>
+            <p><strong>@</strong><?php echo htmlspecialchars($user->getUsername() ?: 'n/a');?></p>
             <p><strong>E-мейл:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
             <p><strong>Телефон:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
 
@@ -40,9 +44,25 @@ if ($user->isActive() === false): ?>
                 <a href="/backbone" class="button">Go to Admin Dashboard</a>
 	        <?php endif; ?>
         </div>
-
+        <?php if (empty($user->getUsername())): ?>
+            <div class="pane-header">
+                <p class="bg-yellow">
+                    Непълен профил! За достъп до активната комуникация (мейл, чат и пр.) се изисква
+                    <a href="/profile/complete" class="button">завършване на профила</a>
+                </p>
+            </div>
+        <?php endif; ?>
     </div>
 
+    <?php if ($activeConference): ?>
+        <div class="pane bg-green">
+                <p>Активна конференция: <strong><?php echo htmlspecialchars($activeConference->getTitle()); ?></strong></p>
+        </div>
+    <?php else: ?>
+        <div class="pane bg-lightblue">
+            <p>В момента няма активна конференция. Моля, следете за новини!</p>
+        </div>
+    <?php endif; ?>
 
     <div class="page-title">
         <h2>Твоите доброволчески регистрации</h2>

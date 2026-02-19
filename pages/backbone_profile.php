@@ -12,16 +12,11 @@ if (!$userID) {
     exit;
 }
 
-$user = $this->database->query(
-    'SELECT * FROM users WHERE uid = :uid',
-    [':uid' => $userID]
-);
-$user = array_shift($user);
+$user = User::load($userID);
 if (!$user) {
     header('Location: /backbone');
     exit;
 }
-$user = new User($user->uid, $user->email, $user->username, $user->name, $user->phone, $user->admin);
 
 $volunteers = $this->database->query(
     'SELECT v.*,  c.title, json_agg(t.name) as teams FROM volunteers v 
@@ -42,12 +37,21 @@ $volunteers = $this->database->query(
     <div class="pane full-width">
         <div class="pane-header">
             <h2> <?php echo htmlspecialchars($user->getName()); ?></h2>
-            <h3> @<?php echo htmlspecialchars($user->getUsername()); ?></h3>
+            <h3> @<?php echo htmlspecialchars($user->getUsername() ?: 'n/a'); ?></h3>
             <p><strong>E-мейл:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
             <p><strong>Телефон:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
         </div>
-
     </div>
+    <?php if (empty($user->getUsername())): ?>
+        <div class="pane full-width">
+            <div class="pane-header">
+                <p class="bg-yellow">
+                    Непълен профил! За достъп до активната комуникация (мейл, чат и пр.) се изисква завършване на профила. <br/>
+                    <a href="/backbone/profile?remind-complete=<?php echo $user->getEmail()?>" class="button">re-send email for reminder</a>
+                </p>
+            </div>
+        </div>
+    <?php endif; ?>
 
 
     <div class="page-title">
