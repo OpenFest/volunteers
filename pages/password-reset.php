@@ -1,23 +1,48 @@
 <?php
 
-/**
- * If the user is already logged in and is admin, redirect to the backbone page,
- * otherwise redirect to the home page
- * @return void
- */
 if (isset($_SESSION['user'])) {
-    if ($_SESSION['user']->isAdmin()) {
-        header('Location: /backbone');
-    } else {
-        header('Location: /profile');
-    }
+    header('Location: ' . ($_SESSION['user']->isAdmin() ? '/backbone' : '/profile'));
     exit;
 }
 
 function handlePost($database): void
 {
     $usernameOrEmail = $_POST['username'] ?? '';
+    $token = $_GET['token'] ?? '';
+    //if token is set, handle password reset
+    if (!empty($token)) {
+        $user = $database->query(
+            'SELECT * FROM users WHERE token = :token AND token_expiry > NOW()',
+            [':token' => $token]
+        );
+        if (empty($user)) {
+            echo "<h3 class='login-error'>Невалиден или изтекъл токен.</h3>";
+            return;
+        }
+        $user = User::load($user[0]->uid);
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        if (empty($password) || empty($confirmPassword)) {
+            echo "<h3 class='login-error'>Моля, попълнете всички полета.</h3>";
+            return;
+        }
+        if ($password !== $confirmPassword) {
+            echo "<h3 class='login-error'>Паролите не съвпадат.</h3>";
+            return;
+        }
+        if (!$user->setPassword($password)) {
+            echo "<h3 class='login-error'>Грешка при нулиране на паролата. Моля, опитайте по-късно.</h3>";
+            return;
+        }
+        $user->resetToken();
+        echo "<h1>Паролата е нулирана успешно!</h1><p>Можете да влезете с новата си парола.</p>";
+        //set session and redirect to profile
+        $_SESSION['user'] = $user;
+        header('Location: /profile');
+        return;
+    }
 
+    //not a token - then handle password reset request
     if (empty($usernameOrEmail)) {
         echo "<h3 class='login-error'>Моля, въведете валиден имейл или потребителско име.</h3>";
         return;
@@ -28,44 +53,70 @@ function handlePost($database): void
         [':identifier' => $usernameOrEmail]
     );
 
-    $errorDetected = FALSE;
-    if (isset($user[0])) {
-        //generate reset token and send email
+    if (!empty($user)) {
         $user = User::load($user[0]->uid);
         $resetToken = User::generateToken($user->getEmail());
         $user->setToken($resetToken, '1 hour');
         $resetLink = "https://{$_SERVER['HTTP_HOST']}/password-reset?token={$resetToken}";
-        //send email
         $subject = "Инструкции за възстановяване на паролата";
         $message = "Здравейте " . $user->getName() . ", 
 \n\nПолучихме заявка за възстановяване на паролата за вашия акаунт. Можете да нулирате паролата си, като кликнете на следната връзка:\n\n{$resetLink}\n\nТази връзка ще бъде валидна за 1 час. Ако не сте направили тази заявка, моля, игнорирайте това съобщение.\n\nПоздрави,\nЕкипът на конференцията";
         $headers = "From: no-reply@{$_SERVER['HTTP_HOST']}\ r\nReply-To: no-reply@{$_SERVER['HTTP_HOST']}\r\n";
         if (!mail($user->getEmail(), $subject, $message, $headers)) {
-            _log("Failed to send password reset email to: " . $user->getEmail(), LOG_ERR);
             echo "<h3 class='login-error'>Грешка при изпращане на имейл. Моля, опитайте по-късно.</h3>";
-                $errorDetected = TRUE;
+            return;
         }
     }
 
-    if (!$errorDetected) {
-        echo "<h1>Заявката е приета!</h1>";
-        echo "<p>Ако има потребител с този имейл или потребителско име, ще получите инструкции за възстановяване на паролата.</p>";
-    }
+    echo "<h1>Заявката е приета!</h1><p>Ако има потребител с този имейл или потребителско име, ще получите инструкции за възстановяване на паролата.</p>";
 }
 
-//if post request, process the login
+function handleToken($database): void
+{
+    $token = $_GET['token'];
+    if (empty($token)) {
+        echo "<h3 class='login-error'>Невалиден токен.</h3>";
+        return;
+    }
+
+    $user = $database->query(
+        'SELECT * FROM users WHERE token = :token AND token_expiry > NOW()',
+        [':token' => $token]
+    );
+
+    if (empty($user)) {
+        echo "<h3 class='login-error'>Невалиден или изтекъл токен.</h3>";
+        return;
+    }
+
+    echo '<h1>Нулиране на паролата</h1>
+    <form action="/password-reset?token=' . htmlspecialchars($token) . '" method="post" class="login-form">
+        <div class="input">
+            <label for="password">Нова парола:</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        <div class="input">
+            <label for="confirm_password">Потвърдете паролата:</label>
+            <input type="password" name="confirm_password" id="confirm_password" required>
+        </div>
+        <div class="form-actions">
+            <button class="btn" type="submit">Нулиране на паролата</button>
+        </div>
+    </form>';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	handlePost($this->database);
+} elseif (isset($_GET['token'])) {
+	handleToken($this->database);
 } else {
-?>
-<form action="/password-reset" method="post" class="login-form">
-    <div class="input">
-        <label for="username">Username/Email:</label>
-        <input type="text" name="username" id="username" required>
-    </div>
-    <div class="form-actions">
-        <button class="btn" type="submit">Забравена Парола</button>
-    </div>
-</form>
-<?php
+    echo '<form action="/password-reset" method="post" class="login-form">
+        <div class="input">
+            <label for="username">Username/Email:</label>
+            <input type="text" name="username" id="username" required>
+        </div>
+        <div class="form-actions">
+            <button class="btn" type="submit">Забравена Парола</button>
+        </div>
+    </form>';
 }

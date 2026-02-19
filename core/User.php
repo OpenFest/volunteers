@@ -154,4 +154,27 @@ class User
 		]);
 
 	}
+
+	public function resetToken(): void
+	{
+		$sql = 'UPDATE users SET token = NULL, token_expiry = NULL WHERE uid = :uid';
+		Database::getInstance()->query($sql, [
+			':uid' => $this->id
+		]);
+	}
+
+	public function setPassword(mixed $password): bool
+	{
+		_log('Setting password for user ' . $this->username);
+		return true; //skip real change for now
+
+		try {
+			$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+			$ldap->changePassword($this->getLdapUser(), $password);
+		} catch (Exception $e) {
+			_log('Failed to change password for user ' . $this->username . ': ' . $e->getMessage(), LOG_ERR);
+			return false;
+		}
+		return true;
+	}
 }

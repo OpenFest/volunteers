@@ -389,4 +389,16 @@ class LDAP
 		return $entryObj;
 
 	}
+
+	public function changePassword(stdClass $LdapUser, string $password)
+	{
+		$entry = [
+			'userPassword' => $password,
+		];
+		if (!ldap_mod_replace($this->ds, $LdapUser->dn, $entry)) {
+			$msg = "Could not change password for user $LdapUser->uid: " . ldap_error($this->ds);
+			_log($msg);
+			throw new Exception("Could not change password: " . ldap_error($this->ds));
+		}
+	}
 }

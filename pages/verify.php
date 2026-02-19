@@ -20,22 +20,21 @@ function verify($database): User|bool|null
 	}
 
 // The user exists, log them in and set the active to true
-	$user = $user[0];
-// Set the user as active
-	$database->query(
-		'UPDATE users SET token = NULL, token_expiry = NULL WHERE uid = :uid',
-		[':uid' => $user->uid]
-	);
-//verify non-verified volunteers linked to this user
-	$database->query(
-		'UPDATE volunteers SET verified = TRUE WHERE "user" = :uid AND verified = FALSE',
-		[':uid' => $user->uid]
-	);
+    $user = $user[0];
+    $user = User::load($user);
 
-	return User::load($user);
+    $user->resetToken();
+//verify non-verified volunteers linked to this user
+    $database->query(
+            'UPDATE volunteers SET verified = TRUE WHERE "user" = :uid AND verified = FALSE',
+            [':uid' => $user->getId()]
+    );
+
+    return $user;
 }
+
 if ($user = verify($this->database)) {
-    if($user->isActive()) {
+    if ($user->isActive()) {
         //add user to LDAP groups, based on team data
         try {
             $user->addToLdapGroups(Conference::getActive()->getSlug());
@@ -45,7 +44,7 @@ if ($user = verify($this->database)) {
     }
     // Set the user in the session
     $_SESSION['user'] = $user;
-	header('Location: /profile');
-	exit;
+    header('Location: /profile');
+    exit;
 }
 
