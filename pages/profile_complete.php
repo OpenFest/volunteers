@@ -66,6 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':uid' => $user->getId()
                 ]
             );
+
+            $user->reload();
+            $activeConference = Conference::getActive();
+            if ($activeConference) {
+                $user->addToLdapGroups($activeConference->getSlug());
+            }
             header('Location: /profile');
             exit;
         } catch (Exception $e) {

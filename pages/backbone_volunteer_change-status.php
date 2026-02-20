@@ -37,7 +37,13 @@ if ($newState === 'accepted') {
 		if ($user->isActive()) {
 			try {
 				$activeConference = Conference::getActive();
-//				$user->addToLdapGroups($activeConference->getSlug());
+				if ($activeConference) {
+					_log('Adding accepted volunteer to LDAP groups: ' . $user->getUsername() . ' for conference ' . $activeConference->getSlug());
+					$user->addToLdapGroups($activeConference->getSlug());
+					_log('Successfully added accepted volunteer to LDAP groups: ' . $user->getUsername());
+				} else {
+					_log('No active conference found when adding accepted volunteer to LDAP groups: ' . $user->getUsername(), LOG_WARNING);
+				}
 				sendActivationMail($user->getEmail(), $activeConference->getTitle(), $user->getName());
 				header('Location: /backbone/volunteers');
 				exit;
