@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS volunteer_teams
     volunteer  INT,
     conference VARCHAR(60),
     team       VARCHAR(60),
-    is_primary INT, -- boolean, may have more than one, or none
+    is_primary bool default false not null, -- boolean, may have more than one, or none
     PRIMARY KEY (volunteer, conference, team),
     FOREIGN KEY (volunteer) REFERENCES volunteers (id),
     FOREIGN KEY (conference, team) REFERENCES teams (conference, slug),
