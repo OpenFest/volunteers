@@ -1,4 +1,7 @@
 <?php
+
+checkAdmin();
+
 function activate($database): User|bool|null
 {
 

@@ -1,10 +1,7 @@
 <?php
 //check if user is logged in and has admin rights
 
-if (!isset($_SESSION['user'])) {
-	header('Location: /login');
-	exit;
-}
+checkAuth();
 
 $user = $_SESSION['user'];
 // check ldap user and redirect to profile, if exists
@@ -62,8 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':uid' => $user->getId()
                 ]
             );
-            //update the user object in the session
-            $_SESSION['user'] = User::load($user->getId());
             header('Location: /profile');
             exit;
         } catch (Exception $e) {
@@ -79,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Завършване на Профил</h1>
     </div>
 <?php
-if (false && $user->isActive() === false): ?>
+if (!$user->isActive()): ?>
     <div class="login-error">
         <p>Този акаунт все още не е активиран от администратор. Моля, изчакайте потвърждение по имейл.</p>
     </div>

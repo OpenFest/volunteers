@@ -1,10 +1,7 @@
 <?php
 //check if user is logged in and has admin rights
 
-if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
-	header('Location: /login');
-	exit;
-}
+checkAdmin();
 
 //get conf from the url parmas
 $allConferences = Conference::getConferences();

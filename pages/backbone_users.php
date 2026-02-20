@@ -1,9 +1,6 @@
 <?php
 
-if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
-	header('Location: /login');
-	exit;
-}
+checkAdmin();
 
 $users = $this->database->query(
 	'SELECT * FROM users ORDER BY name ASC'

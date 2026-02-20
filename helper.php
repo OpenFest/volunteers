@@ -53,3 +53,33 @@ if (!function_exists('_log')) {
 		}
 	}
 }
+
+if (!function_exists('checkAuth')) {
+	function checkAuth($reverse = FALSE): void
+	{
+		if ($reverse) {
+			//allow access only if not logged in (login, pass-reset, etc.), otherwise redirect to profile or backbone
+			if (isset($_SESSION['user'])) {
+				header('Location: /'. ($_SESSION['user']->isAdmin() ? 'backbone' : 'profile'));
+				exit;
+			}
+			return;
+		}
+		if (!isset($_SESSION['user'])) {
+			header('Location: /login');
+			exit;
+		}
+	}
+}
+
+if (!function_exists('checkAdmin')) {
+	function checkAdmin(): void
+	{
+		if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
+			header('Location: /login');
+			exit;
+		}
+	}
+}
+
+

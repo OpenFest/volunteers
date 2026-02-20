@@ -1,9 +1,6 @@
 <?php
 
-if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
-	header('Location: /login');
-	exit;
-}
+checkAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     _log('Processing new team submission. User: ' . $_SESSION['user']->getUsername());

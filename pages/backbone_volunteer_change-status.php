@@ -1,10 +1,6 @@
 <?php
 
-$user = $_SESSION['user'] ?? null;
-if (!$user->isAdmin()) {
-	header('Location: /');
-	exit;
-}
+checkAdmin();
 
 $volunteerId = $_GET['volunteer'] ?? null;
 $status = $_GET['status'] ?? null;

@@ -27,6 +27,10 @@ class App
 	public function run(): void
 	{
 		session_start();
+		if (isset($_SESSION['user']) && $_SESSION['user'] instanceof User) {
+			// Refresh the user data from the database on each request
+			$_SESSION['user']->reload();;
+		}
 		$page = $this->router->getRequestedPage();
 		$this->view->render($page);
 	}

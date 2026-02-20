@@ -1,5 +1,5 @@
 <?php
-$activeConf = 'of-2025';
+$activeConf = Conference::getActive()->getSlug();
 $teams = $this->database->query("SELECT * FROM teams WHERE conference = :conference", ['conference' => $activeConf]);
 ?>
 <h1>Екипи от доброволци</h1>

@@ -1,9 +1,7 @@
 <?php
 
-if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
-	header('Location: /login');
-	exit;
-}
+checkAdmin();
+
 // check for valid conference
 $conference = $_GET['c'] ?? null;
 if (!$conference) {

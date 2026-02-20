@@ -5,18 +5,8 @@
  * otherwise redirect to the home page
  * @return void
  */
-function redirectIfLoggedIn(): void
-{
-    if (isset($_SESSION['user'])) {
-        if ($_SESSION['user']->isAdmin()) {
-            header('Location: /backbone');
-        } else {
-            header('Location: /profile');
-        }
-        exit;
-    }
-}
-redirectIfLoggedIn();
+
+checkAuth(TRUE);
 
 function handlePost($database): void
 {
@@ -115,7 +105,7 @@ function handlePost($database): void
 		$user = new User($uuid, $ldapUser->mail, $ldapUser->uid, $ldapUser->givenname . ' ' . $ldapUser->sn, NULL, $userInCore);
 	}
 	$_SESSION['user'] = $user;
-    redirectIfLoggedIn();
+    checkAuth(TRUE);
 }
 
 //if post request, process the login

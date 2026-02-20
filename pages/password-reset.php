@@ -1,9 +1,6 @@
 <?php
 
-if (isset($_SESSION['user'])) {
-    header('Location: ' . ($_SESSION['user']->isAdmin() ? '/backbone' : '/profile'));
-    exit;
-}
+checkAuth(TRUE);
 
 function handlePost($database): void
 {

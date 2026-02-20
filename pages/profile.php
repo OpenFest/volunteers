@@ -1,14 +1,9 @@
 <?php
 //check if user is logged in and has admin rights
 
-if (!isset($_SESSION['user'])) {
-	header('Location: /login');
-	exit;
-}
+checkAuth();
 
 $user = $_SESSION['user'];
-//reload user
-$user = User::load($user->getId());
 
 $volunteers = $this->database->query(
     'SELECT v.*,  c.title, json_agg(t.name) as teams FROM volunteers v 

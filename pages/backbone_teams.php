@@ -1,9 +1,6 @@
 <?php
 
-if (!isset($_SESSION['user']) || !$_SESSION['user']->isAdmin()) {
-	header('Location: /login');
-	exit;
-}
+checkAdmin();
 
 $teams = $this->database->query(
 	'SELECT * FROM teams ORDER BY conference DESC'
