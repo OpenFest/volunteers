@@ -16,7 +16,7 @@ if (!$user) {
 }
 
 $volunteers = $this->database->query(
-    'SELECT v.*,  c.title, json_agg(t.name) as teams FROM volunteers v 
+    'SELECT v.*,  c.title, jsonb_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
     LEFT JOIN volunteer_teams vt ON v.id=vt.volunteer
     LEFT JOIN teams t ON vt.team = t.slug 
     LEFT JOIN conferences c ON vt.conference = c.slug
@@ -92,8 +92,9 @@ $volunteers = $this->database->query(
             <p><strong>Език:</strong> <?php echo htmlspecialchars($volunteer->lang); ?></p>
             <p><strong>Екип/и/:</strong>
 		        <?php if (!empty($volunteer->teams)): ?>
-			        <?php foreach (json_decode($volunteer->teams) as $team): ?>
-                        <span class="team-badge"><?php echo htmlspecialchars($team); ?></span>
+			        <?php foreach (json_decode($volunteer->teams) as $team => $isPrimary):
+			         ?>
+                        <span class="team-badge <?php echo ($isPrimary ? 'bg-green': '');?>"><?php echo htmlspecialchars($team); ?></span>
 			        <?php endforeach; ?>
 		        <?php else: ?>
                     <span class="team-badge">N/A</span>

@@ -18,14 +18,79 @@ $volunteer = $this->database->query(
 	'SELECT * FROM volunteers WHERE id = :id',
 	[':id' => $volunteerId]
 );
-
+$volunteer = $volunteer[0] ?? null;
 if (!$volunteer) {
 	echo "<h3 class='login-error'>Доброволецът не е намерен.</h3>";
 	exit;
 }
 
-$volunteer = $volunteer[0];
 $newState = $status === 'accept' ? 'accepted' : 'denied';
+if  ($newState === 'accepted' ) {
+	//check current teams:
+	$teams = $this->database->query(
+		'SELECT team, is_primary FROM volunteer_teams WHERE volunteer = :volunteer',
+		[':volunteer' => $volunteerId]
+	);
+	$foundPrimary = false;
+	foreach ($teams as $team) {
+		if ($team->is_primary) {
+			$foundPrimary = true;
+		}
+	}
+	
+	if (!$foundPrimary) {
+	?>
+		<div class="backbone-page">
+			<div class="page-title">
+				<h1>Задаване на основен екип</h1>
+				<h3><?php echo $volunteer->name . ' няма зададен основен екип. Моля, изберете един!' ?></h3>
+			</div>
+			<div class="pane full-width">
+				<form method="post" id="primary-team-form">
+					<input type="hidden" name="volunteer" value="<?php echo $volunteerId; ?>">
+					<div class="input radio-options">
+					<?php foreach ($teams as $team): ?>
+						<div class="radio">
+							<label for="team-<?php echo $team->team; ?>">
+								<input type="radio" id="team-<?php echo $team->team; ?>" name="team" value="<?php echo $team->team; ?>" required>
+								<?php echo $team->team;?>
+							</label>
+						</div>
+					<?php endforeach; ?>
+					</div>
+					<div class="input">
+						<button  type="submit">Запази</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<script>
+			document.getElementById('primary-team-form').addEventListener('submit', function(e) {
+				e.preventDefault();
+				const formData = new FormData(this);
+				fetch('/backbone/set-primary-team', {
+					method: 'POST',
+					body: formData
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						window.location.href = '/backbone/volunteer/change-status?volunteer=<?php echo $volunteerId; ?>&status=<?php echo $status; ?>';
+					} else {
+						alert(data.message);
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					alert('Грешка при задаване на основен екип. Моля, опитайте отново.');
+				});
+			});
+		</script>
+		<?php
+		return;
+	}
+}
+
 $this->database->query("UPDATE volunteers SET status = :status, status_update_date = now() WHERE id = :id",
 [':status' => $newState, ':id' => $volunteerId]
 );
