@@ -26,10 +26,10 @@ if (empty($_conf)) {
 }
 
 $last10volunteers = $this->database->query(
-	'SELECT v.name, u.email, v.registration_date, vt.conference 
+	'SELECT v.name, u.email, v.registration_date, vt.conference, v.status 
 	FROM volunteers v LEFT JOIN users u on v."user" = u.uid LEFT JOIN volunteer_teams vt ON v.id = vt.volunteer 
 	WHERE vt.conference = COALESCE(:conference, vt.conference)
-	GROUP BY v.name, u.email, v.registration_date, vt.conference 
+	GROUP BY v.name, u.email, v.registration_date, vt.conference, v.status
 	ORDER BY v.registration_date DESC LIMIT 10',
 	[':conference' => $conference ? $conference->slug : null]
 );
@@ -118,9 +118,15 @@ $volunteersTeams = $this->database->query(
             </tr>
             </thead>
             <tbody>
-			<?php foreach ($last10volunteers as $volunteer): ?>
+			<?php foreach ($last10volunteers as $volunteer):
+			    $status = match ($volunteer->status) {
+			         'accepted' => '<span class="green tooltip" >✔<span class="tooltiptext">Accepted</span></span>',
+			         'denied' => '<span class="red tooltip">✘<span class="tooltiptext">Denied</span></span>',
+                     'pending' => '<span class="yellow tooltip">⏳<span class="tooltiptext">Pending</span></span>',
+			    }
+			?>
                 <tr>
-                    <td><?php echo htmlspecialchars($volunteer->name); ?></td>
+                    <td><?php echo $status . ' ' .htmlspecialchars($volunteer->name);  ?></td>
                     <td><?php echo htmlspecialchars($volunteer->email); ?></td>
                     <td><?php echo date('Y-m-d H:i:s', strtotime($volunteer->registration_date)); ?></td>
                 </tr>

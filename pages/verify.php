@@ -34,14 +34,6 @@ function verify($database): User|bool|null
 }
 
 if ($user = verify($this->database)) {
-    if ($user->isActive()) {
-        //add user to LDAP groups, based on team data
-        try {
-            $user->addToLdapGroups(Conference::getActive()->getSlug());
-        } catch (Exception $e) {
-            _log('Failed to add user to LDAP groups: ' . $user->getUsername() . ' - ' . $e->getMessage(), LOG_ERR);
-        }
-    }
     // Set the user in the session
     $_SESSION['user'] = $user;
     header('Location: /profile');
