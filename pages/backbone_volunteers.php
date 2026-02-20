@@ -29,6 +29,7 @@ $volunteers = $this->database->query(
 				<tr>
                     <th>Mugshot</th>
                     <th>Verified</th>
+                    <th>Accepted</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
@@ -51,6 +52,17 @@ $volunteers = $this->database->query(
 							<?php endif; ?>
                         </td>
                         <td><?php echo $volunteer->verified ? '<span class="green">✔</span>' : '<span class="red">✘</span>'; ?></td>
+                        <td>
+                            <?php
+                            if ($volunteer->status === 'pending') {
+                                echo '<a href="/backbone/volunteer/change-status?status=accept&volunteer=' . $volunteer->id . '" class="green">Accept</a>';
+                                echo ' | ';
+                                echo ' <a href="/backbone/volunteer/change-status?status=deny&volunteer=' . $volunteer->id . '" class="red">Deny</a>';
+                            } else {
+                                echo $volunteer->status === 'accepted' ? '<span class="green">✔</span>' : '<span class="red">✘</span>';
+                            }
+                            ?>
+                        </td>
                         <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>

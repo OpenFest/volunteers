@@ -37,46 +37,7 @@ body {
 
 }
 
-.small {
-    font-size: 0.8em; /* Smaller font size */
-}
-.green {
-    color: green; /* Green text color */
-}
-.light-green {
-    color: darkseagreen; /* Light green text color */
-}
-.red {
-    color: red; /* Red text color */
-}
 
-.bg-green {
-    background-color: darkseagreen; /* Green background color */
-    color: white; /* White text for contrast */
-    padding: 5px 10px; /* Some padding for better appearance */
-    border-radius: 4px; /* Rounded corners */
-}
-
-.bg-red {
-    background-color: red; /* Red background color */
-    color: white; /* White text for contrast */
-    padding: 5px 10px; /* Some padding for better appearance */
-    border-radius: 4px; /* Rounded corners */
-}
-
-.bg-yellow {
-    background-color: yellow; /* Yellow background color */
-    color: black; /* Black text for contrast */
-    padding: 5px 10px; /* Some padding for better appearance */
-    border-radius: 4px; /* Rounded corners */
-}
-
-.bg-lightblue {
-    background-color: lightblue; /* Light blue background color */
-    color: black; /* Black text for contrast */
-    padding: 5px 10px; /* Some padding for better appearance */
-    border-radius: 4px; /* Rounded corners */
-}
 
 nav {
     height: 81px;
@@ -205,8 +166,7 @@ form .form-group textarea {
     margin-top: 20px;
 }
 
-.form-actions .btn,
-.add-new .btn {
+.btn {
     padding: 10px 20px;
     background-color: #007bff; /* Example button color */
     color: white;
@@ -216,8 +176,7 @@ form .form-group textarea {
     font-size: 1em;
 }
 
-.form-actions .btn:hover,
-.add-new .btn:hover {
+.btn:hover {
     background-color: #0056b3;
 }
 
@@ -478,4 +437,67 @@ form .form-group textarea {
             padding: 0.5rem;
         }
     }
+}
+
+
+.small {
+    font-size: 0.8em; /* Smaller font size */
+}
+.green {
+    color: green; /* Green text color */
+}
+.light-green {
+    color: darkseagreen; /* Light green text color */
+}
+.red {
+    color: red; /* Red text color */
+}
+
+.bg-green {
+    background-color: darkseagreen; /* Green background color */
+    color: white; /* White text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.bg-red {
+    background-color: red; /* Red background color */
+    color: white; /* White text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.bg-yellow {
+    background-color: yellow; /* Yellow background color */
+    color: black; /* Black text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.bg-lightblue {
+    background-color: lightblue; /* Light blue background color */
+    color: black; /* Black text for contrast */
+    padding: 5px 10px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.border-green {
+    border: 2px solid darkseagreen; /* Green border */
+    padding: 5px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+.border-red {
+    border: 2px solid red; /* Red border */
+    padding: 5px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+.border-yellow {
+    border: 2px solid yellow; /* Yellow border */
+    padding: 5px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
+}
+.border-lightblue {
+    border: 2px solid lightblue; /* Light blue border */
+    padding: 5px; /* Some padding for better appearance */
+    border-radius: 4px; /* Rounded corners */
 }

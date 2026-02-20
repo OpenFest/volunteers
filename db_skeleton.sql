@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS teams
     FOREIGN KEY (conference) REFERENCES conferences (slug)
     );
 
+CREATE TYPE volunteer_status AS ENUM ('pending', 'accepted', 'denied');
+
 CREATE TABLE IF NOT EXISTS volunteers
 (
     id            serial PRIMARY KEY ,
@@ -56,6 +58,8 @@ CREATE TABLE IF NOT EXISTS volunteers
     notes        text            NULL,
     verified bool default false not null,
     registration_date timestamp without time zone NOT NULL DEFAULT now(),
+    status volunteer_status default 'pending' not null,
+    status_update_date timestamp without time zone default null,
     FOREIGN KEY (clarion_email) REFERENCES clarion_users (email),
     FOREIGN KEY ("user") REFERENCES users (uid)
     );

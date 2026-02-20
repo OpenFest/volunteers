@@ -59,6 +59,13 @@ $volunteers = $this->database->query(
     </div>
 
     <?php foreach ($volunteers as $volunteer): ?>
+    <?php
+    $bgClass = match ($volunteer->status) {
+        'accepted' => 'bg-green',
+        'denied' => 'bg-red',
+        default => 'bg-yellow',
+    };
+    ?>
     <div class="pane">
         <div class="profile-header">
             <h2><?php echo htmlspecialchars($volunteer->title);?></h2>
@@ -73,7 +80,15 @@ $volunteers = $this->database->query(
 
         </div>
         <div class="profile-info">
-            <p><strong>Дата на регистрация:</strong> <?php echo htmlspecialchars(date('d.m.Y', strtotime($volunteer->registration_date))); ?></p>
+            <p>
+            <strong>Дата на регистрация:</strong> <?php echo htmlspecialchars(date('d.m.Y', strtotime($volunteer->registration_date))); ?>
+                [
+                <span class="team-badge <?php echo $bgClass;?>"><?php echo ucfirst(htmlspecialchars($volunteer->status)); ?></span>
+                <?php if ($volunteer->status !== 'pending') {
+                    echo ' @ ' . htmlspecialchars($volunteer->status_update_date ? date('d.m.Y', strtotime($volunteer->status_update_date)) : 'N/A');
+                }?>
+                ]
+            </p>
             <p><strong>Размер на тениска:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size)); ?></p>
             <p><strong>Кройка на тениска:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_cut)); ?></p>
             <p><strong>Храна:</strong> <?php echo ucfirst(htmlspecialchars($volunteer->food_preferences)); ?></p>

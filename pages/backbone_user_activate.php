@@ -27,7 +27,7 @@ function activate($database): User|bool|null
 	    //show conformation page
 	    echo "<h1>Activate User</h1>";
 	    echo "<p>Are you sure you want to activate the user <strong>" . htmlspecialchars($user->getUsername() ?: $user->getEmail()) . "</strong>?</p>";
-	    echo "<a href='?user={$user->getId()}&confirm={$hash}' class='button'>Activate</a>";
+	    echo "<a href='?user={$user->getId()}&confirm={$hash}' class='green'>Activate</a>";
 	    return FALSE;
     }
     
