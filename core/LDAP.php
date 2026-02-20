@@ -18,9 +18,9 @@ class LDAP
 		'member',
 	];
 	const userObjectClasses = [
-		'person',
+		'inetOrgPerson',
 		'organizationalPerson',
-		'inetLocalMailRecipient',
+		'person',
 	];
 	const groupObjectClasses = [
 		'groupOfNames',
@@ -198,15 +198,16 @@ class LDAP
 	{
 		$userDN = 'uid=' . ldap_escape($username, '', LDAP_ESCAPE_DN) . ',' . $this->volunteersDN;
 		$entry = [
-			'objectClass' => array_merge(['top'], self::userObjectClasses),
 			'uid' => $username,
+			'mail' => $mail,
 			'givenName' => $givenName,
 			'sn' => $sn,
 			'cn' => $givenName . ' ' . $sn,
-			'mail' => $mail,
 			'userPassword' => $password,
+			'objectClass' => array_merge(['top'], self::userObjectClasses),
 		];
 
+		dump($userDN, $entry, $this->ds);
 		if (!ldap_add($this->ds, $userDN, $entry)) {
 			$msg = "Could not add user: " . ldap_error($this->ds);
 			_log($msg);

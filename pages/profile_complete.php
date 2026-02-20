@@ -37,15 +37,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
 //        //create ldap user
-//        try {
-//            [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
-//            $ldap->addUser($username, $new_password, $firstname, $lastname, $email);
-//            _log('LDAP user created for profile completion: ' . $username);
-//        } catch (Exception $e) {
-//            _log("Failed to create LDAP user for profile completion: " . $username . " - " . $e->getMessage(), LOG_ERR);
-//            echo "<h3 class='login-error'>Грешка в системата! Моля, свържете се с администратор.</h3>";
-//            return;
-//        }
+        try {
+            [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
+            dump([
+                'username' => $username,
+                'new_password' => $new_password,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'email' => $email
+            ]);
+            $ldap->addUser($username, $new_password, $firstname, $lastname, $email);
+            _log('LDAP user created for profile completion: ' . $username);
+        } catch (Exception $e) {
+            _log("Failed to create LDAP user for profile completion: " . $username . " - " . $e->getMessage(), LOG_ERR);
+            echo "<h3 class='login-error'>Грешка в системата! Моля, свържете се с администратор.</h3>";
+            return;
+        }
 
         //update the user in the database
         try {
