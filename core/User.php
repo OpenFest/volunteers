@@ -173,7 +173,6 @@ class User
 	public function setPassword(mixed $password): bool
 	{
 		_log('Setting password for user ' . $this->username);
-		return true; //skip real change for now
 		
 		try {
 			$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
