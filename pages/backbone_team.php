@@ -37,7 +37,7 @@ if (!$team) {
 
 //get team members
 $volunteers = $this->database->query(
-        'SELECT * FROM volunteer_teams vt left join volunteers v on vt.volunteer = v.id 
+        'SELECT * FROM volunteer_teams vt left join volunteers v on vt.volunteer = v.id
         WHERE vt.team = :team AND vt.conference = :conference ORDER BY v.name ASC',
         [':team' => $team->slug, ':conference' => $conference->slug]
 );
@@ -62,7 +62,12 @@ $volunteers = $this->database->query(
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($volunteers as $volunteer): ?>
+            <?php foreach ($volunteers as $volunteer):
+                $state = $volunteer->status === 'accepted' ?
+                    '<span class="green">✔</span>' :
+                    ($volunteer->status === 'denied' ?
+                        '<span class="red">✘</span>' : '<span class="yellow">⏳</span>');
+            ?>
                 <tr>
                     <td>
                         <?php if ($volunteer->mugshot): ?>
@@ -71,7 +76,7 @@ $volunteers = $this->database->query(
                             N/A
                         <?php endif; ?>
                     </td>
-                    <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
+                    <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>
                     <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>

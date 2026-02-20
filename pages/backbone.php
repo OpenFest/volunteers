@@ -37,7 +37,7 @@ $volunteersStats = $this->database->query(
 	FROM (
 	    SELECT v.id, tshirt_size, tshirt_cut, food_preferences, previous_experience, lang 
 	    FROM volunteers v LEFT JOIN users u ON v."user" = u.uid LEFT JOIN volunteer_teams vt ON v.id = vt.volunteer 
-	    WHERE vt.conference = COALESCE(:conference, vt.conference) 
+	    WHERE vt.conference = COALESCE(:conference, vt.conference) and v.status = \'accepted\'
 	    GROUP BY v.id, tshirt_size, tshirt_cut, food_preferences, previous_experience
 	) AS a 
 	GROUP BY a.tshirt_size, a.tshirt_cut, a.food_preferences, a.lang',
@@ -82,8 +82,9 @@ foreach ($volunteersStats as $volunteersStat) {
 }
 
 $volunteersTeams = $this->database->query(
-	'SELECT t.conference, vt.team, COUNT(*) as count FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) 
-	WHERE  t.conference = COALESCE(:conference, t.conference)
+	'SELECT t.conference, vt.team, COUNT(*) as count,  count(CASE WHEN v.status = \'accepted\' THEN 1 END) as accepted
+	FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) left join  volunteers v on vt.volunteer = v.id
+	WHERE  t.conference = COALESCE(:conference, t.conference) 
 	GROUP BY t.conference, vt.team order by count(*) DESC',
 	[':conference' => $conference ? $conference->slug : null]
 );
@@ -146,7 +147,7 @@ $volunteersTeams = $this->database->query(
                 <tr>
                     <td><?php echo htmlspecialchars($team->conference); ?></td>
                     <td><a href="/backbone/team?c=<?php echo $team->conference;?>&t=<?php echo $team->team;?>"><?php echo htmlspecialchars($team->team); ?></a></td>
-                    <td><?php echo htmlspecialchars($team->count); ?></td>
+                    <td><?php echo htmlspecialchars($team->accepted) .' (' . $team->count . ')'; ?></td>
                 </tr>
 			<?php endforeach; ?>
             </tbody>
