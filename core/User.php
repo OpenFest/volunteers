@@ -120,9 +120,6 @@ class User
 			[':uid' => $this->id, ':conference' => $conference]
 		);
 		$ldapUser = $this->getLdapUser();
-		if (!$ldapUser) {
-			throw new Exception('User not found in LDAP');
-		}
 		foreach ($teams as $team) {
 			$ldap->addMember($ldapUser, $team->slug, $team->conference);
 		}
@@ -190,6 +187,9 @@ class User
 	private function getLdapUser()
 	{
 		$ldap = new LDAP(LDAP_SERVER, LDAP_BASE_USERS_DN, LDAP_BASE_GROUPS_DN, LDAP_BIND_DN, LDAP_BIND_PASSWORD);
+		if (empty($this->username)) {
+			throw new Exception('Username not set');
+		}
 		return $ldap->getUser($this->username);
 
 	}

@@ -39,13 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //        //create ldap user
         try {
             [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
-            dump([
-                'username' => $username,
-                'new_password' => $new_password,
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'email' => $email
-            ]);
             $ldap->addUser($username, $new_password, $firstname, $lastname, $email);
             _log('LDAP user created for profile completion: ' . $username);
         } catch (Exception $e) {
