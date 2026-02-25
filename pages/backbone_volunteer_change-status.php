@@ -64,28 +64,7 @@ if  ($newState === 'accepted' ) {
 				</form>
 			</div>
 		</div>
-		<script>
-			document.getElementById('primary-team-form').addEventListener('submit', function(e) {
-				e.preventDefault();
-				const formData = new FormData(this);
-				fetch('/backbone/set-primary-team', {
-					method: 'POST',
-					body: formData
-				})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-						window.location.href = '/backbone/volunteer/change-status?volunteer=<?php echo $volunteerId; ?>&status=<?php echo $status; ?>';
-					} else {
-						alert(data.message);
-					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-					alert('Грешка при задаване на основен екип. Моля, опитайте отново.');
-				});
-			});
-		</script>
+		<script src="/assets/js/primary-team-form.js"></script>
 		<?php
 		return;
 	}

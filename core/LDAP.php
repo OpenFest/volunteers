@@ -153,11 +153,11 @@ class LDAP
 			throw new Exception($msg);
 		}
 		ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-		if (!ldap_start_tls($ds)) {
-			$msg = "Could not start TLS on LDAP server: " . $this->server;
-			_log($msg);
-			throw new Exception($msg);
-		}
+//		if (!ldap_start_tls($ds)) {
+//			$msg = "Could not start TLS on LDAP server: " . $this->server;
+//			_log($msg);
+//			throw new Exception($msg);
+//		}
 		if (!ldap_bind($ds, $dn, $password)) {
 			$msg = "Could not bind to LDAP server with DN: " . $dn;
 			_log($msg);

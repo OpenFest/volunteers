@@ -1,5 +1,5 @@
 <?php
-//check if user is logged in and has admin rights
+//check if user is logged in
 
 checkAuth();
 
@@ -10,8 +10,8 @@ try {
     $ldapUser = $ldap->getUser($user->getUsername());
     if ($ldapUser) {
         _log('Trying to complete profile for user: ' . $user->getUsername() . ' - LDAP user found, redirecting to profile');
-        header('Location: /profile');
-        exit;
+//        header('Location: /profile');
+//        exit;
     }
 } catch (Exception $e) {
     _log("LDAP search failed for user: " . $user->getUsername() . " - " . $e->getMessage(), LOG_ERR);
@@ -35,41 +35,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($new_password !== $confirm_new_password) {
         echo "<h3 class='login-error'>Паролите не съвпадат.</h3>";
     } else {
-
-//        //create ldap user
-        try {
-            [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
-            $ldap->addUser($username, $new_password, $firstname, $lastname, $email);
-            _log('LDAP user created for profile completion: ' . $username);
-        } catch (Exception $e) {
-            _log("Failed to create LDAP user for profile completion: " . $username . " - " . $e->getMessage(), LOG_ERR);
-            echo "<h3 class='login-error'>Грешка в системата! Моля, свържете се с администратор.</h3>";
-            return;
-        }
-
-        //update the user in the database
-        try {
-            $this->database->query(
-                'UPDATE users SET name = :name, phone = :phone, email = :email, username = :username WHERE uid = :uid',
-                [
-                    ':name' => $name,
-                    ':phone' => $phone,
-                    ':email' => $email,
-                    ':username' => $username,
-                    ':uid' => $user->getId()
-                ]
-            );
-
-            $user->reload();
-            $activeConference = Conference::getActive();
-            if ($activeConference) {
-                $user->addToLdapGroups($activeConference->getSlug());
+        // Validate password strength
+        $passwordValidation = validatePasswordStrength($new_password);
+        if (!$passwordValidation['valid']) {
+            echo "<h3 class='login-error'>Паролата не отговаря на изискванията за сигурност:</h3>";
+            echo "<ul class='login-error'>";
+            foreach ($passwordValidation['errors'] as $error) {
+                echo "<li>" . htmlspecialchars($error) . "</li>";
             }
-            header('Location: /profile');
-            exit;
-        } catch (Exception $e) {
-            _log("Error updating user profile: " . $e->getMessage(), LOG_ERR);
-            echo "<h3 class='login-error'>Грешка при обновяване на профила. Моля, опитайте отново по-късно.</h3>";
+            echo "</ul>";
+        } else {
+            //create ldap user
+            try {
+                [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
+                $ldap->addUser($username, $new_password, $firstname, $lastname, $email);
+                _log('LDAP user created for profile completion: ' . $username);
+            } catch (Exception $e) {
+                _log("Failed to create LDAP user for profile completion: " . $username . " - " . $e->getMessage(), LOG_ERR);
+                echo "<h3 class='login-error'>Грешка в системата! Моля, свържете се с администратор.</h3>";
+                return;
+            }
+
+            //update the user in the database
+            try {
+                $this->database->query(
+                    'UPDATE users SET name = :name, phone = :phone, email = :email, username = :username WHERE uid = :uid',
+                    [
+                        ':name' => $name,
+                        ':phone' => $phone,
+                        ':email' => $email,
+                        ':username' => $username,
+                        ':uid' => $user->getId()
+                    ]
+                );
+
+                $user->reload();
+                $activeConference = Conference::getActive();
+                if ($activeConference) {
+                    $user->addToLdapGroups($activeConference->getSlug());
+                }
+                header('Location: /profile');
+                exit;
+            } catch (Exception $e) {
+                _log("Error updating user profile: " . $e->getMessage(), LOG_ERR);
+                echo "<h3 class='login-error'>Грешка при обновяване на профила. Моля, опитайте отново по-късно.</h3>";
+            }
         }
     }
 }
@@ -113,11 +123,11 @@ if (!$user->isActive()): ?>
                         <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user->getUsername()); ?>" required>
                     </div>
                     <div class="form-group">
-                        <label for="new_password">Нова парола</label>
+                        <label for="new_password">Парола</label>
                         <input type="password" id="new_password" name="new_password" required>
                     </div>
                     <div class="form-group">
-                        <label for="confirm_new_password">Потвърди новата парола</label>
+                        <label for="confirm_new_password">Потвърди паролата</label>
                         <input type="password" id="confirm_new_password" name="confirm_new_password" required>
                     </div>
 
@@ -131,3 +141,27 @@ if (!$user->isActive()): ?>
 </div>
 <?php endif; ?>
 
+<script src="/assets/js/password-strength.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize password strength checker
+        const passwordChecker = new PasswordStrengthChecker('new_password', 'confirm_new_password', {
+            minLength: 8,
+            requireUppercase: true,
+            requireLowercase: true,
+            requireNumbers: true,
+            requireSpecialChars: true
+        });
+
+        // Validate on form submit
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!passwordChecker.isValid()) {
+                    e.preventDefault();
+                    alert('Моля, поправете грешките в паролата преди да продължите.');
+                }
+            });
+        }
+    });
+</script>

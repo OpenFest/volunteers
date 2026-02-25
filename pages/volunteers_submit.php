@@ -273,11 +273,7 @@ if ($newVolunteer) {
     ?>
     <h1>Благодарим Ви за регистрацията!</h1>
     <p>На посоченият email е изпратен линк за потвърждение на регистрацията!</p>
-    <script>
-        // Clear the localStorage key used for form submission
-        const storageKey = 'volunteerFormData';
-        localStorage.removeItem(storageKey);
-    </script>
+    <script src="/assets/js/volunteer-submit-cleanup.js"></script>
     <?php
 } else {
     _log('Failed to insert new volunteer for user ID: ' . $userID, LOG_ERR);

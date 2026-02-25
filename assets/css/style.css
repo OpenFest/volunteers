@@ -522,3 +522,55 @@ form .form-group textarea {
     padding: 5px; /* Some padding for better appearance */
     border-radius: 4px; /* Rounded corners */
 }
+
+/* Password Strength Indicator Styles */
+.password-strength-indicator {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.password-strength-indicator .strength-bar {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.password-strength-indicator .strength-bar-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.password-strength-indicator .strength-requirements {
+    font-size: 0.85em;
+    color: #666;
+    line-height: 1.6;
+}
+
+.password-strength-indicator .requirement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+.password-strength-indicator .requirement-icon {
+    display: inline-block;
+    width: 18px;
+    margin-right: 6px;
+    font-weight: bold;
+}
+
+.password-strength-indicator .requirement-text {
+    flex: 1;
+}
+
+.password-strength-indicator .strength-text {
+    font-size: 0.9em;
+    margin-top: 8px;
+    font-weight: bold;
+    text-align: center;
+}

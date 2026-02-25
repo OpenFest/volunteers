@@ -27,6 +27,17 @@ function handlePost($database): void
             echo "<h3 class='login-error'>Паролите не съвпадат.</h3>";
             return;
         }
+        // Validate password strength
+        $passwordValidation = validatePasswordStrength($password);
+        if (!$passwordValidation['valid']) {
+            echo "<h3 class='login-error'>Паролата не отговаря на изискванията за сигурност:</h3>";
+            echo "<ul class='login-error'>";
+            foreach ($passwordValidation['errors'] as $error) {
+                echo "<li>" . htmlspecialchars($error) . "</li>";
+            }
+            echo "</ul>";
+            return;
+        }
         if (!$user->setPassword($password)) {
             echo "<h3 class='login-error'>Грешка при нулиране на паролата. Моля, опитайте по-късно.</h3>";
             return;
@@ -99,7 +110,29 @@ function handleToken($database): void
         <div class="form-actions">
             <button class="btn" type="submit">Нулиране на паролата</button>
         </div>
-    </form>';
+    </form>
+    <script src="/assets/js/password-strength.js"></script>
+    <script>
+        document.addEventListener(\'DOMContentLoaded\', function() {
+            const passwordChecker = new PasswordStrengthChecker(\'password\', \'confirm_password\', {
+                minLength: 8,
+                requireUppercase: true,
+                requireLowercase: true,
+                requireNumbers: true,
+                requireSpecialChars: true
+            });
+            
+            const form = document.querySelector(\'form\');
+            if (form) {
+                form.addEventListener(\'submit\', function(e) {
+                    if (!passwordChecker.isValid()) {
+                        e.preventDefault();
+                        alert(\'Моля, поправете грешките в паролата преди да продължите.\');
+                    }
+                });
+            }
+        });
+    </script>';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
