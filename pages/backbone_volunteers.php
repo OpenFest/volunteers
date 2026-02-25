@@ -4,10 +4,17 @@ checkAdmin();
 
 $volunteers = $this->database->query(
 	"SELECT 
-	*, 
+	v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date,
+	u.name, u.active,
+	vt.conference, json_object_agg(t.name, vt.is_primary) as teams,
 	case when v.name <> u.name then concat(v.name, ' (', u.name, ')') else v.name end as name
 	FROM 
-	volunteers v left join users u on v.user = u.uid ORDER BY registration_date DESC"
+	volunteers v 
+	left join users u on v.user = u.uid 
+	left join volunteer_teams vt on v.id=vt.volunteer
+    left join teams t on vt.team = t.slug
+    GROUP BY v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date, u.name, vt.conference, v.name, u.active
+	ORDER BY registration_date DESC"
 );
 
 ?>
@@ -27,6 +34,7 @@ $volunteers = $this->database->query(
                     <th>Mugshot</th>
                     <th>Verified</th>
                     <th>Accepted</th>
+                    <th>Conference</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
@@ -60,6 +68,7 @@ $volunteers = $this->database->query(
                             }
                             ?>
                         </td>
+                        <td><?php echo htmlspecialchars($volunteer->conference ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
