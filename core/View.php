@@ -112,6 +112,7 @@ class View
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/volunteers">Volunteers</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/teams">Teams</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/conferences">Conferences</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/profile">Profile</a>
 <?php
      }
 ?>
@@ -121,6 +122,7 @@ class View
         // Public navigation for non-admin users
 ?>
         <a class="nav-item" href="<?php echo $basePath; ?>/volunteers/new">Кандидатствай за доброволец</a>
+        <a class="nav-item" href="<?php echo $basePath; ?>/login">Login</a>
 <?php
     }
 ?>

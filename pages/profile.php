@@ -6,7 +6,7 @@ checkAuth();
 $user = $_SESSION['user'];
 
 $volunteers = $this->database->query(
-    'SELECT v.*,  c.title, json_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
+    'SELECT v.*, vt.conference, c.title, json_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
     LEFT JOIN volunteer_teams vt ON v.id=vt.volunteer
     LEFT JOIN teams t ON vt.team = t.slug 
     LEFT JOIN conferences c ON vt.conference = c.slug
@@ -15,6 +15,14 @@ $volunteers = $this->database->query(
 );
 
 $activeConference = Conference::getActive();
+
+$registeredForActiveConf = false;
+foreach ($volunteers as $volunteer) {
+    if ($volunteer->conference === $activeConference->getSlug()) {
+        $registeredForActiveConf = true;
+        break;
+    }
+}
 ?>
 
 <div class="profile-page">
@@ -52,6 +60,11 @@ if ($user->isActive() === false): ?>
     <?php if ($activeConference): ?>
         <div class="pane bg-green">
                 <p>Активна конференция: <strong><?php echo htmlspecialchars($activeConference->getTitle()); ?></strong></p>
+            <?php if (!$registeredForActiveConf): ?>
+                <p><a href="/volunteers/new" class="btn bg-lightblue">Включи се</a></p>
+            <?php else: ?>
+                <p><a href="/volunteers/new" class="btn bg-yellow">Допълнителна регистрация</a> </p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="pane bg-lightblue">
