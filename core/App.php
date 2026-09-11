@@ -31,10 +31,13 @@ class App
 			// Refresh the user data from the database on each request
 			try{
 				$_SESSION['user']->reload();
-			} catch (Exception $e) {
-				//log error (most of the time it should be User not found - reset session in this case)
+			} catch (UserNotFoundException $e) {
+				// No user - reset the session
 				_log('Error reloading user data: ' . $e->getMessage());
 				unset($_SESSION['user']);
+			} catch (Exception $e) {
+				// General error
+				_log('Error reloading user data: ' . $e->getMessage());
 			}
 		}
 		$page = $this->router->getRequestedPage();
