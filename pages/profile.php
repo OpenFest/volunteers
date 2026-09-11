@@ -16,8 +16,8 @@ $volunteers = $this->database->query(
 
 $activeConference = Conference::getActive();
 
+$registeredForActiveConf = false;
 if ($activeConference) {
-    $registeredForActiveConf = false;
     foreach ($volunteers as $volunteer) {
         if ($volunteer->conference === $activeConference->getSlug()) {
             $registeredForActiveConf = true;

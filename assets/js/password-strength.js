@@ -84,16 +84,23 @@ class PasswordStrengthChecker {
             </div>
         `;
 
-        // Insert after password input or in specified container
+        // Insert after password input, or appended into the specified container
+        // (append rather than overwrite so any existing container content is preserved).
         if (this.options.containerId) {
-            container.innerHTML = indicatorHTML;
+            container.insertAdjacentHTML('beforeend', indicatorHTML);
         } else {
             this.passwordInput.insertAdjacentHTML('afterend', indicatorHTML);
         }
 
-        this.strengthBarFill = container.querySelector('.strength-bar-fill');
-        this.strengthText = container.querySelector('.strength-text');
-        this.requirements = container.querySelectorAll('.requirement');
+        // Scope lookups to the indicator wrapper we just inserted, not the whole
+        // container, to avoid matching unrelated elements that may already exist there.
+        const indicator = this.options.containerId
+            ? container.lastElementChild
+            : this.passwordInput.nextElementSibling;
+
+        this.strengthBarFill = indicator.querySelector('.strength-bar-fill');
+        this.strengthText = indicator.querySelector('.strength-text');
+        this.requirements = indicator.querySelectorAll('.requirement');
     }
 
     checkStrength() {

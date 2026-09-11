@@ -38,14 +38,14 @@ function handlePost($database): void
 	//verify the password against ldap
 	if (!$ldapUser) {
         _log("Login attempt with non-existing user: " . $username);
-		echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
+		echo "<h3 class='login-error'>Грешен имейл или парола.</h3>";
 		return; // Stop further processing
 	}
     try{
         $ldap->testBind($ldapUser, $password);
     } catch (Exception $e) {
         _log("LDAP bind failed for user: " . $username . " - " . $e->getMessage(), LOG_ERR);
-        echo "<h3 class='login-error'>Грешен имейл или парола.</h1>";
+        echo "<h3 class='login-error'>Грешен имейл или парола.</h3>";
         return; // Stop further processing
     }
 	// Check if the user exists in the local database
