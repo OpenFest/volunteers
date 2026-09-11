@@ -94,7 +94,7 @@ class User
 			[':uid' => $this->id]
 		);
 		if (empty($res)) {
-			throw new Exception('User not found');
+			throw new Exception('User with UID ' . $this->id . ' not found');
 		}
 		
 		$user = $res[0];

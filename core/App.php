@@ -29,7 +29,13 @@ class App
 		session_start();
 		if (isset($_SESSION['user']) && $_SESSION['user'] instanceof User) {
 			// Refresh the user data from the database on each request
-			$_SESSION['user']->reload();;
+			try{
+				$_SESSION['user']->reload();
+			} catch (Exception $e) {
+				//log error (most of the time it should be User not found - reset session in this case)
+				_log('Error reloading user data: ' . $e->getMessage());
+				unset($_SESSION['user']);
+			}
 		}
 		$page = $this->router->getRequestedPage();
 		$this->view->render($page);
