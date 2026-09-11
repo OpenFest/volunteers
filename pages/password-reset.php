@@ -69,7 +69,7 @@ function handlePost($database): void
         $subject = "Инструкции за възстановяване на паролата";
         $message = "Здравейте " . $user->getName() . ", 
 \n\nПолучихме заявка за възстановяване на паролата за вашия акаунт. Можете да нулирате паролата си, като кликнете на следната връзка:\n\n{$resetLink}\n\nТази връзка ще бъде валидна за 1 час. Ако не сте направили тази заявка, моля, игнорирайте това съобщение.\n\nПоздрави,\nЕкипът на конференцията";
-        $headers = "From: no-reply@{$_SERVER['HTTP_HOST']}\ r\nReply-To: no-reply@{$_SERVER['HTTP_HOST']}\r\n";
+        $headers = "From: no-reply@{$_SERVER['HTTP_HOST']}\r\nReply-To: no-reply@{$_SERVER['HTTP_HOST']}\r\n";
         if (!mail($user->getEmail(), $subject, $message, $headers)) {
             echo "<h3 class='login-error'>Грешка при изпращане на имейл. Моля, опитайте по-късно.</h3>";
             return;
