@@ -27,16 +27,18 @@ class Router
         // Remove any query string parameters (e.g., ?id=123)
         $requestUri = strtok($requestUri, '?');
 
-        // Remove the base path if the app is in a subdirectory
-        if (!empty($this->basePath) && str_starts_with($requestUri, $this->basePath)) {
+        // Remove the base path if the app is in a subdirectory.
+        // Only strip it when it matches a full path segment (exact match or followed by '/')
+        if (!empty($this->basePath) && ($requestUri === $this->basePath || str_starts_with($requestUri, $this->basePath . '/'))) {
             $requestUri = substr($requestUri, strlen($this->basePath));
         }
 
-        // Default to 'home' if no specific path is requested (e.g., /)
+        // Default to 'home' if no specific path is requested (e.g., / or empty after stripping base path)
         $page = 'home';
-        if ($requestUri !== '/' && $requestUri !== '') {
-            // Remove leading slash and sanitize for file name (e.g., /about -> about)
-            $page = trim($requestUri, '/');
+        $trimmedUri = trim($requestUri, '/');
+        if ($trimmedUri !== '') {
+            // Remove leading/trailing slashes and sanitize for file name (e.g., /about/ -> about)
+            $page = $trimmedUri;
             // Basic sanitization: only allow alphanumeric, hyphens, and underscores.
             $page = preg_replace('%[^a-zA-Z0-9_/-]%', '', $page);
 			//if there are slashes, replace them with underscores
