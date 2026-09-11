@@ -1,6 +1,24 @@
 <?php
 
 checkAdmin();
+//get conf from the url parmas
+$allConferences = Conference::getConferences();
+$activeConference = Conference::getActive();
+$_conf = $_REQUEST['conf'] ?? '';
+
+$conference = null;
+if (empty($_conf)) {
+    if ($activeConference) {
+        $conference = $activeConference->toObject();
+    }
+} else {
+    foreach ($allConferences as $conf) {
+        if ($conf->slug === $_conf) {
+            $conference = $conf;
+            break;
+        }
+    }
+}
 
 $volunteers = $this->database->query(
 	"SELECT 
@@ -13,8 +31,10 @@ $volunteers = $this->database->query(
 	left join users u on v.user = u.uid 
 	left join volunteer_teams vt on v.id=vt.volunteer
     left join teams t on vt.team = t.slug
+    WHERE vt.conference = COALESCE(:conference, vt.conference)
     GROUP BY v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date, u.name, vt.conference, v.name, u.active
-	ORDER BY registration_date DESC"
+	ORDER BY registration_date DESC",
+	[':conference' => $conference ? $conference->slug : null]
 );
 
 ?>
@@ -22,7 +42,17 @@ $volunteers = $this->database->query(
 <div class="backbone-page">
 	<div class="page-title">
 		<h1>Volunteers</h1>
-	</div>
+        <h3>
+            <label for="conference-select">Conference: </label><select name="conference" id="conference-select" onchange="window.location.href='/backbone/volunteers?conf=' + this.value">
+                <option value="all">All Conferences</option>
+                <?php foreach ($allConferences as $conf): ?>
+                    <option value="<?php echo htmlspecialchars($conf->slug); ?>" <?php echo ($conference && $conference->slug === $conf->slug) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($conf->title); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </h3>
+    </div>
 
 	<div class="pane full-width">
         <div class="red">
