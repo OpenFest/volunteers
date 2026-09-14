@@ -32,8 +32,8 @@ function verify($database): User|bool|null
         return FALSE;
     }
     $database->query(
-            'UPDATE volunteers SET verified = TRUE WHERE "user" = :uid AND verified = FALSE AND conference = :conference',
-            [':uid' => $user->getId(), ':conference' => $activeConference->getSlug()]
+            'UPDATE volunteers SET verified = TRUE WHERE "user" = :uid AND verified = FALSE',
+            [':uid' => $user->getId()]
     );
     _log("User {$user->getId()} verified for conference {$activeConference->getSlug()}");
 
