@@ -258,6 +258,9 @@ if ($newVolunteer) {
             "Екипът на конференцията";
     $headers = 'From: no-reply@openfest.org' . "\r\n" .
             'Reply-To: no-reply@openfest.org' . "\r\n" .
+            'Mime-Version: 1.0' . "\r\n" .
+            'Content-Type: text/plain; charset=UTF-8' . "\r\n" .
+            'Content-Transfer-Encoding: 8bit' . "\r\n" .
             'X-Mailer: PHP/' . phpversion();
     if (mail($volunteerData->email, $subject, $message, $headers)) {
         _log('Verification email sent to: ' . $volunteerData->email);

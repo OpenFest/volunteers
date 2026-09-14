@@ -51,7 +51,7 @@ function activate($database): User|bool|null
     //send mail to user to inform him about the activation
     $subject = "Вашият акаунт е активиран";
     $message = "Здравейте " . ($user->getName() ?: $user->getEmail()) . ",\n\nВашият акаунт в системата на конференцията е активиран от администратор. Можете да влезете и да започнете да използвате всички функции на платформата.\nhttp://{$_SERVER['HTTP_HOST']}/profile\n\nПоздрави,\nЕкипът на конференцията";
-	$headers = "From: no-reply@openfest.org\r\nReply-To: no-reply@openfest.org\r\n";
+	$headers = "From: no-reply@openfest.org\r\nReply-To: no-reply@openfest.org\r\nMime-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n";
 	if (!mail($user->getEmail(), $subject, $message, $headers)) {
 	    _log("Failed to send activation email to user: " . $user->getUsername() . " - " . $user->getEmail(), LOG_ERR);
 	}
