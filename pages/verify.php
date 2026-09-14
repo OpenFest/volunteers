@@ -35,7 +35,7 @@ function verify($database): User|bool|null
             'UPDATE volunteers SET verified = TRUE WHERE "user" = :uid AND verified = FALSE',
             [':uid' => $user->getId()]
     );
-    _log("User {$user->getId()} verified for conference {$activeConference->getSlug()}");
+    _log("User {$user->getId()} | {$user->getName()} <{$user->getEmail()}> verified for conference {$activeConference->getSlug()}");
 
     $volunteers = $database->query(
             'SELECT v.*, vt.conference, c.title, json_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
