@@ -23,8 +23,9 @@ if (!$volunteer) {
 	echo "<h3 class='login-error'>Доброволецът не е намерен.</h3>";
 	exit;
 }
-
+$oldState = $volunteer->status;
 $newState = $status === 'accept' ? 'accepted' : 'denied';
+_log("Changing volunteer status for volunteer ID {$volunteerId} from {$oldState} to {$newState}");
 if  ($newState === 'accepted' ) {
 	//check current teams:
 	$teams = $this->database->query(
@@ -88,7 +89,11 @@ if ($newState === 'accepted') {
 				} else {
 					_log('No active conference found when adding accepted volunteer to LDAP groups: ' . $user->getUsername(), LOG_WARNING);
 				}
-				sendActivationMail($user->getEmail(), $activeConference->getTitle(), $user->getName());
+				//only newly accepted volunteers should get an activation email
+                if ($oldState !== 'accepted') {
+                    _log('Sending activation email to accepted volunteer: ' . $user->getUsername() . ' (' . $user->getEmail() . ')');
+                    sendActivationMail($user->getEmail(), $activeConference->getTitle(), $user->getName());
+                }
 				header('Location: /backbone/volunteers');
 				exit;
 			} catch (Exception $e) {
