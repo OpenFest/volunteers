@@ -54,6 +54,29 @@ if (!function_exists('_log')) {
 	}
 }
 
+if (!function_exists('_mail')) {
+	function _mail($to, $subject, $message, $extraHeaders=[]): bool
+	{
+		$subject = mb_encode_mimeheader(
+			$subject,
+			'UTF-8',
+			'B',
+			"\r\n"
+		);
+		
+		$defHeaders = [
+			'From: no-reply@openfest.org' ,
+			'Reply-To: no-reply@openfest.org' ,
+			'Mime-Version: 1.0' ,
+			'Content-Type: text/plain; charset=UTF-8' ,
+			'Content-Transfer-Encoding: 8bit' ,
+			'X-Mailer: PHP/' . phpversion()
+		];
+		$headers = array_merge($defHeaders, $extraHeaders);
+		return mail($to, $subject, $message, implode("\r\n", $headers));
+	}
+}
+
 if (!function_exists('checkAuth')) {
 	function checkAuth($reverse = FALSE): void
 	{

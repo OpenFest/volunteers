@@ -67,9 +67,8 @@ function verify($database): User|bool|null
 {$volunteer->previous_experience}
 EOT;
 
-        $headers = "From:no-reply@openfest.org\r\nReply-To:no-reply@openfest.org\r\nMime-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n";
         $coreEmail = 'core@openfest.org';
-        if (!mail($coreEmail, $subject, $message, $headers)) {
+        if (!_mail($coreEmail, $subject, $message)) {
             _log("Failed to send verification notification email to core: " . $coreEmail, LOG_ERR);
         }
         _log("Sent verification notification email to core: " . $coreEmail);

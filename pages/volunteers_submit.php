@@ -248,21 +248,23 @@ if ($newVolunteer) {
     // Send verification email
     $verificationLink = 'https://' . $_SERVER['HTTP_HOST'] . '/verify?token=' . urlencode($verificationToken);
     $subject = 'Потвърждение на регистрацията като доброволец';
-    $message = "Здравейте, " . htmlspecialchars($volunteerData->name) . ",\n\n" .
-            "Благодарим ви, че се регистрирахте като доброволец за конференцията!\n\n" .
-            "Моля, потвърдете регистрацията си, като кликнете върху следния линк:\n" .
-            $verificationLink . "\n" .
-            "(валидност на линка: 24 часа)\n\n" .
-            "Ако не сте се регистрирали, моля, игнорирайте този имейл.\n\n" .
-            "Поздрави,\n" .
-            "Екипът на конференцията";
-    $headers = 'From: no-reply@openfest.org' . "\r\n" .
-            'Reply-To: no-reply@openfest.org' . "\r\n" .
-            'Mime-Version: 1.0' . "\r\n" .
-            'Content-Type: text/plain; charset=UTF-8' . "\r\n" .
-            'Content-Transfer-Encoding: 8bit' . "\r\n" .
-            'X-Mailer: PHP/' . phpversion();
-    if (mail($volunteerData->email, $subject, $message, $headers)) {
+    $cleanName = htmlspecialchars($volunteerData->name);
+    $message = <<<EOT
+Здравейте, {$cleanName},
+
+Благодарим ви, че се регистрирахте като доброволец за конференцията!
+
+Моля, потвърдете регистрацията си, като кликнете върху следния линк:
+{$verificationLink}
+(валидност на линка: 24 часа)
+
+Ако не сте се регистрирали, моля, игнорирайте този имейл.
+
+Поздрави,
+Екипът на конференцията
+EOT;
+
+    if (_mail($volunteerData->email, $subject, $message)) {
         _log('Verification email sent to: ' . $volunteerData->email);
     } else {
         _log('Failed to send verification email to: ' . $volunteerData->email, LOG_ERR);

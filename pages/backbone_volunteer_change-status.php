@@ -148,8 +148,7 @@ youtube:   https://www.youtube.com/@openfestbulgaria
 Екипът на Openfest
 EOT;
 
-	$headers = "From: no-reply@openfest.org\r\nReply-To: no-reply@openfest.org\r\nMime-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n";
-	if (!mail($to, $subject, $message, $headers)) {
+	if (!_mail($to, $subject, $message)) {
 			    _log("Failed to send volunteer activation email to: " . $to, LOG_ERR);
 		echo "<h3 class='login-error'>Грешка при изпращане на имейл. Моля, опитайте по-късно.</h3>";
 	}
