@@ -48,6 +48,9 @@ function verify($database): User|bool|null
 
 
     foreach ($volunteers as $volunteer) {
+        $volTeams = json_decode($volunteer->teams, true);
+        $volTeamsString = $volTeams ? implode(', ', array_keys($volTeams)) : 'N/A';
+
         //send mail to core about the verification
         $subject = "Нов доброволец за {$activeConference->getTitle()}";
         $message = <<<EOT
@@ -55,7 +58,7 @@ function verify($database): User|bool|null
 
 Потребителят {$user->getName()} <{$user->getEmail()}> потвърди регистрацията си като доброволец.
 
-Екипи: {$volunteer->teams}
+Екип(и): {$volTeamsString}
 
 Език: {$volunteer->lang}
 Телефон: {$user->getPhone()}
@@ -71,6 +74,7 @@ EOT;
         if (!_mail($coreEmail, $subject, $message)) {
             _log("Failed to send verification notification email to core: " . $coreEmail, LOG_ERR);
         }
+        _log("Volunteer {$volunteer->id} | {$volunteer->name} verified for conference {$volunteer->conference}. Teams: {$volTeamsString}");
         _log("Sent verification notification email to core: " . $coreEmail);
     }
     return $user;
