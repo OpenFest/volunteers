@@ -67,7 +67,7 @@ $volunteers = $this->database->query(
                     '<span class="green">✔</span>' :
                     ($volunteer->status === 'denied' ?
                         '<span class="red">✘</span>' : '<span class="yellow">⏳</span>');
-                $primary = $volunteer->is_primary ? '<span class="green" title="Primary">★</span>' : '';
+                $primary = $volunteer->is_primary ? '<span class="green tooltip">★<span class="tooltiptext">Primary</span></span>' : '';
             ?>
                 <tr>
                     <td>
