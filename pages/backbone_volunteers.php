@@ -22,7 +22,7 @@ if (empty($_conf)) {
 
 $volunteers = $this->database->query(
 	"SELECT 
-	v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date,
+	v.id, v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date,
 	u.name, u.active,
 	vt.conference, json_object_agg(t.name, vt.is_primary) as teams,
 	case when v.name <> u.name then concat(v.name, ' (', u.name, ')') else v.name end as name
@@ -32,7 +32,7 @@ $volunteers = $this->database->query(
 	left join volunteer_teams vt on v.id=vt.volunteer
     left join teams t on vt.team = t.slug
     WHERE vt.conference = COALESCE(:conference, vt.conference)
-    GROUP BY v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date, u.name, vt.conference, v.name, u.active
+    GROUP BY v.id, v.mugshot, v.verified, v.status, u.phone, u.email, v.tshirt_cut, v.tshirt_size, v.food_preferences, v.previous_experience, v.notes, v.registration_date, u.name, vt.conference, v.name, u.active
 	ORDER BY registration_date DESC",
 	[':conference' => $conference ? $conference->slug : null]
 );
