@@ -83,7 +83,7 @@ $volunteers = $this->database->query(
 							<?php if ($volunteer->mugshot): ?>
                                 <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot" />
 							<?php else: ?>
-                                N/A
+                                <img src="/assets/img/default-profile.png" alt="Default Profile Picture" class="vol-mugshot" />
 							<?php endif; ?>
                         </td>
                         <td><?php echo $volunteer->verified ? '<span class="green">✔</span>' : '<span class="red">✘</span>'; ?></td>
