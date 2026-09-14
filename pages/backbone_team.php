@@ -67,6 +67,7 @@ $volunteers = $this->database->query(
                     '<span class="green">✔</span>' :
                     ($volunteer->status === 'denied' ?
                         '<span class="red">✘</span>' : '<span class="yellow">⏳</span>');
+                $primary = $volunteer->is_primary ? '<span class="green" title="Primary">★</span>' : '';
             ?>
                 <tr>
                     <td>
@@ -76,7 +77,7 @@ $volunteers = $this->database->query(
                             N/A
                         <?php endif; ?>
                     </td>
-                    <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
+                    <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A') . ' ' . $primary; ?></td>
                     <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>
                     <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>
