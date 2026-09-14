@@ -38,7 +38,7 @@ if (!$team) {
 
 //get all volunteers not in this team
 $volunteers = $this->database->query(
-	'SELECT * FROM volunteers v WHERE v.id NOT IN (SELECT volunteer FROM volunteer_teams WHERE team = :team AND conference = :conference) ORDER BY v.name ASC',
+	'SELECT * FROM volunteers v WHERE v.id IN (SELECT volunteer FROM volunteer_teams WHERE conference = :conference) AND v.id NOT IN (SELECT volunteer FROM volunteer_teams WHERE team = :team AND conference = :conference)  ORDER BY v.name ASC',
 	[':team' => $team->slug, ':conference' => $conference->slug]
 );
 
