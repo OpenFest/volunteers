@@ -57,8 +57,8 @@ function verify($database): User|bool|null
 
 Екипи: {$volunteer->teams}
 
-Език: {$volunteer->language}
-Телефон: {$volunteer->phone}
+Език: {$volunteer->lang}
+Телефон: {$user->getPhone()}
 Размер на тениска: {$volunteer->tshirt_size}
 Кройка на тениска: {$volunteer->tshirt_cut}
 Предпочитания за храна: {$volunteer->food_preferences}
