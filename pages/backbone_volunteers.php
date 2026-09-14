@@ -77,7 +77,18 @@ $volunteers = $this->database->query(
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($volunteers as $volunteer): ?>
+				<?php foreach ($volunteers as $volunteer):
+                    $volTeams = json_decode($volunteer->teams, true);
+                    $volTeamsString = [];
+                    foreach ($volTeams as $teamName => $isPrimary) {
+                        if ($isPrimary) {
+                            $volTeamsString[] = '<span class="team-badge bg-green">' . htmlspecialchars($teamName) . '</span>';
+                        } else {
+                            $volTeamsString[] = '<span class="team-badge">' . htmlspecialchars($teamName) . '</span>';
+                        }
+                    }
+                    $volTeamsString = implode(' ', $volTeamsString);
+				?>
 					<tr <?php if (!$volunteer->active) echo 'class="red"'; ?>>
                         <td>
 							<?php if ($volunteer->mugshot): ?>
@@ -99,7 +110,7 @@ $volunteers = $this->database->query(
                             ?>
                         </td>
                         <td><?php echo htmlspecialchars($volunteer->conference ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></br><?php echo $volTeamsString; ?></td>
                         <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
                         <td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut ?? 'N/A')); ?></td>

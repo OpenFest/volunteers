@@ -60,7 +60,7 @@ $teams = $this->database->query(
 				<?php foreach ($teams as $team): ?>
 					<tr>
 						<td><?php echo htmlspecialchars($team->conference); ?></td>
-						<td><?php echo htmlspecialchars($team->slug); ?></td>
+						<td><a href="/backbone/team?c=<?php echo htmlspecialchars($team->conference); ?>&t=<?php echo htmlspecialchars($team->slug); ?>"><?php echo htmlspecialchars($team->slug); ?></a></td>
 						<td><?php echo htmlspecialchars($team->name); ?></td>
 						<td><?php echo htmlspecialchars($team->description); ?></td>
 					</tr>
