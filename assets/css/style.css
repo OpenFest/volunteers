@@ -345,6 +345,10 @@ form .form-group textarea {
             padding: 5px;
             border: 1px solid #ddd; /* Adds a border to table cells */
             text-align: start; /* Aligns text to the left */
+
+            .compact & {
+                padding: 0 5px; /* Less padding for compact tables */
+            }
         }
         th {
             background-color: #f4f4f4; /* Light background for header */

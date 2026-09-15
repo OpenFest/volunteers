@@ -58,7 +58,7 @@ $volunteers = $this->database->query(
         <div class="red">
             Red color = user not active yet.
         </div>
-		<table>
+		<table class="compact">
 			<thead>
 				<tr>
                     <th>Mugshot</th>
