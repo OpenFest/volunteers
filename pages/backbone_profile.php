@@ -16,7 +16,7 @@ if (!$user) {
 }
 
 $volunteers = $this->database->query(
-    'SELECT v.*, vt.conference, c.title, jsonb_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
+    'SELECT v.*, vt.conference, c.title,jsonb_object_agg(t.slug, jsonb_build_object(\'name\', t.name, \'is_primary\', vt.is_primary)) as teams FROM volunteers v 
     LEFT JOIN volunteer_teams vt ON v.id=vt.volunteer
     LEFT JOIN teams t ON vt.team = t.slug 
     LEFT JOIN conferences c ON vt.conference = c.slug
@@ -92,9 +92,17 @@ $volunteers = $this->database->query(
             <p><strong>Език:</strong> <?php echo htmlspecialchars($volunteer->lang); ?></p>
             <p><strong>Екип/и/:</strong>
 		        <?php if (!empty($volunteer->teams)): ?>
-			        <?php foreach (json_decode($volunteer->teams) as $team => $isPrimary):
+			        <?php foreach (json_decode($volunteer->teams) as $team => $teamData):
+                         $isPrimary = $teamData->is_primary;
+                         $teamName = $teamData->name;
 			         ?>
-                        <span class="team-badge <?php echo ($isPrimary ? 'bg-green': '');?>"><?php echo htmlspecialchars($team); ?></span>
+                        <button
+                        class="team-badge <?php echo ($isPrimary ? 'bg-green': 'btn set-primary-team-button');?>"
+                        data-volunteer-id="<?php echo htmlspecialchars($volunteer->id); ?>"
+                        data-team-id="<?php echo htmlspecialchars($team); ?>"
+                        >
+                        <?php echo htmlspecialchars($teamName); ?>
+                        </button>
 			        <?php endforeach; ?>
 		        <?php else: ?>
                     <span class="team-badge">N/A</span>
@@ -113,5 +121,6 @@ $volunteers = $this->database->query(
 
     <?php endforeach;?>
 </div>
+<script src="/assets/js/set-primary-team.js"></script>
 <script src="/assets/js/team-add-volunteer.js"></script>
 

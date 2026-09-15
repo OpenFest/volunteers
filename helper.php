@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\NoReturn;
-
 if (!function_exists("dump")) {
 	function dump(...$args): void
 	{
@@ -14,7 +12,6 @@ if (!function_exists("dump")) {
 }
 
 if (!function_exists("dd")) {
-	#[NoReturn]
 	function dd(...$args): void
 	{
 		dump(...$args);
@@ -44,6 +41,9 @@ if (!function_exists('_log')) {
 	// Log a message to the syslog
 	function _log($message, $level = LOG_INFO): void
 	{
+		if (isset($_SESSION['user']) && method_exists($_SESSION['user'], 'getId')) {
+			$message = "[User ID: {$_SESSION['user']->getId()}] $message";
+		}
 		if (function_exists('syslog')) {
 			openlog('vol', LOG_PID | LOG_PERROR, LOG_USER);
 			syslog($level, $message);
