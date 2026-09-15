@@ -88,12 +88,12 @@ $volunteers = $this->database->query(
                         }
                     }
                     $volTeamsString = implode(' ', $volTeamsString);
-                    $volPrevExp = htmlspecialchars($volunteer->previous_experience);
+                    $volPrevExp = nl2br(htmlspecialchars($volunteer->previous_experience));
                     if (mb_strlen($volunteer->previous_experience) > 50) {
                         $volPrevExp = '<span class="tooltip">'.mb_substr(htmlspecialchars($volunteer->previous_experience), 0, 50) . '...' . '<span class="tooltiptext spaced">' . htmlspecialchars($volunteer->previous_experience) . '</span></span>';
                     }
 
-                    $volNotes = htmlspecialchars($volunteer->notes);
+                    $volNotes = nl2br(htmlspecialchars($volunteer->notes));
                     if (mb_strlen($volunteer->notes) > 50) {
                         $volNotes = '<span class="tooltip">' . '<span class="tooltiptext spaced">' . htmlspecialchars($volunteer->notes) . '</span>'.mb_substr(htmlspecialchars($volunteer->notes), 0, 50) . '...'.'</span>';
                     }

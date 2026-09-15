@@ -114,8 +114,8 @@ $volunteers = $this->database->query(
                     +
                 </button>
             </p>
-            <p><strong>Предишен опит:</strong> <?php echo htmlspecialchars($volunteer->previous_experience); ?></p>
-            <p><strong>Бележки:</strong> <?php echo htmlspecialchars($volunteer->notes); ?></p>
+            <p><strong>Предишен опит:</strong> <?php echo nl2br(htmlspecialchars($volunteer->previous_experience)); ?></p>
+            <p><strong>Бележки:</strong> <?php echo nl2br(htmlspecialchars($volunteer->notes)); ?></p>
         </div>
     </div>
 
