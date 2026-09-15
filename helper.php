@@ -41,8 +41,8 @@ if (!function_exists('_log')) {
 	// Log a message to the syslog
 	function _log($message, $level = LOG_INFO): void
 	{
-		if (isset($_SESSION['user']) && method_exists($_SESSION['user'], 'getId')) {
-			$message = "[User ID: {$_SESSION['user']->getId()}] $message";
+		if (isset($_SESSION['user']) && method_exists($_SESSION['user'], 'getUsername')) {
+			$message = "[User ID: {$_SESSION['user']->getUsername()}] $message";
 		}
 		if (function_exists('syslog')) {
 			openlog('vol', LOG_PID | LOG_PERROR, LOG_USER);
