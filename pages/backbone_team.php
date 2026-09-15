@@ -51,11 +51,6 @@ $volunteers = $this->database->query(
 	</div>
 
 	<div class="pane full-width">
-	    <div class="add-new">
-            <button type="button" onclick="window.location.href='/backbone/team/add-volunteer?c=<?php echo htmlspecialchars($conference->slug); ?>&t=<?php echo htmlspecialchars($team->slug); ?>'" class="btn">
-                Add Volunteer
-            </button>
-        </div>
         <table>
             <thead>
             <tr>

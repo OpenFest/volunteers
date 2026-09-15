@@ -16,7 +16,7 @@ if (!$user) {
 }
 
 $volunteers = $this->database->query(
-    'SELECT v.*,  c.title, jsonb_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
+    'SELECT v.*, vt.conference, c.title, jsonb_object_agg(t.name, vt.is_primary) as teams FROM volunteers v 
     LEFT JOIN volunteer_teams vt ON v.id=vt.volunteer
     LEFT JOIN teams t ON vt.team = t.slug 
     LEFT JOIN conferences c ON vt.conference = c.slug
@@ -99,6 +99,12 @@ $volunteers = $this->database->query(
 		        <?php else: ?>
                     <span class="team-badge">N/A</span>
 		        <?php endif; ?>
+                <button
+                        data-volunteer="<?php echo htmlspecialchars($volunteer->id); ?>"
+                        data-conference="<?php echo htmlspecialchars($volunteer->conference); ?>"
+                        class="btn team-badge bg-lightblue assign-to-team-button">
+                    +
+                </button>
             </p>
             <p><strong>Предишен опит:</strong> <?php echo htmlspecialchars($volunteer->previous_experience ? 'Да' : 'Не'); ?></p>
             <p><strong>Бележки:</strong> <?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></p>
@@ -107,4 +113,5 @@ $volunteers = $this->database->query(
 
     <?php endforeach;?>
 </div>
+<script src="/assets/js/team-add-volunteer.js"></script>
 

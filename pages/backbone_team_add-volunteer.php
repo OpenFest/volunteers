@@ -2,11 +2,17 @@
 
 checkAdmin();
 
+//get raw data from POST request
+$rawData = json_decode(file_get_contents('php://input'), true);
+
 //check valid conference
-$conference = $_GET['c'] ?? null;
+$conference = $_REQUEST['c'] ?? $rawData['c'] ?? null;
 if (!$conference) {
-	header('Location: /backbone');
-	exit;
+    echo json_encode([
+        'success' => false,
+        'message' => 'Невалидна конференция.'
+    ]);
+    exit();
 }
 
 $conference = $this->database->query(
@@ -15,15 +21,21 @@ $conference = $this->database->query(
 );
 $conference = array_shift($conference);
 if (!$conference) {
-	header('Location: /backbone');
-	exit;
+    echo json_encode([
+        'success' => false,
+        'message' => 'Невалидна конференция!'
+    ]);
+    exit();
 }
 
 //check valid team
-$team = $_GET['t'] ?? null;
+$team = $_REQUEST['t'] ?? $rawData['t'] ?? null;
 if (!$team) {
-	header('Location: /backbone');
-	exit;
+    echo json_encode([
+        'success' => false,
+        'message' => 'Невалиден екип.'
+    ]);
+    exit();
 }
 
 $team = $this->database->query(
@@ -32,25 +44,20 @@ $team = $this->database->query(
 );
 $team = array_shift($team);
 if (!$team) {
-	header('Location: /backbone');
-	exit;
-}
-
-//get all volunteers not in this team
-$volunteers = $this->database->query(
-	'SELECT * FROM volunteers v WHERE v.id IN (SELECT volunteer FROM volunteer_teams WHERE conference = :conference) AND v.id NOT IN (SELECT volunteer FROM volunteer_teams WHERE team = :team AND conference = :conference)  ORDER BY v.name ASC',
-	[':team' => $team->slug, ':conference' => $conference->slug]
-);
-
-if (empty($volunteers)) {
-	echo "<h3 class='login-error'>Няма налични доброволци за добавяне към този екип.</h3>";
+    echo json_encode([
+        'success' => false,
+        'message' => 'Невалиден екип!'
+    ]);
 	exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	$volunteerId = $_POST['volunteer'] ?? NULL;
+	$volunteerId = $_POST['volunteer'] ?? $rawData['volunteer'] ?? null;
 	if (!$volunteerId) {
-		echo "<h3 class='login-error'>Моля, изберете доброволец.</h3>";
+		echo json_encode([
+            'success' => false,
+            'message' => 'Моля, изберете доброволец.'
+        ]);
 		exit;
 	}
 	
@@ -60,8 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		[':volunteer' => $volunteerId, ':team' => $team->slug, ':conference' => $conference->slug]
 	);
 	if ($existing) {
-		echo "<h3 class='login-error'>Доброволецът вече е част от този екип.</h3>";
-		exit;
+		echo json_encode([
+            'success' => false,
+            'message' => 'Доброволецът вече е част от този екип.'
+        ]);
+		exit();
 	}
 	
 	//add volunteer to team
@@ -69,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		'INSERT INTO volunteer_teams (volunteer, team, conference) VALUES (:volunteer, :team, :conference)',
 		[':volunteer' => $volunteerId, ':team' => $team->slug, ':conference' => $conference->slug]
 	);
+
 	//get volunteer data
 	$volunteer = $this->database->query(
 		'SELECT * FROM volunteers WHERE id = :id',
@@ -87,30 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			_log('Failed to add volunteer to LDAP groups for conference: ' . $conference->slug . ': ' . $e->getMessage(), LOG_ERR);
 		}
 	}
-	header('Location: /backbone/team?c=' . urlencode($conference->slug) . '&t=' . urlencode($team->slug));
-	exit;
+    header('Content-Type: application/json');
+    echo json_encode([
+            'success' => true,
+            'message' => 'Volunteer added to team successfully.'
+    ]);
+    exit();
 }
-?>
-<div class="backbone-page">
-	<div class="page-title">
-		<h1>Add Volunteer to Team <?php echo htmlspecialchars($team->name);?> [<?php echo htmlspecialchars($conference->title) ?>]</h1>
-	</div>
-	<div class="pane full-width">
-		<form method="post" id="add-volunteer-form" >
-			<input type="hidden" name="team" value="<?php echo htmlspecialchars($team->slug); ?>">
-			<input type="hidden" name="conference" value="<?php echo htmlspecialchars($conference->slug); ?>">
-			<div class="input">
-				<label for="volunteer">Volunteer:</label>
-				<select name="volunteer" id="volunteer" required>
-					<option value="">Select a volunteer</option>
-					<?php foreach ($volunteers as $volunteer): ?>
-						<option value="<?php echo htmlspecialchars($volunteer->id); ?>"><?php echo htmlspecialchars($volunteer->name); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</div>
-			<div class="input">
-				<button type="submit" class="btn">Add Volunteer</button>
-			</div>
-		</form>
-	</div>
-</div>
