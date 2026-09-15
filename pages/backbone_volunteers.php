@@ -88,6 +88,15 @@ $volunteers = $this->database->query(
                         }
                     }
                     $volTeamsString = implode(' ', $volTeamsString);
+                    $volPrevExp = htmlspecialchars($volunteer->previous_experience);
+                    if (mb_strlen($volunteer->previous_experience) > 50) {
+                        $volPrevExp = '<span class="tooltip">'.mb_substr(htmlspecialchars($volunteer->previous_experience), 0, 50) . '...' . '<span class="tooltiptext spaced">' . htmlspecialchars($volunteer->previous_experience) . '</span></span>';
+                    }
+
+                    $volNotes = htmlspecialchars($volunteer->notes);
+                    if (mb_strlen($volunteer->notes) > 50) {
+                        $volNotes = '<span class="tooltip">' . '<span class="tooltiptext spaced">' . htmlspecialchars($volunteer->notes) . '</span>'.mb_substr(htmlspecialchars($volunteer->notes), 0, 50) . '...'.'</span>';
+                    }
 				?>
 					<tr <?php if (!$volunteer->active) echo 'class="red"'; ?>>
                         <td>
@@ -116,8 +125,8 @@ $volunteers = $this->database->query(
                         <td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut ?? 'N/A')); ?></td>
                         <td><?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size ?? 'N/A')); ?></td>
                         <td><?php echo ucwords(htmlspecialchars($volunteer->food_preferences ?? 'N/A')); ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>
+                        <td><?php echo $volPrevExp ?? 'N/A'; ?></td>
+                        <td><?php echo $volNotes ?? 'N/A'; ?></td>
                         <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>
 					</tr>
 				<?php endforeach; ?>

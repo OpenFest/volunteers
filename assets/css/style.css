@@ -452,6 +452,7 @@ form .form-group textarea {
 .tooltiptext {
     visibility: hidden;
     min-width: 130px;
+    /*width: 100%;*/
     background-color: rgba(0, 0, 0, 0.75);
     color: #fff;
     text-align: center;
@@ -459,6 +460,9 @@ form .form-group textarea {
     padding: 5px 0;
     position: absolute;
     z-index: 1;
+    &.spaced {
+        padding: 10px 5px;
+    }
 }
 
 .tooltip:hover .tooltiptext {

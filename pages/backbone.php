@@ -126,7 +126,7 @@ $volunteersTeams = $this->database->query(
 			    $teams = json_decode($volunteer->teams, true);
 			    $teamsMarkers = '';
 			    foreach ($teams as $team => $isPrimary) {
-			        $teamsMarkers .= '<span class="team-badge inline ' . ($isPrimary ? 'bg-green' : '') . '" title="' . htmlspecialchars($team) . '">' . htmlspecialchars(ucfirst(substr($team, 0, 3))) . '</span> ';
+			        $teamsMarkers .= '<span class="team-badge inline tooltip ' . ($isPrimary ? 'bg-green' : '') . '" ><span class="tooltiptext">' . htmlspecialchars($team) . '</span>' . htmlspecialchars(ucfirst(substr($team, 0, 3))) . '</span> ';
 			    }
 			?>
                 <tr>
