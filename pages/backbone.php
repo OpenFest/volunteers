@@ -23,7 +23,7 @@ if (empty($_conf)) {
 }
 
 $last10volunteers = $this->database->query(
-	'SELECT v.name, u.email, v.registration_date, vt.conference, v.status 
+	'SELECT v.name, u.email, v.registration_date, vt.conference, v.status, json_object_agg(vt.team, vt.is_primary) as teams 
 	FROM volunteers v LEFT JOIN users u on v."user" = u.uid LEFT JOIN volunteer_teams vt ON v.id = vt.volunteer 
 	WHERE vt.conference = COALESCE(:conference, vt.conference)
 	GROUP BY v.name, u.email, v.registration_date, vt.conference, v.status
@@ -111,6 +111,7 @@ $volunteersTeams = $this->database->query(
             <thead>
             <tr>
                 <th>Name</th>
+                <th>Teams</th>
                 <th>Email</th>
                 <th>Reg. Date</th>
             </tr>
@@ -121,10 +122,16 @@ $volunteersTeams = $this->database->query(
 			         'accepted' => '<span class="green tooltip" >✔<span class="tooltiptext">Accepted</span></span>',
 			         'denied' => '<span class="red tooltip">✘<span class="tooltiptext">Denied</span></span>',
                      'pending' => '<span class="yellow tooltip">⏳<span class="tooltiptext">Pending</span></span>',
+			    };
+			    $teams = json_decode($volunteer->teams, true);
+			    $teamsMarkers = '';
+			    foreach ($teams as $team => $isPrimary) {
+			        $teamsMarkers .= '<span class="team-badge inline ' . ($isPrimary ? 'bg-green' : '') . '" title="' . htmlspecialchars($team) . '">' . htmlspecialchars(ucfirst(substr($team, 0, 3))) . '</span> ';
 			    }
 			?>
                 <tr>
                     <td><?php echo $status . ' ' .htmlspecialchars($volunteer->name);  ?></td>
+                    <td><?php echo $teamsMarkers; ?></td>
                     <td><?php echo htmlspecialchars($volunteer->email); ?></td>
                     <td><?php echo date('Y-m-d H:i:s', strtotime($volunteer->registration_date)); ?></td>
                 </tr>

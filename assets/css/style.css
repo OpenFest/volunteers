@@ -269,6 +269,10 @@ form .form-group textarea {
     border-radius: 4px;
     font-size: 0.9em; /* Slightly smaller font size for badges */
     margin-bottom: 10px; /* Space below the badge */
+    &.inline {
+        display: inline;
+        padding: 5px;
+    }
 }
 
 .teams-list{
