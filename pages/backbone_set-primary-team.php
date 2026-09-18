@@ -35,5 +35,21 @@ $this->database->query(
 );
 _log("Set primary team for volunteer $volunteerId to '$team'");
 
+//get volunteer data and user data for ldap refresh (temp way to fix ldap access)
+$volunteer = $this->database->query(
+	'SELECT * FROM volunteers WHERE id = :id',
+	[':id' => $volunteerId]
+);
+$volunteer = array_shift($volunteer);
+$user = User::load($volunteer->user);
+if ($user->isActive()) {
+	try {
+		$user->addToLdapGroups($conference->slug);
+		_log('Added volunteer to LDAP groups for conference: ' . $conference->slug);
+	} catch (Exception $e) {
+		_log('Failed to add volunteer to LDAP groups for conference: ' . $conference->slug . ': ' . $e->getMessage(), LOG_ERR);
+	}
+}
+
 echo json_encode(['success' => true, 'message' => 'Основният екип е зададен успешно.']);
 exit;
