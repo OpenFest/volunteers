@@ -44,10 +44,10 @@ $volunteer = array_shift($volunteer);
 $user = User::load($volunteer->user);
 if ($user->isActive()) {
 	try {
-		$user->addToLdapGroups($conference->slug);
-		_log('Added volunteer to LDAP groups for conference: ' . $conference->slug);
+		$user->addToLdapGroups($conference);
+		_log('Added volunteer to LDAP groups for conference: ' . $conference);
 	} catch (Exception $e) {
-		_log('Failed to add volunteer to LDAP groups for conference: ' . $conference->slug . ': ' . $e->getMessage(), LOG_ERR);
+		_log('Failed to add volunteer to LDAP groups for conference: ' . $conference . ': ' . $e->getMessage(), LOG_ERR);
 	}
 }
 
