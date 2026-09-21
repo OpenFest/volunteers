@@ -53,7 +53,31 @@ class User
 			(bool)$user->active
 		);
 	}
-
+	
+	public static function loadByEmail(string $email): ?User
+	{
+		if (empty($email)) {
+			return null;
+		}
+		$user = Database::getInstance()->query(
+			'SELECT * FROM users WHERE email = :email',
+			[':email' => $email]
+		);
+		$user = $user[0] ?? null;
+		if (empty($user)) {
+			return NULL;
+		}
+		return new self(
+			$user->uid,
+			$user->email,
+			$user->username ?? '',
+			$user->name,
+			$user->phone,
+			(bool)$user->admin,
+			(bool)$user->active
+		);
+	}
+	
 	public function getId(): string
 	{
 		return $this->id;

@@ -1,7 +1,35 @@
 <?php
 //check if user is logged in
 
-checkAuth();
+if (isset($_GET['token'])) {
+    $token = $_GET['token'];
+    if (empty($token)) {
+        echo "<h3 class='login-error'>Невалиден токен.</h3>";
+        return;
+    }
+
+    $user = $this->database->query(
+        'SELECT * FROM users WHERE token = :token AND token_expiry > NOW()',
+        [':token' => $token]
+    );
+    $user = $user[0] ?? null;
+
+    if ($user) {
+        //setup clean session and log the user in
+        checkAuth(TRUE);
+        $userObject = User::load($user->uid);
+        $_SESSION['user'] = $userObject;
+        _log('User profile completion: ' . $userObject->getUsername() . ' (' . $userObject->getEmail() . ')');
+        $userObject->resetToken();
+        _log('User token reset.');
+    } else {
+        echo "<h3 class='login-error'>Невалидна връзка за завършване на профила. Моля, свържете се с администратора.</h3>";
+        return;
+    }
+} else {
+    //standard auth check for logged users
+    checkAuth();
+}
 
 $user = $_SESSION['user'];
 // check ldap user and redirect to profile, if exists

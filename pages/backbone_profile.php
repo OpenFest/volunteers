@@ -3,6 +3,37 @@
 
 checkAdmin();
 
+if (isset($_GET['remind-complete'])) {
+    $email = $_GET['remind-complete'];
+    $user = User::loadByEmail($email);
+    if ($user) {
+        $user->resetToken();
+        $token = User::generateToken($user->getEmail());
+        $resetLink = "https://{$_SERVER['HTTP_HOST']}/profile/complete?token={$token}";
+        $subject = "Завършване на профил";
+        $message = <<<EOT
+Здравейте {$user->getName()},
+За да завършите профила си и да получите достъп до комуникацията на конференцията, моля, кликнете на следната връзка:
+{$resetLink}
+Тази връзка ще бъде валидна за 24 часа.
+Ако пропуснете да завършите профила си в този срок, ще трябва да поискате нова връзка за завършване на профила. В такъв случай, моля, свържете се с нас!
+
+Поздрави,
+Екипът на конференцията
+EOT;
+        if (!_mail($user->getEmail(), $subject, $message)) {
+            echo "<h3 class='login-error'>Грешка при изпращане на имейл. Моля, опитайте по-късно.</h3>";
+            return;
+        }
+        $user->setToken($token, '24 hours');
+        _log('Resent profile completion email to user: ' . $user->getUsername() . ' (' . $user->getEmail() . ')');
+
+        echo '<div class="pane full-width"><div class="pane-header"><p class="bg-green">Activation email sent to ' . htmlspecialchars($email) . '</p></div></div>';
+    } else {
+        echo '<div class="pane full-width"><div class="pane-header"><p class="bg-red">No user found with email ' . htmlspecialchars($email) . '</p></div></div>';
+    }
+}
+
 $userID = $_GET['user'] ?? null;
 if (!$userID) {
     header('Location: /backbone');
