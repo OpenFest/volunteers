@@ -64,7 +64,6 @@ function handlePost($database): void
     if (!empty($user)) {
         $user = User::load($user[0]->uid);
         $resetToken = User::generateToken($user->getEmail());
-        $user->setToken($resetToken, '1 hour');
         $resetLink = "https://{$_SERVER['HTTP_HOST']}/password-reset?token={$resetToken}";
         $subject = "Инструкции за възстановяване на паролата";
 		$message = <<<EOT
@@ -84,6 +83,8 @@ EOT;
             echo "<h3 class='login-error'>Грешка при изпращане на имейл. Моля, опитайте по-късно.</h3>";
             return;
         }
+	    $user->setToken($resetToken, '1 hour');
+	    _log('Sent password reset email to user: ' . $user->getUsername() . ' (' . $user->getEmail() . ')');
     }
 
     echo "<h1>Заявката е приета!</h1><p>Ако има потребител с този имейл или потребителско име, ще получите инструкции за възстановяване на паролата.</p>";
