@@ -146,17 +146,17 @@ if (!$user->isActive()): ?>
                 <div class="pane-header"> ℹ️ Основна информация</div>
                 <div class="pane-content">
                     <div class="form-group">
-                        <label for="name">Име</label>
-                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user->getName()); ?>" required>
+                        <label for="name">Име (препоръчително латиница)</label>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
                     </div>
 
                     <div class="form-group">
                         <label for="phone">Телефон</label>
-                        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($user->getPhone() ?? ''); ?>">
+                        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($phone); ?>">
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user->getEmail()); ?>" required>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
                     </div>
                 </div>
             </div>
@@ -165,7 +165,7 @@ if (!$user->isActive()): ?>
                 <div class="pane-content">
                     <div class="form-group">
                         <label for="username">Потребителско име</label>
-                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user->getUsername()); ?>" required>
+                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="new_password">Парола</label>
