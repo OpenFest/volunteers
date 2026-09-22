@@ -50,7 +50,35 @@ function activate($database): User|bool|null
     
     //send mail to user to inform him about the activation
     $subject = "Вашият акаунт е активиран";
-    $message = "Здравейте " . ($user->getName() ?: $user->getEmail()) . ",\n\nВашият акаунт в системата на конференцията е активиран от администратор. Можете да влезете и да започнете да използвате всички функции на платформата.\nhttp://{$_SERVER['HTTP_HOST']}/profile\n\nПоздрави,\nЕкипът на конференцията";
+    if (empty($user->getUsername())) {
+        //no username - send profile completion link
+        $user->resetToken();
+        $token = User::generateToken($user->getEmail());
+        $user->setToken($token, '24 hours');
+		$message =  <<<EOT
+Здравейте,
+Вашият акаунт в системата на конференцията е активиран от администратор.
+За да завършите профила си и да получите достъп до комуникацията на конференцията, моля, кликнете на следната връзка:
+https://{$_SERVER['HTTP_HOST']}/profile/complete?token={$token}
+Тази връзка ще бъде валидна за 24 часа.
+Ако пропуснете да завършите профила си в този срок, ще трябва да поискате нова връзка за завършване на профила. В такъв случай, моля, свържете се с нас!
+
+Поздрави,
+Екипът на конференцията
+EOT;
+
+	} else {
+		//existing username - send activation email
+		$message =  <<<EOT
+Здравейте {$user->getUsername()},
+Вашият акаунт в системата на конференцията е активиран от администратор.
+Можете да влезете и да започнете да използвате всички функции на платформата.
+http://{$_SERVER['HTTP_HOST']}/profile
+
+Поздрави,
+Екипът на конференцията
+EOT;
+    }
 	if (!_mail($user->getEmail(), $subject, $message)) {
 	    _log("Failed to send activation email to user: " . $user->getUsername() . " - " . $user->getEmail(), LOG_ERR);
 	}
