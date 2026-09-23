@@ -212,7 +212,9 @@ class LDAP
 			'objectClass' => array_merge(['top'], self::userObjectClasses),
 		];
 
-		dump($userDN, $entry, $this->ds);
+		$entryToLog = $entry;
+		unset($entryToLog['userPassword']); // Remove password from log
+		_log('Adding LDAP user: ' . $userDN . ' with entry: ' . print_r($entryToLog, TRUE));
 		if (!ldap_add($this->ds, $userDN, $entry)) {
 			$msg = "Could not add user: " . ldap_error($this->ds);
 			_log($msg);
