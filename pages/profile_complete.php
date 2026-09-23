@@ -67,11 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'SELECT * FROM users WHERE email = :email AND uid != :uid',
             [':email' => $email, ':uid' => $user->getId()]
     );
+    [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
     if (empty($name) || empty($email) || empty($username) || empty($new_password) || empty($confirm_new_password)) {
         echo "<h3 class='login-error'>Моля, попълнете всички задължителни полета.</h3>";
+    } elseif (empty($firstname) || empty($lastname)) {
+        echo "<h3 class='login-error'>Моля, въведете поне 2 имена (име и фамилия).</h3>";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "<h3 class='login-error'>Невалиден имейл адрес.</h3>";
     } elseif ($new_password !== $confirm_new_password) {
         echo "<h3 class='login-error'>Паролите не съвпадат.</h3>";
-    } else if (!$passwordValidation['valid']) {
+    } elseif (!$passwordValidation['valid']) {
         echo "<h3 class='login-error'>Паролата не отговаря на изискванията за сигурност:</h3>";
         echo "<ul class='login-error'>";
         foreach ($passwordValidation['errors'] as $error) {
@@ -87,7 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         //create ldap user
         try {
-            [$firstname, $lastname] = explode(' ', $name, 2) + [1 => ''];
             $ldap->addUser($username, $new_password, $firstname, $lastname, $email);
             _log('LDAP user created for profile completion: ' . $username);
         } catch (Exception $e) {
