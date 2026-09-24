@@ -106,7 +106,7 @@ $volunteers = $this->database->query(
                                 <img src="/assets/img/default-profile.png" alt="Default Profile Picture" class="vol-mugshot" />
 							<?php endif; ?>
                         </td>
-                        <td><?php echo $volunteer->verified ? '<span class="green">✔</span>' : '<span class="red">✘</span> <a href="/backbone/send-verification-link?volunteer=' . $volunteer->id . '">Resend Verification</a>'; ?></td>
+                        <td><?php echo $volunteer->verified ? '<span class="green">✔</span>' : '<span class="red">✘</span> <a href="/backbone/send-verification-link?volunteer=' . $volunteer->id . '">Resend</a>'; ?></td>
                         <td>
                             <?php
                             if ($volunteer->status === 'pending') {
