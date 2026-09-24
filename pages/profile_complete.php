@@ -16,7 +16,6 @@ if (isset($_GET['token'])) {
 
     if ($user) {
         //setup clean session and log the user in
-        checkAuth(TRUE);
         $userObject = User::load($user->uid);
         $_SESSION['user'] = $userObject;
         _log('User profile completion: ' . $userObject->getUsername() . ' (' . $userObject->getEmail() . ')');
