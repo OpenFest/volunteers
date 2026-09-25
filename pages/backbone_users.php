@@ -29,9 +29,20 @@ $existingUsers = $this->database->query(
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($newUsers as $user): ?>
+				<?php foreach ($newUsers as $user):
+				    $tokenIcon = '';
+				    if (!empty($user->token)) {
+				        if(strtotime($user->token_expiry) < time()) {
+				            //token red warning icon
+                            $tokenIcon = '<span class="red tooltip"><span class="tooltiptext">Token Expired</span>⚠</span>';
+                        } else {
+                            //token icon yellow sand watch
+                            $tokenIcon = '<span class="yellow tooltip"><span class="tooltiptext">Token Pending</span>⏳</span>';
+                        }
+                    }
+				?>
 					<tr>
-                        <td><a href="/backbone/profile?user=<?php echo $user->uid; ?>"><?php echo htmlspecialchars($user->username ?? 'n/a'); ?></a></td>
+                        <td><?php echo $tokenIcon; ?><a href="/backbone/profile?user=<?php echo $user->uid; ?>"><?php echo htmlspecialchars($user->username ?? 'n/a');?></a></td>
                         <td><?php echo htmlspecialchars($user->name); ?></td>
 						<td><?php echo htmlspecialchars($user->email); ?></td>
 						<td><?php echo htmlspecialchars($user->phone); ?></td>
