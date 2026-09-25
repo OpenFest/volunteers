@@ -35,6 +35,11 @@ $existingUsers = $this->database->query(
 				        if(strtotime($user->token_expiry) < time()) {
 				            //token red warning icon
                             $tokenIcon = '<span class="red tooltip"><span class="tooltiptext">Token Expired</span>⚠</span>';
+                            //token icon if user not active
+                            if (!$user->active) {
+                                //use different icon (red warning with exclamation mark)
+                                $tokenIcon = '<span class="red tooltip"><span class="tooltiptext">Token Expired and User Inactive</span>❗</span>';
+                            }
                         } else {
                             //token icon yellow sand watch
                             $tokenIcon = '<span class="yellow tooltip"><span class="tooltiptext">Token Pending</span>⏳</span>';
