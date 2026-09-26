@@ -11,3 +11,7 @@ const LDAP_BASE_GROUPS_DN = 'base-groups-dn';
 const LDAP_BIND_DN = 'bind-dn';
 const LDAP_BIND_PASSWORD = 'bind-pass';
 const LDAP_USER_ATTRIBUTE = 'user-identifier';
+
+const MAILMAN_API_URL = 'https://your-mailman-api-url';
+const MAILMAN_API_USERNAME = 'mailman-api-username';
+const MAILMAN_API_PASSWORD = 'mailman-api-password';

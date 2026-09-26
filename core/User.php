@@ -218,6 +218,11 @@ class User
 
 	}
 
+    public function addToMailingLists(string $conferenceSlug): void
+    {
+        $mailman = new Mailman(MAILMAN_API_URL, MAILMAN_API_USERNAME, MAILMAN_API_PASSWORD);
+    }
+
 }
 
 class UserNotFoundException extends Exception
