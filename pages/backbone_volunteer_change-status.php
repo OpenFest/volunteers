@@ -125,10 +125,8 @@ website: https://openfest.org
 
 mailing list: team@openfest.org - тук ще бъдете автоматично добавени, пишем анонси и ако някой има въпроси или проблеми, важно е да го следите
 
-регистрирате се тук: https://auth.openfest.org/realms/openfest/account/ - Single Sign On акаунт за (почти) всичко около openfest
-
 matrix:    https://chat.openfest.org - основното място за комуникация общо и по екипи (mobile app: Element)
-git:       https://git.openfest.org - git repository
+git:       https://github.com/OpenFest - git repository
 nextcloud: https://nc.openfest.org - тук са файловете, които не са в git, документи, медия и т.н.
 
 социални медии - чувствайте се свободни да разпространявате информацията за събитието на приятели, познати и всички останали!
