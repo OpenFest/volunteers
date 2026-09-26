@@ -31,14 +31,25 @@ CREATE TABLE IF NOT EXISTS conferences
     registration_close DATE NOT NULL
     );
 
+CREATE TABLE IF NOT EXISTS mail_lists
+(
+    id    serial PRIMARY KEY,
+    name  VARCHAR(60) UNIQUE NOT NULL,
+    value VARCHAR(60) UNIQUE NOT NULL,
+    description TEXT NOT NULL,
+    global bool default false not null
+    );
+
 CREATE TABLE IF NOT EXISTS teams
 (
     conference  VARCHAR(60),
     slug        VARCHAR(60),
     name        VARCHAR(240),
     description TEXT,
+    mail_list   INT,
     PRIMARY KEY (conference, slug),
-    FOREIGN KEY (conference) REFERENCES conferences (slug)
+    FOREIGN KEY (conference) REFERENCES conferences (slug),
+    FOREIGN KEY (mail_list) REFERENCES mail_lists (id)
     );
 
 CREATE TYPE volunteer_status AS ENUM ('pending', 'accepted', 'denied');
