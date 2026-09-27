@@ -149,7 +149,27 @@ class User
 		}
 	}
 
-	public function toObject(): object
+    /**
+     * @throws Exception
+     */
+    public function addToMailingLists(string $conferenceSlug): void
+    {
+        _log('Adding user ' . $this->username . ' to mailing lists for conference ' . $conferenceSlug);
+        $mailman = new Mailman(MAILMAN_API_URL, MAILMAN_API_USERNAME, MAILMAN_API_PASSWORD);
+        $mails = Database::getInstance()->query( 'SELECT m.value FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) LEFT JOIN volunteers v ON (vt.volunteer = v.id) LEFT JOIN users u ON (v."user" = u.uid) LEFT JOIN mail_lists m ON (t.mail_list = m.id OR m.global) WHERE u.uid= :uid and t.conference = :conference GROUP BY m.value;',
+            [':uid' => $this->id, ':conference' => $conferenceSlug]
+        );
+        foreach ($mails as $mail) {
+            _log('Subscribing user ' . $this->username . ' to mailing list ' . $mail->value);
+            if ($mailman->isMember($mail->value, $this->email)) {
+                _log('User ' . $this->username . ' is already a member of mailing list ' . $mail->value);
+                continue;
+            }
+            $mailman->subscribe($mail->value, $this->email, $this->name);
+        }
+    }
+
+    public function toObject(): object
 	{
 		return (object)[
 			'uid' => $this->id,
@@ -217,11 +237,6 @@ class User
 		return $ldap->getUser($this->username);
 
 	}
-
-    public function addToMailingLists(string $conferenceSlug): void
-    {
-        $mailman = new Mailman(MAILMAN_API_URL, MAILMAN_API_USERNAME, MAILMAN_API_PASSWORD);
-    }
 
 }
 

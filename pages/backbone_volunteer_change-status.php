@@ -81,16 +81,16 @@ if ($newState === 'accepted') {
 		$user = User::load($volunteer->user);
         $activeConference = Conference::getActive();
         try{
-            _log('Adding accepted volunteer to mailing list: ' . $user->getUsername() . ' for conference ' . $activeConference->getSlug());
+            _log('Adding accepted volunteer to mailing lists');
             $user->addToMailingLists($activeConference->getSlug());
-            _log('Successfully added accepted volunteer to mailing list: ' . $user->getUsername());
+            _log('Successfully added accepted volunteer to mailing lists: ' . $user->getUsername());
         } catch (Exception $e) {
-            _log('Failed to add user to mailing list: ' . $user->getUsername() . ' - ' . $e->getMessage(), LOG_ERR);
+            _log('Failed to add user to mailing lists: ' . $user->getUsername() . ' - ' . $e->getMessage(), LOG_ERR);
         }
 		if ($user->isActive()) {
 			try {
 				if ($activeConference) {
-					_log('Adding accepted volunteer to LDAP groups: ' . $user->getUsername() . ' for conference ' . $activeConference->getSlug());
+					_log('Adding accepted volunteer to LDAP groups');
 					$user->addToLdapGroups($activeConference->getSlug());
 					_log('Successfully added accepted volunteer to LDAP groups: ' . $user->getUsername());
 				} else {

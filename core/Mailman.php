@@ -4,11 +4,7 @@ class Mailman
 {
     private string $apiUrl;
 
-    public function __construct(
-        string         $apiUrl,
-        private string $username,
-        private string $password
-    )
+    public function __construct( string $apiUrl, private string $username, private string $password )
     {
         $this->apiUrl = rtrim($apiUrl, '/');
     }
@@ -48,13 +44,9 @@ class Mailman
         ]);
     }
 
-    /**
-     * @throws Exception
-     */
     public function isMember(string $listId, string $email): bool
     {
         $endpoint = sprintf('/lists/%s/member/%s', urlencode($listId), urlencode($email));
-
         try {
             $this->request('GET', $endpoint);
             return true;
@@ -69,6 +61,7 @@ class Mailman
      */
     public function subscribe(string $listId, string $email, string $displayName = '', bool $bypassAuth = true): array|string
     {
+        _log("Subscribing {$email} to list {$listId} with display name '{$displayName}' and bypassAuth={$bypassAuth}");
         $data = [
             'list_id' => $listId,
             'subscriber' => $email,
