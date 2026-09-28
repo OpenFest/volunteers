@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $slug = $_POST['slug'];
     $name = $_POST['name'];
     $description = $_POST['description'];
+    $mailList = $_POST['mail_list'] ?? '';
+    $mailList = $mailList === '' ? null : (int)$mailList;
 
     // Validate required fields
     if (empty($conference) || empty($slug) || empty($name) || empty($description)) {
@@ -33,12 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Insert the new team into the database
     $this->database->query(
-        'INSERT INTO teams (conference, slug, name, description) VALUES (:conference, :slug, :name, :description)',
+        'INSERT INTO teams (conference, slug, name, description, mail_list) VALUES (:conference, :slug, :name, :description, :mail_list)',
         [
             ':conference' => $conference,
             ':slug' => $slug,
             ':name' => $name,
-            ':description' => $description
+            ':description' => $description,
+            ':mail_list' => $mailList
         ]
     );
     // insert LDAP group
@@ -83,6 +86,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="description">Description</label>
                 <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="mail_list">Mail list</label>
+                <select id="mail_list" name="mail_list">
+                    <option value="">-- None --</option>
+                    <?php foreach ($this->database->query('SELECT * FROM mail_lists WHERE NOT global ORDER BY name') as $mailList): ?>
+                        <option value="<?php echo htmlspecialchars($mailList->id); ?>">
+                            <?php echo htmlspecialchars($mailList->name); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn">Add Team</button>

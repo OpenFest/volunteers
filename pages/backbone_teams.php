@@ -22,7 +22,7 @@ if (empty($_conf)) {
 }
 
 $teams = $this->database->query(
-	'SELECT * FROM teams WHERE conference = COALESCE(:conference, conference) ORDER BY conference DESC',
+	'SELECT t.*, m.name AS mail_list_name, m.value AS mail_list_value FROM teams t LEFT JOIN mail_lists m ON t.mail_list = m.id WHERE t.conference = COALESCE(:conference, t.conference) ORDER BY t.conference DESC',
 	[':conference' => $conference ? $conference->slug : null]
 );
 ?>
@@ -54,6 +54,7 @@ $teams = $this->database->query(
 					<th>Slug</th>
 					<th>Name</th>
 					<th>Description</th>
+					<th>Mail list</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -63,6 +64,7 @@ $teams = $this->database->query(
 						<td><a href="/backbone/team?c=<?php echo htmlspecialchars($team->conference); ?>&t=<?php echo htmlspecialchars($team->slug); ?>"><?php echo htmlspecialchars($team->slug); ?></a></td>
 						<td><?php echo htmlspecialchars($team->name); ?></td>
 						<td><?php echo htmlspecialchars($team->description); ?></td>
+						<td><?php echo htmlspecialchars($team->mail_list_name ?? ''); ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
