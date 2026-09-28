@@ -59,7 +59,7 @@ class Mailman
     /**
      * @throws Exception
      */
-    public function subscribe(string $listId, string $email, string $displayName = '', bool $bypassAuth = true): array|string
+    public function subscribe(string $listId, string $email, string $displayName = '', bool $bypassAuth = true, bool $sendWelcomeMessage = false): array|string
     {
         _log("Subscribing {$email} to list {$listId} with display name '{$displayName}' and bypassAuth={$bypassAuth}");
         $data = [
@@ -69,6 +69,7 @@ class Mailman
             'pre_verified' => $bypassAuth,
             'pre_confirmed' => $bypassAuth,
             'pre_approved' => $bypassAuth,
+            'send_welcome_message' => $sendWelcomeMessage,
         ];
 
         return $this->request('POST', '/members', $data);
