@@ -26,10 +26,12 @@ $user->resetToken();
 $token = User::generateToken($volunteerId);
 
 
+$verificationLink = 'https://' . $_SERVER['HTTP_HOST'] . '/verify?token=' . urlencode($token);
+$cleanName = htmlspecialchars($volunteer->name);
 $message = <<<EOT
-Здравейте {$volunteer->name},
+Здравейте {$cleanName},
 Моля, кликнете на следния линк, за да потвърдите вашия имейл адрес и да завършите регистрацията си като доброволец за конференцията:
-https://volunteer.example.com/verify?token={$token}
+{$verificationLink}
 (Този линк ще изтече след 24 часа.)
 
 Поздрави,
