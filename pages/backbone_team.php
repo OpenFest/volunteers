@@ -72,7 +72,7 @@ $volunteers = $this->database->query(
                 <tr>
                     <td>
                         <?php if ($volunteer->mugshot): ?>
-                            <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot" />
+                            <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot zoomable" />
                         <?php else: ?>
                             N/A
                         <?php endif; ?>

@@ -131,6 +131,7 @@ class View
     <div class="container">
         <?php echo $content; ?>
     </div>
+    <script src="<?php echo $basePath; ?>/assets/js/image-zoom.js"></script>
 </body>
 </html>
 <?php

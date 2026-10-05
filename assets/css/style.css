@@ -617,3 +617,29 @@ dialog {
     width: 400px;
     max-width: 90%;
 }
+
+img.zoomable {
+    cursor: zoom-in;
+}
+
+dialog.image-zoom {
+    padding: 0;
+    width: 90vw;
+    height: 90vh;
+    max-width: 90vw;
+    background: transparent;
+    box-shadow: none;
+    overflow: hidden;
+
+    img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        cursor: zoom-out;
+    }
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.75);
+    }
+}

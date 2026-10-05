@@ -101,7 +101,7 @@ $volunteers = $this->database->query(
 					<tr <?php if (!$volunteer->active) echo 'class="red"'; ?>>
                         <td>
 							<?php if ($volunteer->mugshot): ?>
-                                <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot" />
+                                <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot zoomable" />
 							<?php else: ?>
                                 <img src="/assets/img/default-profile.png" alt="Default Profile Picture" class="vol-mugshot" />
 							<?php endif; ?>
