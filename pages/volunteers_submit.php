@@ -35,6 +35,10 @@ foreach ($allTeams as $row) {
 //validate data
 $volunteerData = (object) $_POST['volunteer'];
 $volunteerData->picture = $_FILES['picture'] ?? NULL; // Handle file upload
+if (($_SESSION['user'] ?? null) instanceof User) {
+    // Logged-in users cannot register under a different email
+    $volunteerData->email = $_SESSION['user']->getEmail();
+}
 $errors = [];
 _log('Processing volunteer registration submission...');
 

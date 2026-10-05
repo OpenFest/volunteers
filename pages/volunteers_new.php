@@ -26,6 +26,8 @@ foreach ($teams as $row) {
     $volunteerTeams[$row->slug] = $row->name;
 }
 
+
+$loggedUser = ($_SESSION['user'] ?? null) instanceof User ? $_SESSION['user'] : null;
 ?>
 
    <h1>Кандидатствай за доброволец (<?php echo htmlspecialchars($activeConf->title);?>)</h1>
@@ -41,7 +43,7 @@ foreach ($teams as $row) {
 
             <div class="input">
                 <label for="volunteer_email"><abbr title="Задължително поле">*</abbr> E-mail</label>
-                <input type="email" name="volunteer[email]" id="volunteer_email" />
+                <input type="email" name="volunteer[email]" id="volunteer_email"<?php if ($loggedUser): ?> data-prefilled value="<?= htmlspecialchars($loggedUser->getEmail()) ?>" readonly<?php endif; ?> />
                 <span class="hint">Е-mail адресът Ви, който ще бъде видим само от организаторите</span>
             </div>
 
@@ -53,7 +55,7 @@ foreach ($teams as $row) {
 
             <div class="input">
                 <label for="volunteer_phone"><abbr title="Задължително поле">*</abbr> Телефон</label>
-                <input type="tel" name="volunteer[phone]" id="volunteer_phone" />
+                <input type="tel" name="volunteer[phone]" id="volunteer_phone"<?php if ($loggedUser && $loggedUser->getPhone()): ?> data-prefilled value="<?= htmlspecialchars($loggedUser->getPhone()) ?>"<?php endif; ?> />
                 <span class="hint">Мобилният Ви телефон, който ще бъде видим само за организаторите</span>
             </div>
 

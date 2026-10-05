@@ -26,7 +26,7 @@
             const data = JSON.parse(savedData);
             for (const [name, value] of Object.entries(data)) {
                 const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
-                if (!field) continue;
+                if (!field || field.hasAttribute('data-prefilled')) continue; // server-provided value wins
 
                 if (field.type === 'checkbox') {
                     field.checked = value === true;
@@ -50,6 +50,7 @@
             if (key === 'csrf_token') return; // Skip CSRF token
 
             const field = form.querySelector(`[name="${CSS.escape(key)}"]`);
+            if (field && field.hasAttribute('data-prefilled')) return; // do not persist account data
             if (field && (field.type === 'checkbox' || field.type === 'radio')) {
                 data[key] = field.checked;
             } else if (field && field.type === 'file') {
