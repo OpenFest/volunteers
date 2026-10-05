@@ -99,6 +99,7 @@ if ($user->isActive() === false): ?>
             'denied' => 'bg-red',
             default => 'bg-yellow',
         };
+        $mugshotId = 'mugshot-' . (int)$volunteer->id . '-' . preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$volunteer->conference);
         $isActiveRegistration = $activeConference && $volunteer->conference === $activeConference->getSlug();
         ?>
     <div class="pane<?php echo $isActiveRegistration ? ' active-conference' : ''; ?>">
@@ -110,16 +111,16 @@ if ($user->isActive() === false): ?>
         </div>
         <div class="profile-header">
             <?php if($volunteer->mugshot): ?>
-                <img class="profile-image" src="/assets/uploads/volunteers/<?php echo htmlspecialchars($volunteer->mugshot); ?>" alt="Profile Picture">
+                <img class="profile-image" id="<?php echo $mugshotId; ?>" src="/assets/uploads/volunteers/<?php echo htmlspecialchars($volunteer->mugshot); ?>" alt="Profile Picture">
             <?php else: ?>
-                <img class="profile-image" src="/assets/img/default-profile.png" alt="Default Profile Picture">
+                <img class="profile-image" id="<?php echo $mugshotId; ?>" src="/assets/img/default-profile.png" alt="Default Profile Picture">
             <?php endif; ?>
             <h3><?php echo htmlspecialchars($volunteer->name)?></h3>
             <?php if ($isActiveRegistration): ?>
                 <form action="/profile/details" method="post" enctype="multipart/form-data" class="mugshot-form">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
                     <input type="hidden" name="volunteer_id" value="<?php echo (int)$volunteer->id; ?>">
-                    <input type="file" name="picture" accept="image/jpeg,image/png,image/gif" required>
+                    <input type="file" name="picture" accept="image/jpeg,image/png,image/gif" data-preview="<?php echo $mugshotId; ?>" required>
                     <button class="btn" type="submit">Смени снимката</button>
                 </form>
             <?php endif; ?>
@@ -175,3 +176,15 @@ if ($user->isActive() === false): ?>
     <?php endforeach;?>
 </div>
 
+<script>
+    document.querySelectorAll('input[type="file"][data-preview]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            const img = document.getElementById(input.dataset.preview);
+            const file = input.files[0];
+            if (!img || !file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = function (e) { img.src = e.target.result; };
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
