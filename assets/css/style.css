@@ -151,6 +151,10 @@ form .form-group input[type="file"] {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+
+    &[readonly] {
+        color: #888;
+    }
 }
 
 .input textarea,
