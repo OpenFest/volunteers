@@ -25,12 +25,26 @@ if ($activeConference) {
         }
     }
 }
+
+if (empty($_SESSION['profile_csrf_token'])) {
+    $_SESSION['profile_csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrfToken = $_SESSION['profile_csrf_token'];
+$profileError = $_SESSION['profile_error'] ?? null;
+$profileNotice = $_SESSION['profile_notice'] ?? null;
+unset($_SESSION['profile_error'], $_SESSION['profile_notice']);
 ?>
 
 <div class="profile-page">
     <div class="page-title">
         <h1>Профил</h1>
     </div>
+<?php if ($profileError): ?>
+    <div class="login-error"><p><?php echo htmlspecialchars($profileError); ?></p></div>
+<?php endif; ?>
+<?php if ($profileNotice): ?>
+    <div class="pane bg-green"><p><?php echo htmlspecialchars($profileNotice); ?></p></div>
+<?php endif; ?>
 <?php
 if ($user->isActive() === false): ?>
     <div class="login-error">
@@ -85,10 +99,14 @@ if ($user->isActive() === false): ?>
             'denied' => 'bg-red',
             default => 'bg-yellow',
         };
+        $isActiveRegistration = $activeConference && $volunteer->conference === $activeConference->getSlug();
         ?>
-    <div class="pane">
+    <div class="pane<?php echo $isActiveRegistration ? ' active-conference' : ''; ?>">
         <div class="profile-header">
             <h2><?php echo htmlspecialchars($volunteer->title);?></h2>
+            <?php if ($isActiveRegistration): ?>
+                <span class="team-badge bg-green">Активна конференция</span>
+            <?php endif; ?>
         </div>
         <div class="profile-header">
             <?php if($volunteer->mugshot): ?>
@@ -97,17 +115,49 @@ if ($user->isActive() === false): ?>
                 <img class="profile-image" src="/assets/img/default-profile.png" alt="Default Profile Picture">
             <?php endif; ?>
             <h3><?php echo htmlspecialchars($volunteer->name)?></h3>
-
+            <?php if ($isActiveRegistration): ?>
+                <form action="/profile/details" method="post" enctype="multipart/form-data" class="mugshot-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
+                    <input type="hidden" name="volunteer_id" value="<?php echo (int)$volunteer->id; ?>">
+                    <input type="file" name="picture" accept="image/jpeg,image/png,image/gif" required>
+                    <button class="btn" type="submit">Смени снимката</button>
+                </form>
+            <?php endif; ?>
         </div>
         <div class="profile-info">
             <p>
                 <strong>Дата на регистрация:</strong> <?php echo htmlspecialchars(date('d.m.Y', strtotime($volunteer->registration_date))); ?>
                  <span class="team-badge <?php echo $bgClass;?>"><?php echo ucfirst(htmlspecialchars($volunteer->status)); ?></span>
             </p>
+            <?php if ($isActiveRegistration): ?>
+                <form action="/profile/details" method="post" class="details-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
+                    <input type="hidden" name="volunteer_id" value="<?php echo (int)$volunteer->id; ?>">
+                    <?php
+                    $fields = [
+                        'tshirt_size' => ['Размер на тениска', ['s' => 'S', 'm' => 'M', 'l' => 'L', 'xl' => 'XL', 'xxl' => 'XXL', 'xxxl' => 'XXXL']],
+                        'tshirt_cut' => ['Кройка на тениска', ['unisex' => 'Унисекс', 'female' => 'Дамска']],
+                        'food_preferences' => ['Храна', ['none' => 'Нищо специфично', 'vegetarian' => 'Вегетарианец', 'vegan' => 'Веган']],
+                        'lang' => ['Език', ['bg' => 'Български', 'en' => 'Английски']],
+                    ];
+                    foreach ($fields as $field => [$label, $options]): ?>
+                        <p>
+                            <label for="<?php echo $field . '_' . (int)$volunteer->id; ?>"><strong><?php echo $label; ?>:</strong></label>
+                            <select name="<?php echo $field; ?>" id="<?php echo $field . '_' . (int)$volunteer->id; ?>">
+                                <?php foreach ($options as $value => $optionLabel): ?>
+                                    <option value="<?php echo $value; ?>"<?php echo $volunteer->$field === $value ? ' selected' : ''; ?>><?php echo $optionLabel; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </p>
+                    <?php endforeach; ?>
+                    <button class="btn" type="submit">Запази</button>
+                </form>
+            <?php else: ?>
             <p><strong>Размер на тениска:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size)); ?></p>
             <p><strong>Кройка на тениска:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_cut)); ?></p>
             <p><strong>Храна:</strong> <?php echo ucfirst(htmlspecialchars($volunteer->food_preferences)); ?></p>
             <p><strong>Език:</strong> <?php echo htmlspecialchars($volunteer->lang); ?></p>
+            <?php endif; ?>
             <p><strong>Екип/и/:</strong>
 		        <?php if (!empty($volunteer->teams)): ?>
 			        <?php foreach (json_decode($volunteer->teams) as $team => $isPrimary): ?>
