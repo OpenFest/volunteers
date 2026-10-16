@@ -37,6 +37,14 @@ $volunteers = $this->database->query(
 	[':conference' => $conference ? $conference->slug : null]
 );
 
+//extract pending volunteers and remove them from the main list
+$pendingVolunteers = array_filter($volunteers, function ($volunteer) {
+    return $volunteer->status === 'pending';
+});
+$volunteers = array_filter($volunteers, function ($volunteer) {
+    return $volunteer->status !== 'pending';
+});
+
 ?>
 
 <div class="backbone-page">
@@ -55,6 +63,80 @@ $volunteers = $this->database->query(
     </div>
 
 	<div class="pane full-width">
+	    <div class="page-title">
+            <h2>Pending</h2>
+        </div>
+        <div class="red">
+            Red color = user not active yet.
+        </div>
+        <table class="compact">
+            <thead>
+            	<tr>
+                    <th>Mugshot</th>
+                    <th>Verified</th>
+                    <th>Accepted</th>
+                    <th>Conference</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>T-shirt Cut</th>
+                    <th>T-shirt Size</th>
+                    <th>Food Prefs</th>
+                    <th>Previous Experience</th>
+                    <th>Notes</th>
+                    <th>Reg. Date</th>
+				</tr>
+            </thead>
+            <tbody>
+                <?php foreach ($pendingVolunteers as $volunteer):
+                    $volTeams = json_decode($volunteer->teams, true);
+                    $volTeamsString = [];
+                    foreach ($volTeams as $teamName => $isPrimary) {
+                        if ($isPrimary) {
+                            $volTeamsString[] = '<span class="team-badge bg-green">' . htmlspecialchars($teamName) . '</span>';
+                        } else {
+                            $volTeamsString[] = '<span class="team-badge">' . htmlspecialchars($teamName) . '</span>';
+                        }
+                    }
+                    $volTeamsString = implode(' ', $volTeamsString);
+                ?>
+                    <tr>
+                        <td>
+                            <?php if ($volunteer->mugshot): ?>
+                                <img src="<?php echo htmlspecialchars('/assets/uploads/volunteers/' .$volunteer->mugshot); ?>" alt="Mugshot" class="vol-mugshot zoomable" />
+                            <?php else: ?>
+                                <img src="/assets/img/default-profile.png" alt="Default Profile Picture" class="vol-mugshot" />
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo $volunteer->verified ? '<span class="green">✔</span>' : '<span class="red">✘</span> <a href="/backbone/send-verification-link?volunteer=' . $volunteer->id . '">Resend</a>'; ?></td>
+                        <td>
+                            <?php
+                            if ($volunteer->status === 'pending') {
+                                echo '<a href="/backbone/volunteer/change-status?status=accept&volunteer=' . $volunteer->id . '" class="green">Accept</a>';
+                                echo ' | ';
+                                echo ' <a href="/backbone/volunteer/change-status?status=deny&volunteer=' . $volunteer->id . '" class="red">Deny</a>';
+                            } else {
+                                echo $volunteer->status === 'accepted' ? '<span class="green">✔</span>' : '<span class="red">✘</span>';
+                            }
+                            ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($volunteer->conference ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A');?></br><?php echo $volTeamsString; ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
+                        <td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut ?? 'N/A')); ?></td>
+                        <td><?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size ?? 'N/A')); ?></td>
+                        <td><?php echo ucwords(htmlspecialchars($volunteer->food_preferences ?? 'N/A')); ?></td>
+                        <td><?php echo nl2br(htmlspecialchars($volunteer->previous_experience ?? 'N/A')); ?></td>
+                        <td><?php echo nl2br(htmlspecialchars($volunteer->notes ?? 'N/A')); ?></td>
+                        <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <div class="page-title">
+            <h2>Accepted / Denied</h2>
+        </div>
         <div class="red">
             Red color = user not active yet.
         </div>
