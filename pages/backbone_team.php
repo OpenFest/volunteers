@@ -77,7 +77,8 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])
 
 //get team members
 $volunteers = $this->database->query(
-        'SELECT * FROM volunteer_teams vt left join volunteers v on vt.volunteer = v.id
+        'SELECT vt.*, v.*, u.email, u.phone FROM volunteer_teams vt left join volunteers v on vt.volunteer = v.id
+        left join users u on v."user" = u.uid
         WHERE vt.team = :team AND vt.conference = :conference ORDER BY vt.is_leader DESC, vt.is_primary DESC, v.name ASC',
         [':team' => $team->slug, ':conference' => $conference->slug]
 );
@@ -125,6 +126,8 @@ foreach ($volunteers as $v) {
             <tr>
                 <th>Mugshot</th>
                 <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
                 <th>Previous Experience</th>
                 <th>Notes</th>
                 <th>Reg. Date</th>
@@ -148,6 +151,8 @@ foreach ($volunteers as $v) {
                         <?php endif; ?>
                     </td>
                     <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A') . ' ' . $primary . $lead; ?></td>
+                    <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>
                     <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>
