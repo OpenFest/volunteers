@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])) {
 //get team members
 $volunteers = $this->database->query(
         'SELECT * FROM volunteer_teams vt left join volunteers v on vt.volunteer = v.id
-        WHERE vt.team = :team AND vt.conference = :conference ORDER BY v.name ASC',
+        WHERE vt.team = :team AND vt.conference = :conference ORDER BY vt.is_leader DESC, vt.is_primary DESC, v.name ASC',
         [':team' => $team->slug, ':conference' => $conference->slug]
 );
 
