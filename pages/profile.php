@@ -14,6 +14,15 @@ $volunteers = $this->database->query(
     [':uid' => $user->getId()]
 );
 
+$ledTeams = $this->database->query(
+    'SELECT t.conference, t.slug, t.name, c.title FROM volunteer_teams vt
+    JOIN volunteers v ON vt.volunteer = v.id
+    JOIN teams t ON vt.team = t.slug AND vt.conference = t.conference
+    JOIN conferences c ON t.conference = c.slug
+    WHERE v."user" = :uid AND vt.is_leader = TRUE ORDER BY c.title, t.name',
+    [':uid' => $user->getId()]
+);
+
 $activeConference = Conference::getActive();
 
 $registeredForActiveConf = false;
@@ -72,6 +81,15 @@ if ($user->isActive() === false): ?>
             </div>
         <?php endif; ?>
     </div>
+
+    <?php if ($ledTeams): ?>
+        <div class="pane">
+            <p><strong>Ти си лидер на екип:</strong></p>
+            <?php foreach ($ledTeams as $ledTeam): ?>
+                <p><a class="btn" href="/backbone/team?c=<?php echo urlencode($ledTeam->conference); ?>&t=<?php echo urlencode($ledTeam->slug); ?>"><?php echo htmlspecialchars($ledTeam->name . ' [' . $ledTeam->title . ']'); ?></a></p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <?php if ($activeConference): ?>
         <div class="pane bg-green">

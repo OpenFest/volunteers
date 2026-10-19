@@ -1,11 +1,19 @@
 <?php
 
-checkAdmin();
+checkAuth();
+$isAdmin = $_SESSION['user']->isAdmin();
+
+// non-admins reach this page only as leaders of the requested team (checked below)
+if (!$isAdmin) {
+    $redirectTo = '/profile';
+} else {
+    $redirectTo = '/backbone';
+}
 
 // check for valid conference
 $conference = $_GET['c'] ?? null;
 if (!$conference) {
-    header('Location: /backbone');
+    header('Location: ' . $redirectTo);
     exit;
 }
 $conference = $this->database->query(
@@ -14,13 +22,13 @@ $conference = $this->database->query(
 );
 $conference = array_shift($conference);
 if (!$conference) {
-    header('Location: /backbone');
+    header('Location: ' . $redirectTo);
     exit;
 }
 // check for valid team
 $team = $_GET['t'] ?? null;
 if (!$team) {
-    header('Location: /backbone');
+    header('Location: ' . $redirectTo);
     exit;
 }
 
@@ -30,12 +38,24 @@ $team = $this->database->query(
 );
 $team = array_shift($team);
 if (!$team) {
-    header('Location: /backbone');
+    header('Location: ' . $redirectTo);
     exit;
 }
 
+if (!$isAdmin) {
+    $isLeader = $this->database->query(
+        'SELECT 1 FROM volunteer_teams vt JOIN volunteers v ON vt.volunteer = v.id
+        WHERE vt.team = :team AND vt.conference = :conference AND vt.is_leader = TRUE AND v."user" = :uid',
+        [':team' => $team->slug, ':conference' => $conference->slug, ':uid' => $_SESSION['user']->getId()]
+    );
+    if (!$isLeader) {
+        header('Location: /profile');
+        exit;
+    }
+}
+
 // set team leader
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])) {
+if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])) {
     $leaderId = (int)$_POST['leader'];
     $this->database->query(
         'UPDATE volunteer_teams SET is_leader = FALSE WHERE team = :team AND conference = :conference',
@@ -80,6 +100,9 @@ foreach ($volunteers as $v) {
 	</div>
 
 	<div class="pane full-width">
+        <?php if (!$isAdmin): ?>
+            <p><strong>Team leader:</strong> <?php echo $leader ? htmlspecialchars($leader->name) : 'none'; ?></p>
+        <?php else: ?>
         <form method="post" class="team-leader-form">
             <strong>Team leader:</strong>
             <?php echo $leader ? htmlspecialchars($leader->name) : 'none'; ?>
@@ -93,6 +116,7 @@ foreach ($volunteers as $v) {
             </select>
             <button type="submit" class="btn">Set leader</button>
         </form>
+        <?php endif; ?>
         <?php foreach (['' => $volunteers, 'Denied' => $deniedVolunteers] as $sectionTitle => $sectionVolunteers):
             if ($sectionTitle && !$sectionVolunteers) continue; ?>
         <?php if ($sectionTitle): ?><h2><?php echo $sectionTitle; ?></h2><?php endif; ?>
