@@ -34,6 +34,25 @@ if (!$team) {
     exit;
 }
 
+// set team leader
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])) {
+    $leaderId = (int)$_POST['leader'];
+    $this->database->query(
+        'UPDATE volunteer_teams SET is_leader = FALSE WHERE team = :team AND conference = :conference',
+        [':team' => $team->slug, ':conference' => $conference->slug]
+    );
+    if ($leaderId) {
+        // only volunteers with this team as primary can lead
+        $this->database->query(
+            'UPDATE volunteer_teams SET is_leader = TRUE
+            WHERE volunteer = :volunteer AND team = :team AND conference = :conference AND is_primary = TRUE',
+            [':volunteer' => $leaderId, ':team' => $team->slug, ':conference' => $conference->slug]
+        );
+    }
+    _log("Set leader of team '{$team->slug}' to volunteer $leaderId");
+    header('Location: ' . $_SERVER['REQUEST_URI']);
+    exit;
+}
 
 //get team members
 $volunteers = $this->database->query(
@@ -41,6 +60,13 @@ $volunteers = $this->database->query(
         WHERE vt.team = :team AND vt.conference = :conference ORDER BY v.name ASC',
         [':team' => $team->slug, ':conference' => $conference->slug]
 );
+
+$leader = null;
+foreach ($volunteers as $v) {
+    if ($v->is_leader) {
+        $leader = $v;
+    }
+}
 
 ?>
 
@@ -51,6 +77,19 @@ $volunteers = $this->database->query(
 	</div>
 
 	<div class="pane full-width">
+        <form method="post" class="team-leader-form">
+            <strong>Team leader:</strong>
+            <?php echo $leader ? htmlspecialchars($leader->name) : 'none'; ?>
+            <select name="leader">
+                <option value="0">— none —</option>
+                <?php foreach ($volunteers as $v): if (!$v->is_primary) continue; ?>
+                    <option value="<?php echo (int)$v->volunteer; ?>"<?php echo $v->is_leader ? ' selected' : ''; ?>>
+                        <?php echo htmlspecialchars($v->name); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <button type="submit" class="btn">Set leader</button>
+        </form>
         <table>
             <thead>
             <tr>
@@ -68,6 +107,7 @@ $volunteers = $this->database->query(
                     ($volunteer->status === 'denied' ?
                         '<span class="red">✘</span>' : '<span class="yellow">⏳</span>');
                 $primary = $volunteer->is_primary ? '<span class="green tooltip">★<span class="tooltiptext">Primary</span></span>' : '';
+                $lead = $volunteer->is_leader ? ' <span class="yellow tooltip">♛<span class="tooltiptext">Team leader</span></span>' : '';
             ?>
                 <tr>
                     <td>
@@ -77,7 +117,7 @@ $volunteers = $this->database->query(
                             N/A
                         <?php endif; ?>
                     </td>
-                    <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A') . ' ' . $primary; ?></td>
+                    <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A') . ' ' . $primary . $lead; ?></td>
                     <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>
                     <td><?php echo date('Y-m-d H:i:s',strtotime($volunteer->registration_date)); ?></td>
