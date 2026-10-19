@@ -82,7 +82,8 @@ foreach ($volunteersStats as $volunteersStat) {
 }
 
 $volunteersTeams = $this->database->query(
-	'SELECT t.conference, vt.team, COUNT(*) as count,  count(CASE WHEN v.status = \'accepted\' THEN 1 END) as accepted, count(CASE WHEN v.status = \'accepted\' AND vt.is_primary THEN 1 END) as primary
+	'SELECT t.conference, vt.team, COUNT(*) as count,  count(CASE WHEN v.status = \'accepted\' THEN 1 END) as accepted, count(CASE WHEN v.status = \'accepted\' AND vt.is_primary THEN 1 END) as primary,
+	max(CASE WHEN vt.is_leader THEN v.name END) as leader_name, max(CASE WHEN vt.is_leader THEN v."user" END) as leader_user
 	FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) left join  volunteers v on vt.volunteer = v.id
 	WHERE  t.conference = COALESCE(:conference, t.conference) 
 	GROUP BY t.conference, vt.team order by count(*) DESC',
@@ -146,6 +147,7 @@ $volunteersTeams = $this->database->query(
             <tr>
                 <th>Conference</th>
                 <th>Team</th>
+                <th>Leader</th>
                 <th>Count <span class='tooltip'><span class='tooltiptext'>Legend: <pre>/primary/ : verified (total)</pre></span>?<span></th>
             </tr>
             </thead>
@@ -154,6 +156,11 @@ $volunteersTeams = $this->database->query(
                 <tr>
                     <td><?php echo htmlspecialchars($team->conference); ?></td>
                     <td><a href="/backbone/team?c=<?php echo $team->conference;?>&t=<?php echo $team->team;?>"><?php echo htmlspecialchars($team->team); ?></a></td>
+                    <td>
+                        <?php if ($team->leader_name && $team->leader_user): ?>
+                            <a href="/backbone/profile?user=<?php echo urlencode($team->leader_user); ?>"><?php echo htmlspecialchars($team->leader_name); ?></a>
+                        <?php else: echo htmlspecialchars($team->leader_name ?? 'n/a'); endif; ?>
+                    </td>
                     <td><?php echo  '/' . $team->primary.'/ : ' . htmlspecialchars($team->accepted) .' (' . $team->count . ')'; ?></td>
                 </tr>
 			<?php endforeach; ?>
