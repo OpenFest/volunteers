@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = $_POST['description'];
     $mailList = $_POST['mail_list'] ?? '';
     $mailList = $mailList === '' ? null : (int)$mailList;
+    $minPrimary = max(1, (int)($_POST['min_primary'] ?? 1));
+    $minTotal = max(1, (int)($_POST['min_total'] ?? 1));
 
     // Validate required fields
     if (empty($conference) || empty($slug) || empty($name) || empty($description)) {
@@ -35,13 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Insert the new team into the database
     $this->database->query(
-        'INSERT INTO teams (conference, slug, name, description, mail_list) VALUES (:conference, :slug, :name, :description, :mail_list)',
+        'INSERT INTO teams (conference, slug, name, description, mail_list, min_primary, min_total) VALUES (:conference, :slug, :name, :description, :mail_list, :min_primary, :min_total)',
         [
             ':conference' => $conference,
             ':slug' => $slug,
             ':name' => $name,
             ':description' => $description,
-            ':mail_list' => $mailList
+            ':mail_list' => $mailList,
+            ':min_primary' => $minPrimary,
+            ':min_total' => $minTotal
         ]
     );
     // insert LDAP group
@@ -97,6 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="min_primary">Minimum primary volunteers</label>
+                <input type="number" id="min_primary" name="min_primary" min="1" value="1">
+            </div>
+            <div class="form-group">
+                <label for="min_total">Minimum total volunteers</label>
+                <input type="number" id="min_total" name="min_total" min="1" value="1">
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn">Add Team</button>

@@ -83,10 +83,10 @@ foreach ($volunteersStats as $volunteersStat) {
 
 $volunteersTeams = $this->database->query(
 	'SELECT t.conference, vt.team, COUNT(*) as count,  count(CASE WHEN v.status = \'accepted\' THEN 1 END) as accepted, count(CASE WHEN v.status = \'accepted\' AND vt.is_primary THEN 1 END) as primary,
-	max(CASE WHEN vt.is_leader THEN v.name END) as leader_name, max(CASE WHEN vt.is_leader THEN v."user" END) as leader_user
+	t.min_primary, t.min_total, max(CASE WHEN vt.is_leader THEN v.name END) as leader_name, max(CASE WHEN vt.is_leader THEN v."user" END) as leader_user
 	FROM volunteer_teams vt LEFT JOIN teams t ON (vt.team = t.slug AND vt.conference = t.conference) left join  volunteers v on vt.volunteer = v.id
 	WHERE  t.conference = COALESCE(:conference, t.conference) 
-	GROUP BY t.conference, vt.team order by count(*) DESC',
+	GROUP BY t.conference, vt.team, t.min_primary, t.min_total order by count(*) DESC',
 	[':conference' => $conference ? $conference->slug : null]
 );
 
@@ -148,7 +148,9 @@ $volunteersTeams = $this->database->query(
                 <th>Conference</th>
                 <th>Team</th>
                 <th>Leader</th>
-                <th>Count <span class='tooltip'><span class='tooltiptext'>Legend: <pre>/primary/ : verified (total)</pre></span>?<span></th>
+                <th>Primary <span class='tooltip'><span class='tooltiptext'>Accepted with this team as primary (minimum in brackets)</span>?</span></th>
+                <th>Accepted <span class='tooltip'><span class='tooltiptext'>Accepted in total (minimum in brackets)</span>?</span></th>
+                <th>All <span class='tooltip'><span class='tooltiptext'>All registrations: pending, accepted and denied</span>?</span></th>
             </tr>
             </thead>
             <tbody>
@@ -161,7 +163,9 @@ $volunteersTeams = $this->database->query(
                             <a href="/backbone/profile?user=<?php echo urlencode($team->leader_user); ?>"><?php echo htmlspecialchars($team->leader_name); ?></a>
                         <?php else: echo htmlspecialchars($team->leader_name ?? 'n/a'); endif; ?>
                     </td>
-                    <td><?php echo  '/' . $team->primary.'/ : ' . htmlspecialchars($team->accepted) .' (' . $team->count . ')'; ?></td>
+                    <td class="<?php echo quotaClass($team->primary, $team->min_primary); ?>"><?php echo (int)$team->primary . ' (' . (int)$team->min_primary . ')'; ?></td>
+                    <td class="<?php echo quotaClass($team->accepted, $team->min_total); ?>"><?php echo (int)$team->accepted . ' (' . (int)$team->min_total . ')'; ?></td>
+                    <td><?php echo (int)$team->count; ?></td>
                 </tr>
 			<?php endforeach; ?>
             </tbody>

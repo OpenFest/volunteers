@@ -22,7 +22,10 @@ if (empty($_conf)) {
 }
 
 $teams = $this->database->query(
-	'SELECT t.*, m.name AS mail_list_name, m.value AS mail_list_value FROM teams t LEFT JOIN mail_lists m ON t.mail_list = m.id WHERE t.conference = COALESCE(:conference, t.conference) ORDER BY t.conference DESC',
+	'SELECT t.*, m.name AS mail_list_name, m.value AS mail_list_value,
+	(SELECT count(*) FROM volunteer_teams vt JOIN volunteers v ON vt.volunteer = v.id WHERE vt.team = t.slug AND vt.conference = t.conference AND v.status = \'accepted\') AS accepted_total,
+	(SELECT count(*) FROM volunteer_teams vt JOIN volunteers v ON vt.volunteer = v.id WHERE vt.team = t.slug AND vt.conference = t.conference AND v.status = \'accepted\' AND vt.is_primary) AS accepted_primary
+	FROM teams t LEFT JOIN mail_lists m ON t.mail_list = m.id WHERE t.conference = COALESCE(:conference, t.conference) ORDER BY t.conference DESC',
 	[':conference' => $conference ? $conference->slug : null]
 );
 ?>
@@ -55,6 +58,8 @@ $teams = $this->database->query(
 					<th>Name</th>
 					<th>Description</th>
 					<th>Mail list</th>
+					<th>Primary (min)</th>
+					<th>Total (min)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -65,6 +70,8 @@ $teams = $this->database->query(
 						<td><?php echo htmlspecialchars($team->name); ?></td>
 						<td><?php echo htmlspecialchars($team->description); ?></td>
 						<td><?php echo htmlspecialchars($team->mail_list_name ?? ''); ?></td>
+						<td class="<?php echo quotaClass($team->accepted_primary, $team->min_primary); ?>"><?php echo (int)$team->accepted_primary . ' (' . (int)$team->min_primary . ')'; ?></td>
+						<td class="<?php echo quotaClass($team->accepted_total, $team->min_total); ?>"><?php echo (int)$team->accepted_total . ' (' . (int)$team->min_total . ')'; ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>

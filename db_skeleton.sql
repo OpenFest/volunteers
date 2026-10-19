@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS teams
     name        VARCHAR(240),
     description TEXT,
     mail_list   INT,
+    min_primary INT NOT NULL DEFAULT 1 CHECK (min_primary >= 1), -- minimum accepted volunteers with this team as primary
+    min_total   INT NOT NULL DEFAULT 1 CHECK (min_total >= 1), -- minimum accepted volunteers in total
     PRIMARY KEY (conference, slug),
     FOREIGN KEY (conference) REFERENCES conferences (slug),
     FOREIGN KEY (mail_list) REFERENCES mail_lists (id)

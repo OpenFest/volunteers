@@ -95,6 +95,23 @@ if (!function_exists('checkAuth')) {
 	}
 }
 
+if (!function_exists('quotaClass')) {
+	/**
+	 * CSS class for progress against a minimum: green >= 100%, yellow >= 80%, red below.
+	 * Returns an empty string when no minimum is set.
+	 */
+	function quotaClass(int $count, int $min): string
+	{
+		if ($min <= 0) {
+			return '';
+		}
+		if ($count >= $min) {
+			return 'green';
+		}
+		return $count * 100 >= $min * 80 ? 'yellow' : 'red';
+	}
+}
+
 if (!function_exists('checkAdmin')) {
 	function checkAdmin(): void
 	{

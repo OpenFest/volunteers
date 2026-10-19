@@ -75,6 +75,23 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])
     exit;
 }
 
+// set team limits
+// admins and (already verified) team leaders
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['min_primary'], $_POST['min_total'])) {
+    $this->database->query(
+        'UPDATE teams SET min_primary = :min_primary, min_total = :min_total WHERE conference = :conference AND slug = :slug',
+        [
+            ':min_primary' => max(1, (int)$_POST['min_primary']),
+            ':min_total' => max(1, (int)$_POST['min_total']),
+            ':conference' => $conference->slug,
+            ':slug' => $team->slug,
+        ]
+    );
+    _log("Updated limits of team '{$team->slug}' in conference '{$conference->slug}'");
+    header('Location: ' . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
 //get team members
 $volunteers = $this->database->query(
         'SELECT vt.*, v.*, u.email, u.phone FROM volunteer_teams vt left join volunteers v on vt.volunteer = v.id
@@ -101,6 +118,15 @@ foreach ($volunteers as $v) {
 	</div>
 
 	<div class="pane full-width">
+        <?php
+        $acceptedTotal = count(array_filter($volunteers, fn($v) => $v->status === 'accepted'));
+        $acceptedPrimary = count(array_filter($volunteers, fn($v) => $v->status === 'accepted' && $v->is_primary));
+        ?>
+        <p>
+            <strong>Primary:</strong> <span class="<?php echo quotaClass($acceptedPrimary, $team->min_primary); ?>"><?php echo $acceptedPrimary . ' / ' . (int)$team->min_primary; ?></span>
+            &nbsp; <strong>Total:</strong> <span class="<?php echo quotaClass($acceptedTotal, $team->min_total); ?>"><?php echo $acceptedTotal . ' / ' . (int)$team->min_total; ?></span>
+            <span class="small">(accepted / minimum)</span>
+        </p>
         <?php if (!$isAdmin): ?>
             <p><strong>Team leader:</strong> <?php echo $leader ? htmlspecialchars($leader->name) : 'none'; ?></p>
         <?php else: ?>
@@ -118,6 +144,13 @@ foreach ($volunteers as $v) {
             <button type="submit" class="btn">Set leader</button>
         </form>
         <?php endif; ?>
+        <form method="post" class="team-limits-form">
+            <label for="min_primary">Min primary:</label>
+            <input type="number" id="min_primary" name="min_primary" min="1" value="<?php echo (int)$team->min_primary; ?>">
+            <label for="min_total">Min total:</label>
+            <input type="number" id="min_total" name="min_total" min="1" value="<?php echo (int)$team->min_total; ?>">
+            <button type="submit" class="btn">Set limits</button>
+        </form>
         <?php foreach (['' => $volunteers, 'Denied' => $deniedVolunteers] as $sectionTitle => $sectionVolunteers):
             if ($sectionTitle && !$sectionVolunteers) continue; ?>
         <?php if ($sectionTitle): ?><h2><?php echo $sectionTitle; ?></h2><?php endif; ?>
