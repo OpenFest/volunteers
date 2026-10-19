@@ -60,7 +60,7 @@ if  ($newState === 'accepted' ) {
 					<?php endforeach; ?>
 					</div>
 					<div class="input">
-						<button  type="submit">Запази</button>
+						<button type="submit" class="btn">Запази</button>
 					</div>
 				</form>
 			</div>

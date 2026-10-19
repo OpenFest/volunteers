@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])) {
         // only volunteers with this team as primary can lead
         $this->database->query(
             'UPDATE volunteer_teams SET is_leader = TRUE
-            WHERE volunteer = :volunteer AND team = :team AND conference = :conference AND is_primary = TRUE',
+            WHERE volunteer = :volunteer AND team = :team AND conference = :conference AND is_primary = TRUE
+            AND volunteer NOT IN (SELECT id FROM volunteers WHERE status = \'denied\')',
             [':volunteer' => $leaderId, ':team' => $team->slug, ':conference' => $conference->slug]
         );
     }
@@ -61,6 +62,8 @@ $volunteers = $this->database->query(
         [':team' => $team->slug, ':conference' => $conference->slug]
 );
 
+$deniedVolunteers = array_filter($volunteers, fn($v) => $v->status === 'denied');
+$volunteers = array_filter($volunteers, fn($v) => $v->status !== 'denied');
 $leader = null;
 foreach ($volunteers as $v) {
     if ($v->is_leader) {
@@ -82,7 +85,7 @@ foreach ($volunteers as $v) {
             <?php echo $leader ? htmlspecialchars($leader->name) : 'none'; ?>
             <select name="leader">
                 <option value="0">— none —</option>
-                <?php foreach ($volunteers as $v): if (!$v->is_primary) continue; ?>
+                <?php foreach ($volunteers as $v): if (!$v->is_primary || $v->status === 'denied') continue; ?>
                     <option value="<?php echo (int)$v->volunteer; ?>"<?php echo $v->is_leader ? ' selected' : ''; ?>>
                         <?php echo htmlspecialchars($v->name); ?>
                     </option>
@@ -90,6 +93,9 @@ foreach ($volunteers as $v) {
             </select>
             <button type="submit" class="btn">Set leader</button>
         </form>
+        <?php foreach (['' => $volunteers, 'Denied' => $deniedVolunteers] as $sectionTitle => $sectionVolunteers):
+            if ($sectionTitle && !$sectionVolunteers) continue; ?>
+        <?php if ($sectionTitle): ?><h2><?php echo $sectionTitle; ?></h2><?php endif; ?>
         <table>
             <thead>
             <tr>
@@ -101,7 +107,7 @@ foreach ($volunteers as $v) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($volunteers as $volunteer):
+            <?php foreach ($sectionVolunteers as $volunteer):
                 $state = $volunteer->status === 'accepted' ?
                     '<span class="green">✔</span>' :
                     ($volunteer->status === 'denied' ?
@@ -125,4 +131,5 @@ foreach ($volunteers as $v) {
             <?php endforeach; ?>
             </tbody>
         </table>
+        <?php endforeach; ?>
 	</div>

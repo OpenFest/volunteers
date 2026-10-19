@@ -41,8 +41,11 @@ $volunteers = $this->database->query(
 $pendingVolunteers = array_filter($volunteers, function ($volunteer) {
     return $volunteer->status === 'pending';
 });
+$deniedVolunteers = array_filter($volunteers, function ($volunteer) {
+    return $volunteer->status === 'denied';
+});
 $volunteers = array_filter($volunteers, function ($volunteer) {
-    return $volunteer->status !== 'pending';
+    return $volunteer->status === 'accepted';
 });
 
 ?>
@@ -134,8 +137,9 @@ $volunteers = array_filter($volunteers, function ($volunteer) {
                 <?php endforeach; ?>
             </tbody>
         </table>
+<?php foreach (['Accepted' => $volunteers, 'Denied' => $deniedVolunteers] as $sectionTitle => $sectionVolunteers): ?>
         <div class="page-title">
-            <h2>Accepted / Denied</h2>
+            <h2><?php echo $sectionTitle; ?></h2>
         </div>
         <div class="red">
             Red color = user not active yet.
@@ -159,7 +163,7 @@ $volunteers = array_filter($volunteers, function ($volunteer) {
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($volunteers as $volunteer):
+				<?php foreach ($sectionVolunteers as $volunteer):
                     $volTeams = json_decode($volunteer->teams, true);
                     $volTeamsString = [];
                     foreach ($volTeams as $teamName => $isPrimary) {
@@ -214,5 +218,6 @@ $volunteers = array_filter($volunteers, function ($volunteer) {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
+<?php endforeach; ?>
 	</div>
 
