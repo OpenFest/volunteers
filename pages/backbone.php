@@ -90,6 +90,12 @@ $volunteersTeams = $this->database->query(
 	[':conference' => $conference ? $conference->slug : null]
 );
 
+$sumPrimary = array_sum(array_column($volunteersTeams, 'primary'));
+$sumAccepted = array_sum(array_column($volunteersTeams, 'accepted'));
+$sumAll = array_sum(array_column($volunteersTeams, 'count'));
+$sumMinPrimary = array_sum(array_column($volunteersTeams, 'min_primary'));
+$sumMinTotal = array_sum(array_column($volunteersTeams, 'min_total'));
+
 ?>
 <div class="backbone-page">
     <div class="page-title">
@@ -169,6 +175,14 @@ $volunteersTeams = $this->database->query(
                 </tr>
 			<?php endforeach; ?>
             </tbody>
+            <tfoot>
+            <tr>
+                <th colspan="3">Total</th>
+                <th class="<?php echo quotaClass($sumPrimary, $sumMinPrimary); ?>"><?php echo $sumPrimary . ' (' . $sumMinPrimary . ')'; ?></th>
+                <th class="<?php echo quotaClass($sumAccepted, $sumMinTotal); ?>"><?php echo $sumAccepted . ' (' . $sumMinTotal . ')'; ?></th>
+                <th><?php echo $sumAll; ?></th>
+            </tr>
+            </tfoot>
         </table>
     </div>
     <div class="pane">
