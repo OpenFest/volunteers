@@ -42,15 +42,16 @@
                         const dialog = document.createElement('dialog');
                         dialog.classList.add('dialog');
                         dialog.innerHTML = `
-                    <h3>Добави в екип</h3>
+                    <h3>Add to team</h3>
                     <form id="add-volunteer-form">
-                        <label for="team-select">Екип:</label>
+                        <label for="team-select">Team:</label>
                     </form>
                 `;
                         dialog.querySelector('#add-volunteer-form').appendChild(select);
                         const submitButton = document.createElement('button');
                         submitButton.type = 'submit';
-                        submitButton.textContent = 'Добави';
+                        submitButton.classList.add('btn');
+                        submitButton.textContent = 'Add';
                         dialog.querySelector('#add-volunteer-form').appendChild(submitButton);
                         document.body.appendChild(dialog);
                         dialog.showModal();
@@ -61,7 +62,7 @@
                             const teamSelect = dialog.querySelector('#team-select');
                             const team = teamSelect.value;
                             if (!team) {
-                                alert('Моля, изберете екип.');
+                                alert('Please select a team.');
                                 return;
                             }
                             //send the data to the server
@@ -93,7 +94,7 @@
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
-                                    alert('Грешка при добавяне на доброволец към екипа. Моля, опитайте отново.');
+                                    alert('Error adding volunteer to the team. Please try again.');
                                 });
                         });
                     } else {
@@ -102,7 +103,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Грешка при зареждане на екипите. Моля, опитайте отново.');
+                    alert('Error loading teams. Please try again.');
                 });
         });
     });

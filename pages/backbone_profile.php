@@ -22,7 +22,7 @@ if (isset($_GET['remind-complete'])) {
 Екипът на конференцията
 EOT;
         if (!_mail($user->getEmail(), $subject, $message)) {
-            echo "<h3 class='login-error'>Грешка при изпращане на имейл. Моля, опитайте по-късно.</h3>";
+            echo "<h3 class='login-error'>Error sending email. Please try again later.</h3>";
             return;
         }
         $user->setToken($token, '24 hours');
@@ -60,22 +60,22 @@ $volunteers = $this->database->query(
 
 <div class="backbone-page profile-page">
     <div class="page-title">
-        <h1>Профил</h1>
+        <h1>Profile</h1>
     </div>
 
     <div class="pane full-width">
         <div class="pane-header">
             <h2> <?php echo htmlspecialchars($user->getName()); ?></h2>
             <h3> @<?php echo htmlspecialchars($user->getUsername() ?: 'n/a'); ?></h3>
-            <p><strong>E-мейл:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
-            <p><strong>Телефон:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
+            <p><strong>Email:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
+            <p><strong>Phone:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
         </div>
     </div>
     <?php if (empty($user->getUsername())): ?>
         <div class="pane full-width">
             <div class="pane-header">
                 <p class="bg-yellow">
-                    Непълен профил! За достъп до активната комуникация (мейл, чат и пр.) се изисква завършване на профила. <br/>
+                    Incomplete profile! Completing the profile is required for access to active communication (email, chat, etc.). <br/>
                     <a href="/backbone/profile?remind-complete=<?php echo $user->getEmail()?>" class="button">re-send email for reminder</a>
                 </p>
             </div>
@@ -84,7 +84,7 @@ $volunteers = $this->database->query(
 
 
     <div class="page-title">
-        <h2>Доброволчески регистрации</h2>
+        <h2>Volunteer registrations</h2>
     </div>
 
     <?php foreach ($volunteers as $volunteer): ?>
@@ -110,7 +110,7 @@ $volunteers = $this->database->query(
         </div>
         <div class="profile-info">
             <p>
-            <strong>Дата на регистрация:</strong> <?php echo htmlspecialchars(date('d.m.Y', strtotime($volunteer->registration_date))); ?>
+            <strong>Registration date:</strong> <?php echo htmlspecialchars(date('d.m.Y', strtotime($volunteer->registration_date))); ?>
                 [
                 <span class="team-badge <?php echo $bgClass;?>"><?php echo ucfirst(htmlspecialchars($volunteer->status)); ?></span>
                 <?php if ($volunteer->status !== 'pending') {
@@ -118,11 +118,11 @@ $volunteers = $this->database->query(
                 }?>
                 ]
             </p>
-            <p><strong>Размер на тениска:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size)); ?></p>
-            <p><strong>Кройка на тениска:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_cut)); ?></p>
-            <p><strong>Храна:</strong> <?php echo ucfirst(htmlspecialchars($volunteer->food_preferences)); ?></p>
-            <p><strong>Език:</strong> <?php echo htmlspecialchars($volunteer->lang); ?></p>
-            <p><strong>Екип/и/:</strong>
+            <p><strong>T-shirt size:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size)); ?></p>
+            <p><strong>T-shirt cut:</strong> <?php echo strtoupper(htmlspecialchars($volunteer->tshirt_cut)); ?></p>
+            <p><strong>Food:</strong> <?php echo ucfirst(htmlspecialchars($volunteer->food_preferences)); ?></p>
+            <p><strong>Language:</strong> <?php echo htmlspecialchars($volunteer->lang); ?></p>
+            <p><strong>Team(s):</strong>
 		        <?php if (!empty($volunteer->teams)): ?>
 			        <?php foreach (json_decode($volunteer->teams) as $team => $teamData):
                          $isPrimary = $teamData->is_primary;
@@ -143,12 +143,12 @@ $volunteers = $this->database->query(
                 <button
                         data-volunteer="<?php echo htmlspecialchars($volunteer->id); ?>"
                         data-conference="<?php echo htmlspecialchars($volunteer->conference); ?>"
-                        class="btn team-badge bg-lightblue assign-to-team-button">
+                        class="btn team-badge assign-to-team-button">
                     +
                 </button>
             </p>
-            <p><strong>Предишен опит:</strong> <?php echo nl2br(htmlspecialchars($volunteer->previous_experience)); ?></p>
-            <p><strong>Бележки:</strong> <?php echo nl2br(htmlspecialchars($volunteer->notes)); ?></p>
+            <p><strong>Previous experience:</strong> <?php echo nl2br(htmlspecialchars($volunteer->previous_experience)); ?></p>
+            <p><strong>Notes:</strong> <?php echo nl2br(htmlspecialchars($volunteer->notes)); ?></p>
         </div>
     </div>
 
