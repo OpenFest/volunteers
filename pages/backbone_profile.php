@@ -47,7 +47,8 @@ if (!$user) {
 }
 
 $volunteers = $this->database->query(
-    'SELECT v.*, vt.conference, c.title,jsonb_object_agg(t.slug, jsonb_build_object(\'name\', t.name, \'is_primary\', vt.is_primary)) as teams FROM volunteers v 
+    'SELECT v.*, vt.conference, c.title,jsonb_object_agg(t.slug, jsonb_build_object(\'name\', t.name, \'is_primary\', vt.is_primary)) as teams,
+    bool_or(vt.is_leader) as is_leader FROM volunteers v 
     LEFT JOIN volunteer_teams vt ON v.id=vt.volunteer
     LEFT JOIN teams t ON vt.team = t.slug 
     LEFT JOIN conferences c ON vt.conference = c.slug
@@ -129,6 +130,7 @@ $volunteers = $this->database->query(
 			         ?>
                         <button
                         class="team-badge <?php echo ($isPrimary ? 'bg-green': 'btn set-primary-team-button');?>"
+                        <?php echo (!$isPrimary && $volunteer->is_leader) ? 'disabled title="Team leaders cannot change their primary team"' : ''; ?>
                         data-volunteer-id="<?php echo htmlspecialchars($volunteer->id); ?>"
                         data-team-id="<?php echo htmlspecialchars($team); ?>"
                         >

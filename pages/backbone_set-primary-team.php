@@ -22,8 +22,19 @@ if (!$volunteerTeam) {
     exit;
 }
 
-//get other teams from this conference for this volunteer and set them to is_primary = false
 $conference = $volunteerTeam[0]->conference;
+
+// a team leader must stay in the team they lead
+$leads = $this->database->query(
+    'SELECT 1 FROM volunteer_teams WHERE volunteer = :volunteer AND conference = :conference AND is_leader = TRUE',
+    [':volunteer' => $volunteerId, ':conference' => $conference]
+);
+if ($leads) {
+    echo json_encode(['success' => false, 'message' => 'Лидерът на екип не може да сменя основния си екип.']);
+    exit;
+}
+
+//get other teams from this conference for this volunteer and set them to is_primary = false
 $this->database->query(
 	'UPDATE volunteer_teams SET is_primary = FALSE WHERE volunteer = :volunteer AND conference = :conference',
 	[':volunteer' => $volunteerId, ':conference' => $conference]
