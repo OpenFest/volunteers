@@ -78,11 +78,13 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leader'])
 // set team limits
 // admins and (already verified) team leaders
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['min_primary'], $_POST['min_total'])) {
+    $minTotal = max(1, (int)$_POST['min_total']);
+    $minPrimary = min(max(1, (int)$_POST['min_primary']), $minTotal);
     $this->database->query(
         'UPDATE teams SET min_primary = :min_primary, min_total = :min_total WHERE conference = :conference AND slug = :slug',
         [
-            ':min_primary' => max(1, (int)$_POST['min_primary']),
-            ':min_total' => max(1, (int)$_POST['min_total']),
+            ':min_primary' => $minPrimary,
+            ':min_total' => $minTotal,
             ':conference' => $conference->slug,
             ':slug' => $team->slug,
         ]
@@ -195,3 +197,5 @@ foreach ($volunteers as $v) {
         </table>
         <?php endforeach; ?>
 	</div>
+
+<script src="/assets/js/team-limits.js"></script>

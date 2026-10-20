@@ -11,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = $_POST['description'];
     $mailList = $_POST['mail_list'] ?? '';
     $mailList = $mailList === '' ? null : (int)$mailList;
-    $minPrimary = max(1, (int)($_POST['min_primary'] ?? 1));
     $minTotal = max(1, (int)($_POST['min_total'] ?? 1));
+    $minPrimary = min(max(1, (int)($_POST['min_primary'] ?? 1)), $minTotal);
 
     // Validate required fields
     if (empty($conference) || empty($slug) || empty($name) || empty($description)) {
@@ -115,3 +115,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
 	</div>
+
+<script src="/assets/js/team-limits.js"></script>

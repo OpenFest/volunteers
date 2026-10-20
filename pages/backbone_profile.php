@@ -10,16 +10,16 @@ if (isset($_GET['remind-complete'])) {
         $user->resetToken();
         $token = User::generateToken($user->getEmail());
         $resetLink = "https://{$_SERVER['HTTP_HOST']}/profile/complete?token={$token}";
-        $subject = "Завършване на профил";
+        $subject = "Complete your profile";
         $message = <<<EOT
-Здравейте {$user->getName()},
-За да завършите профила си и да получите достъп до комуникацията на конференцията, моля, кликнете на следната връзка:
+Hello {$user->getName()},
+To complete your profile and get access to the conference communication, please click the following link:
 {$resetLink}
-Тази връзка ще бъде валидна за 24 часа.
-Ако пропуснете да завършите профила си в този срок, ще трябва да поискате нова връзка за завършване на профила. В такъв случай, моля, свържете се с нас!
+This link will be valid for 24 hours.
+If you do not complete your profile within this period, you will need to request a new profile completion link. In that case, please contact us!
 
-Поздрави,
-Екипът на конференцията
+Best regards,
+The conference team
 EOT;
         if (!_mail($user->getEmail(), $subject, $message)) {
             echo "<h3 class='login-error'>Error sending email. Please try again later.</h3>";
