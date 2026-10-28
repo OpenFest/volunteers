@@ -507,6 +507,12 @@ form .form-group textarea {
 .red {
     color: red;
 }
+.orange {
+    color: #e8590c;
+}
+.gray {
+    color: gray;
+}
 .yellow {
     color: #d4a000;
 }

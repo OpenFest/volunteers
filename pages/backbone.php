@@ -171,7 +171,7 @@ $sumMinTotal = array_sum(array_column($volunteersTeams, 'min_total'));
                     </td>
                     <td class="<?php echo quotaClass($team->primary, $team->min_primary); ?>"><?php echo (int)$team->primary . ' (' . (int)$team->min_primary . ')'; ?></td>
                     <td class="<?php echo quotaClass($team->accepted, $team->min_total); ?>"><?php echo (int)$team->accepted . ' (' . (int)$team->min_total . ')'; ?></td>
-                    <td><?php echo (int)$team->count; ?></td>
+                    <td class="<?php echo $team->count > $team->accepted ? 'orange' : ''; ?>"><?php echo (int)$team->count; ?></td>
                 </tr>
 			<?php endforeach; ?>
             </tbody>
@@ -179,8 +179,8 @@ $sumMinTotal = array_sum(array_column($volunteersTeams, 'min_total'));
             <tr>
                 <th colspan="3">Total</th>
                 <th class="<?php echo quotaClass($sumPrimary, $sumMinPrimary); ?>"><?php echo $sumPrimary . ' (' . $sumMinPrimary . ')'; ?></th>
-                <th class="<?php echo quotaClass($sumAccepted, $sumMinTotal); ?>"><?php echo $sumAccepted . ' (' . $sumMinTotal . ')'; ?></th>
-                <th><?php echo $sumAll; ?></th>
+                <th class="gray"><?php echo $sumAccepted . ' (' . $sumMinTotal . ')'; ?></th>
+                <th class="gray"><?php echo $sumAll; ?></th>
             </tr>
             </tfoot>
         </table>
