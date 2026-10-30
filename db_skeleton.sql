@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS volunteers
     registration_date timestamp without time zone NOT NULL DEFAULT now(),
     status volunteer_status default 'pending' not null,
     status_update_date timestamp without time zone default null,
+    shirt_taken_date timestamp without time zone default null, -- set when the volunteer picks up their t-shirt
     FOREIGN KEY (clarion_email) REFERENCES clarion_users (email),
     FOREIGN KEY ("user") REFERENCES users (uid)
     );
