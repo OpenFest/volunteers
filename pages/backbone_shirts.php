@@ -23,15 +23,16 @@ if (empty($_conf)) {
 // only accepted volunteers get shirts; one row per volunteer even with several teams
 $volunteers = $this->database->query(
 	"SELECT v.id, v.tshirt_cut, v.tshirt_size, v.shirt_taken_date,
-	COALESCE(u.name, v.name) AS name, u.email,
+	v.name, u.name AS user_name, u.email, v.registration_date,
+	string_agg(DISTINCT vt.conference, ', ') AS conferences,
 	string_agg(DISTINCT t.name, ', ') AS teams
 	FROM volunteers v
 	LEFT JOIN users u ON v.user = u.uid
 	JOIN volunteer_teams vt ON v.id = vt.volunteer
 	LEFT JOIN teams t ON vt.team = t.slug AND vt.conference = t.conference
 	WHERE v.status = 'accepted' AND vt.conference = COALESCE(:conference, vt.conference)
-	GROUP BY v.id, v.tshirt_cut, v.tshirt_size, v.shirt_taken_date, u.name, v.name, u.email
-	ORDER BY COALESCE(u.name, v.name)",
+	GROUP BY v.id, v.tshirt_cut, v.tshirt_size, v.shirt_taken_date, u.name, v.name, u.email, v.registration_date
+	ORDER BY v.name, v.registration_date",
 	[':conference' => $conference ? $conference->slug : null]
 );
 
@@ -94,14 +95,16 @@ ksort($summary);
 		</div>
 		<table class="compact" id="shirts-table">
 			<thead>
-				<tr><th>Name</th><th>Teams</th><th>Cut</th><th>Size</th><th>Shirt taken</th></tr>
+				<tr><th>Name</th><th>Conference</th><th>Reg. Date</th><th>Teams</th><th>Cut</th><th>Size</th><th>Shirt taken</th></tr>
 			</thead>
 			<tbody>
 				<?php foreach ($volunteers as $volunteer): ?>
-					<tr data-search="<?php echo htmlspecialchars(mb_strtolower($volunteer->name . ' ' . $volunteer->email . ' ' . $volunteer->teams)); ?>"
+					<tr data-search="<?php echo htmlspecialchars(mb_strtolower($volunteer->name . ' ' . $volunteer->user_name . ' ' . $volunteer->email . ' ' . $volunteer->teams)); ?>"
 						data-summary="<?php echo htmlspecialchars($volunteer->tshirt_cut . '|' . $volunteer->tshirt_size); ?>"
 						data-taken="<?php echo $volunteer->shirt_taken_date ? '1' : '0'; ?>">
-						<td><?php echo htmlspecialchars($volunteer->name); ?></td>
+						<td><?php echo htmlspecialchars($volunteer->name); ?><?php if ($volunteer->user_name && $volunteer->user_name !== $volunteer->name): ?> (<?php echo htmlspecialchars($volunteer->user_name); ?>)<?php endif; ?></td>
+						<td><?php echo htmlspecialchars($volunteer->conferences ?? ''); ?></td>
+						<td><?php echo date('Y-m-d', strtotime($volunteer->registration_date)); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->teams ?? ''); ?></td>
 						<td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut)); ?></td>
 						<td><?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size)); ?></td>
