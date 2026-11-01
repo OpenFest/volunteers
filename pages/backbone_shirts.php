@@ -23,7 +23,7 @@ if (empty($_conf)) {
 // only accepted volunteers get shirts; one row per volunteer even with several teams
 $volunteers = $this->database->query(
 	"SELECT v.id, v.tshirt_cut, v.tshirt_size, v.shirt_taken_date,
-	v.name, u.name AS user_name, u.email, v.registration_date,
+	v.name, u.name AS user_name, u.email, u.phone, v.registration_date,
 	string_agg(DISTINCT vt.conference, ', ') AS conferences,
 	string_agg(DISTINCT t.name, ', ') AS teams
 	FROM volunteers v
@@ -31,7 +31,7 @@ $volunteers = $this->database->query(
 	JOIN volunteer_teams vt ON v.id = vt.volunteer
 	LEFT JOIN teams t ON vt.team = t.slug AND vt.conference = t.conference
 	WHERE v.status = 'accepted' AND vt.conference = COALESCE(:conference, vt.conference)
-	GROUP BY v.id, v.tshirt_cut, v.tshirt_size, v.shirt_taken_date, u.name, v.name, u.email, v.registration_date
+	GROUP BY v.id, v.tshirt_cut, v.tshirt_size, v.shirt_taken_date, u.name, v.name, u.email, u.phone, v.registration_date
 	ORDER BY v.name, v.registration_date",
 	[':conference' => $conference ? $conference->slug : null]
 );
@@ -100,19 +100,21 @@ $accessUsers = Access::usersFor('shirts');
 			<h2>Volunteers</h2>
 		</div>
 		<div class="input">
-			<input type="search" id="shirt-search" placeholder="Search by name, email or team" autofocus>
+			<input type="search" id="shirt-search" placeholder="Search by name, email, phone or team" autofocus>
 			<label><input type="checkbox" id="shirt-hide-taken"> Hide those who took their shirt</label>
 		</div>
 		<table class="compact" id="shirts-table">
 			<thead>
-				<tr><th>Name</th><th>Conference</th><th>Reg. Date</th><th>Teams</th><th>Cut</th><th>Size</th><th>Shirt taken</th></tr>
+				<tr><th>Name</th><th>Email</th><th>Phone</th><th>Conference</th><th>Reg. Date</th><th>Teams</th><th>Cut</th><th>Size</th><th>Shirt taken</th></tr>
 			</thead>
 			<tbody>
 				<?php foreach ($volunteers as $volunteer): ?>
-					<tr data-search="<?php echo htmlspecialchars(mb_strtolower($volunteer->name . ' ' . $volunteer->user_name . ' ' . $volunteer->email . ' ' . $volunteer->teams)); ?>"
+					<tr data-search="<?php echo htmlspecialchars(mb_strtolower($volunteer->name . ' ' . $volunteer->user_name . ' ' . $volunteer->email . ' ' . $volunteer->phone . ' ' . $volunteer->teams)); ?>"
 						data-summary="<?php echo htmlspecialchars($volunteer->tshirt_cut . '|' . $volunteer->tshirt_size); ?>"
 						data-taken="<?php echo $volunteer->shirt_taken_date ? '1' : '0'; ?>">
 						<td><?php echo htmlspecialchars($volunteer->name); ?><?php if ($volunteer->user_name && $volunteer->user_name !== $volunteer->name): ?> (<?php echo htmlspecialchars($volunteer->user_name); ?>)<?php endif; ?></td>
+						<td><?php echo htmlspecialchars($volunteer->email ?? ''); ?></td>
+						<td><?php echo htmlspecialchars($volunteer->phone ?? ''); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->conferences ?? ''); ?></td>
 						<td><?php echo date('Y-m-d', strtotime($volunteer->registration_date)); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->teams ?? ''); ?></td>
