@@ -48,9 +48,19 @@ foreach ($volunteers as $volunteer) {
 	}
 }
 ksort($summary);
+$accessUsers = Access::usersFor('shirts');
 ?>
 
 <div class="backbone-page">
+	<div class="pane full-width">
+		<p><strong>Users with access:</strong>
+			<?php echo $accessUsers
+				? implode(', ', array_map(fn($u) => htmlspecialchars($u->name . ' <' . $u->email . '>'), $accessUsers))
+				: 'none'; ?>
+			(admins always have access)
+		</p>
+	</div>
+
 	<div class="page-title">
 		<h1>Shirts</h1>
 		<h3>

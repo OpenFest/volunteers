@@ -29,6 +29,15 @@ class Access
 		));
 	}
 
+	/** @return object[] users explicitly granted the module (name, email) */
+	public static function usersFor(string $module): array
+	{
+		return Database::getInstance()->query(
+			'SELECT u.uid, u.name, u.email FROM user_access ua JOIN users u ON ua.user = u.uid WHERE ua.module = :module ORDER BY u.name',
+			[':module' => $module]
+		);
+	}
+
 	public static function grant(string $uid, string $module): void
 	{
 		if (!self::isModule($module)) {
