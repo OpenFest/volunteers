@@ -46,6 +46,21 @@ if (!$user) {
     exit;
 }
 
+$_SESSION['access_csrf_token'] ??= bin2hex(random_bytes(32));
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save-access'])) {
+    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['access_csrf_token'], $_POST['csrf_token'])) {
+        http_response_code(403);
+        echo "<h3 class='login-error'>Invalid CSRF token.</h3>";
+        return;
+    }
+    $modules = is_array($_POST['access'] ?? null) ? $_POST['access'] : [];
+    Access::sync($user->getId(), $modules);
+    _log('Access modules for user ' . $user->getEmail() . ' set to: ' . implode(',', array_filter($modules, 'Access::isModule')));
+    header('Location: /backbone/profile?user=' . urlencode($user->getId()));
+    exit;
+}
+$userAccess = Access::forUser($user->getId());
+
 $volunteers = $this->database->query(
     'SELECT v.*, vt.conference, c.title,jsonb_object_agg(t.slug, jsonb_build_object(\'name\', t.name, \'is_primary\', vt.is_primary)) as teams,
     bool_or(vt.is_leader) as is_leader FROM volunteers v 
@@ -69,6 +84,25 @@ $volunteers = $this->database->query(
             <h3> @<?php echo htmlspecialchars($user->getUsername() ?: 'n/a'); ?></h3>
             <p><strong>Email:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
             <p><strong>Phone:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
+        </div>
+    </div>
+    <div class="pane full-width">
+        <div class="pane-header">
+            <h2>Backbone access</h2>
+            <?php if ($user->isAdmin()): ?>
+                <p>Admin: full access to all modules.</p>
+            <?php else: ?>
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['access_csrf_token']); ?>">
+                    <?php foreach (Access::MODULES as $key => [$label]): ?>
+                        <label>
+                            <input type="checkbox" name="access[]" value="<?php echo htmlspecialchars($key); ?>" <?php echo in_array($key, $userAccess, true) ? 'checked' : ''; ?>>
+                            <?php echo htmlspecialchars($label); ?>
+                        </label>
+                    <?php endforeach; ?>
+                    <button type="submit" name="save-access" value="1" class="button">Save</button>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
     <?php if (empty($user->getUsername())): ?>

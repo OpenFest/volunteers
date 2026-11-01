@@ -115,6 +115,13 @@ class View
         <a class="nav-item" href="<?php echo $basePath; ?>/backbone/conferences">Conferences</a>
         <a class="nav-item" href="<?php echo $basePath; ?>/profile">Profile</a>
 <?php
+     } else {
+        foreach ($_SESSION['user']->getAccess() as $module) {
+            [$label, $path] = Access::MODULES[$module];
+?>
+        <a class="nav-item" href="<?php echo $basePath . $path; ?>"><?php echo htmlspecialchars($label); ?></a>
+<?php
+        }
      }
 ?>
         <a class="nav-item" href="<?php echo $basePath; ?>/logout">Logout [<span class="small"><?php echo $_SESSION['user']->getEmail() ?></span>]</a>

@@ -10,6 +10,7 @@ class User
 	private ?string $phone;
 	private bool $isActive;
 	private bool $isAdmin;
+	private ?array $access = null;
 
 	public function __construct(string $id, string $email, string $username, string $name, ?string $phone, bool $isAdmin = false, bool $isActive = true)
 	{
@@ -96,6 +97,21 @@ class User
 	{
 		return $this->isAdmin;
 	}
+	/** Admins have every module; others only granted ones. */
+	public function hasAccess(string $module): bool
+	{
+		if ($this->isAdmin) {
+			return true;
+		}
+		return in_array($module, $this->getAccess(), true);
+	}
+
+	/** @return string[] explicitly granted modules */
+	public function getAccess(): array
+	{
+		return $this->access ??= Access::forUser($this->id);
+	}
+
 	public function getUsername(): string
 	{
 		return $this->username;
@@ -128,6 +144,7 @@ class User
 		$this->phone = $user->phone;
 		$this->isAdmin = (bool)$user->admin;
 		$this->isActive = (bool)$user->active;
+		$this->access = null;
 		
 	}
 	

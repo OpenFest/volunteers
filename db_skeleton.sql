@@ -91,3 +91,13 @@ CREATE TABLE IF NOT EXISTS volunteer_teams
     FOREIGN KEY (conference, team) REFERENCES teams (conference, slug),
     FOREIGN KEY (conference) REFERENCES conferences (slug)
     );
+
+-- backbone access: one row per (user, module). Admins have access to every module implicitly.
+CREATE TABLE IF NOT EXISTS user_access
+(
+    "user" VARCHAR(60) NOT NULL,
+    module VARCHAR(60) NOT NULL,
+    granted_at timestamp without time zone NOT NULL DEFAULT now(),
+    PRIMARY KEY ("user", module),
+    FOREIGN KEY ("user") REFERENCES users (uid) ON DELETE CASCADE
+    );

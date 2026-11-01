@@ -122,6 +122,17 @@ if (!function_exists('checkAdmin')) {
 	}
 }
 
+if (!function_exists('checkAccess')) {
+	/** Allow admins and users granted the given Access module. */
+	function checkAccess(string $module): void
+	{
+		if (!isset($_SESSION['user']) || !$_SESSION['user']->hasAccess($module)) {
+			header('Location: /login');
+			exit;
+		}
+	}
+}
+
 if (!function_exists('validatePasswordStrength')) {
 	/**
 	 * Validate password strength against security requirements

@@ -1,6 +1,6 @@
 <?php
 
-checkAdmin();
+checkAccess('shirts');
 
 $allConferences = Conference::getConferences();
 $activeConference = Conference::getActive();
