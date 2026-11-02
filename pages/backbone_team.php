@@ -186,7 +186,7 @@ foreach ($volunteers as $v) {
                         <?php endif; ?>
                     </td>
                     <td><?php echo $state . ' ' .htmlspecialchars($volunteer->name ?? 'N/A') . ' ' . $primary . $lead; ?></td>
-                    <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($volunteer->phone ? format_phone($volunteer->phone) : 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->previous_experience ?? 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($volunteer->notes ?? 'N/A'); ?></td>

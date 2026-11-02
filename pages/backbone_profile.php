@@ -83,7 +83,7 @@ $volunteers = $this->database->query(
             <h2> <?php echo htmlspecialchars($user->getName()); ?></h2>
             <h3> @<?php echo htmlspecialchars($user->getUsername() ?: 'n/a'); ?></h3>
             <p><strong>Email:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
-            <p><strong>Phone:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
+            <p><strong>Phone:</strong> <?php echo htmlspecialchars($user->getPhone() ? format_phone($user->getPhone()) : 'N/A'); ?></p>
         </div>
     </div>
     <div class="pane full-width">

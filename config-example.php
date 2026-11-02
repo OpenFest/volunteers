@@ -15,3 +15,5 @@ const LDAP_USER_ATTRIBUTE = 'user-identifier';
 const MAILMAN_API_URL = 'https://your-mailman-api-url';
 const MAILMAN_API_USERNAME = 'mailman-api-username';
 const MAILMAN_API_PASSWORD = 'mailman-api-password';
+
+const DEFAULT_PHONE_COUNTRY_CODE = '359'; // Used when a local number starts with 0

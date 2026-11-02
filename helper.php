@@ -218,3 +218,56 @@ if (!function_exists('validatePasswordStrength')) {
 }
 
 
+
+if (!defined('DEFAULT_PHONE_COUNTRY_CODE')) {
+	define('DEFAULT_PHONE_COUNTRY_CODE', '359');
+}
+
+if (!function_exists("normalize_phone")) {
+	/** Returns phone in tight international format (+359123456789) or null if invalid. */
+	function normalize_phone(?string $phone): ?string
+	{
+		$phone = preg_replace('/[\s\-().]/', '', trim((string)$phone));
+		if ($phone === '') {
+			return null;
+		}
+		if (str_starts_with($phone, '00')) {
+			$phone = '+' . substr($phone, 2);
+		} elseif (str_starts_with($phone, '0')) {
+			$phone = '+' . DEFAULT_PHONE_COUNTRY_CODE . substr($phone, 1);
+		}
+		return preg_match('/^\+[1-9][0-9]{7,14}$/', $phone) ? $phone : null;
+	}
+}
+
+if (!function_exists("format_phone")) {
+	/** Formats a stored phone for display: +359 12 345 6789 */
+	function format_phone(?string $phone): string
+	{
+		if ($phone === null || !preg_match('/^\+[1-9][0-9]{7,14}$/', $phone)) {
+			return (string)$phone;
+		}
+		$digits = substr($phone, 1);
+		if (str_starts_with($digits, DEFAULT_PHONE_COUNTRY_CODE)) {
+			$cc = DEFAULT_PHONE_COUNTRY_CODE;
+		} elseif ($digits[0] === '1' || $digits[0] === '7') {
+			$cc = $digits[0];
+		} elseif (in_array(substr($digits, 0, 2),
+		[//3-digit country codes
+					'21', '22', '23', '24', '25', '26', '29',
+					'35', '37', '38',
+					'42',
+					'50', '59',
+					'67', '68', '69',
+					'80', '85', '88',
+					'96', '97', '99'
+				], true)) {
+			$cc = substr($digits, 0, 3);
+		} else {
+			$cc = substr($digits, 0, 2);
+		}
+		$rest = substr($digits, strlen($cc));
+		$parts = [substr($rest, 0, 2), substr($rest, 2, 3), substr($rest, 5)];
+		return '+' . $cc . ' ' . implode(' ', array_filter($parts, fn($p) => $p !== ''));
+	}
+}

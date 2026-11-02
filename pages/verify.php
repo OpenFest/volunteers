@@ -53,6 +53,7 @@ function verify($database): User|bool|null
 
         //send mail to core about the verification
         $subject = "Нов доброволец за {$activeConference->getTitle()}";
+        $phoneFormatted = format_phone($user->getPhone());
         $message = <<<EOT
 Здравейте,
 
@@ -61,7 +62,7 @@ function verify($database): User|bool|null
 Екип(и): {$volTeamsString}
 
 Език: {$volunteer->lang}
-Телефон: {$user->getPhone()}
+Телефон: {$phoneFormatted}
 Размер на тениска: {$volunteer->tshirt_size}
 Кройка на тениска: {$volunteer->tshirt_cut}
 Предпочитания за храна: {$volunteer->food_preferences}

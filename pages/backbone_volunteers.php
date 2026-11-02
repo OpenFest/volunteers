@@ -125,7 +125,7 @@ $volunteers = array_filter($volunteers, function ($volunteer) {
                         </td>
                         <td><?php echo htmlspecialchars($volunteer->conference ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A');?></br><?php echo $volTeamsString; ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->phone ? format_phone($volunteer->phone) : 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
                         <td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut ?? 'N/A')); ?></td>
                         <td><?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size ?? 'N/A')); ?></td>
@@ -206,7 +206,7 @@ $volunteers = array_filter($volunteers, function ($volunteer) {
                         </td>
                         <td><?php echo htmlspecialchars($volunteer->conference ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->name ?? 'N/A'); ?></br><?php echo $volTeamsString; ?></td>
-                        <td><?php echo htmlspecialchars($volunteer->phone ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($volunteer->phone ? format_phone($volunteer->phone) : 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($volunteer->email ?? 'N/A'); ?></td>
                         <td><?php echo ucwords(htmlspecialchars($volunteer->tshirt_cut ?? 'N/A')); ?></td>
                         <td><?php echo strtoupper(htmlspecialchars($volunteer->tshirt_size ?? 'N/A')); ?></td>

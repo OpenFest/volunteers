@@ -49,8 +49,8 @@ if (empty($volunteerData->name)) {
 if (empty($volunteerData->email) || !filter_var($volunteerData->email, FILTER_VALIDATE_EMAIL)) {
     $errors[] = 'Моля, въведете валиден имейл адрес.';
 }
-if (empty($volunteerData->phone) || !preg_match('/^\+?[0-9\s]+$/', $volunteerData->phone)) {
-    $errors[] = 'Моля, въведете валиден телефонен номер.';
+if (normalize_phone($volunteerData->phone ?? null) === null) {
+    $errors[] = 'Моля, въведете валиден телефонен номер (+359....).';
 }
 if (empty($volunteerData->volunteer_team_ids) || !is_array($volunteerData->volunteer_team_ids)) {
     $errors[] = 'Моля, изберете поне един екип доброволци.';
@@ -155,7 +155,7 @@ if (empty($existingUsers)) {
 
     $email = $volunteerData->email;
     $name = $volunteerData->name;
-    $phone = $volunteerData->phone;
+    $phone = normalize_phone($volunteerData->phone);
     $admin = FALSE;
     $username = NULL;
 

@@ -50,7 +50,7 @@ $existingUsers = $this->database->query(
                         <td><?php echo $tokenIcon; ?><a href="/backbone/profile?user=<?php echo $user->uid; ?>"><?php echo htmlspecialchars($user->username ?? 'n/a');?></a></td>
                         <td><?php echo htmlspecialchars($user->name); ?></td>
 						<td><?php echo htmlspecialchars($user->email); ?></td>
-						<td><?php echo htmlspecialchars($user->phone); ?></td>
+						<td><?php echo htmlspecialchars(format_phone($user->phone)); ?></td>
                         <td><?php echo $user->admin ? '<span class="green">✔</span>' : '<span class="red">✘</span>';?></td>
                         <td><?php echo $user->active ? '<span class="green">✔</span>' : '<span class="red">✘</span> <a href="/backbone/user/activate?user=' . $user->uid .'" class="button green">Activate</a>';?></td>
 					</tr>
@@ -80,7 +80,7 @@ $existingUsers = $this->database->query(
                         <td><a href="/backbone/profile?user=<?php echo $user->uid; ?>"><?php echo htmlspecialchars($user->username ?? 'n/a'); ?></a></td>
                         <td><?php echo htmlspecialchars($user->name); ?></td>
                         <td><?php echo htmlspecialchars($user->email); ?></td>
-                        <td><?php echo htmlspecialchars($user->phone); ?></td>
+                        <td><?php echo htmlspecialchars(format_phone($user->phone)); ?></td>
                         <td><?php echo $user->admin ? '<span class="green">✔</span>' : '<span class="red">✘</span>';?></td>
                         <td><?php echo $user->active ? '<span class="green">✔</span>' : '<span class="red">✘</span> <a href="/backbone/user/activate?user=' . $user->uid .'" class="button green">Activate</a>';?></td>
                     </tr>

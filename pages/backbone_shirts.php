@@ -114,7 +114,7 @@ $accessUsers = Access::usersFor('shirts');
 						data-taken="<?php echo $volunteer->shirt_taken_date ? '1' : '0'; ?>">
 						<td><?php echo htmlspecialchars($volunteer->name); ?><?php if ($volunteer->user_name && $volunteer->user_name !== $volunteer->name): ?> (<?php echo htmlspecialchars($volunteer->user_name); ?>)<?php endif; ?></td>
 						<td><?php echo htmlspecialchars($volunteer->email ?? ''); ?></td>
-						<td><?php echo htmlspecialchars($volunteer->phone ?? ''); ?></td>
+						<td><?php echo htmlspecialchars(format_phone($volunteer->phone)); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->conferences ?? ''); ?></td>
 						<td><?php echo date('Y-m-d', strtotime($volunteer->registration_date)); ?></td>
 						<td><?php echo htmlspecialchars($volunteer->teams ?? ''); ?></td>

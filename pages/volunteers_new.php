@@ -55,7 +55,7 @@ $loggedUser = ($_SESSION['user'] ?? null) instanceof User ? $_SESSION['user'] : 
 
             <div class="input">
                 <label for="volunteer_phone"><abbr title="Задължително поле">*</abbr> Телефон</label>
-                <input type="tel" name="volunteer[phone]" id="volunteer_phone"<?php if ($loggedUser && $loggedUser->getPhone()): ?> data-prefilled value="<?= htmlspecialchars($loggedUser->getPhone()) ?>"<?php endif; ?> />
+                <input type="tel" name="volunteer[phone]" id="volunteer_phone"<?php if ($loggedUser && $loggedUser->getPhone()): ?> data-prefilled value="<?= htmlspecialchars(format_phone($loggedUser->getPhone())) ?>"<?php endif; ?> />
                 <span class="hint">Мобилният Ви телефон, който ще бъде видим само за организаторите</span>
             </div>
 

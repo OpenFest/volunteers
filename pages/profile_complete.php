@@ -51,6 +51,7 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $phone = $_POST['phone'] ?? '';
+    $normalizedPhone = normalize_phone($phone);
     $email = $_POST['email'] ?? '';
     $username = $_POST['username'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
@@ -73,6 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<h3 class='login-error'>Моля, въведете поне 2 имена (име и фамилия).</h3>";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         echo "<h3 class='login-error'>Невалиден имейл адрес.</h3>";
+    } elseif ($phone !== '' && $normalizedPhone === null) {
+        echo "<h3 class='login-error'>Моля, въведете телефон в международен формат (напр. +359 12 345 6789).</h3>";
     } elseif ($new_password !== $confirm_new_password) {
         echo "<h3 class='login-error'>Паролите не съвпадат.</h3>";
     } elseif (!$passwordValidation['valid']) {
@@ -105,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'UPDATE users SET name = :name, phone = :phone, email = :email, username = :username WHERE uid = :uid',
                     [
                             ':name' => $name,
-                            ':phone' => $phone,
+                            ':phone' => $normalizedPhone,
                             ':email' => $email,
                             ':username' => $username,
                             ':uid' => $user->getId()
@@ -128,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 //set last params case of errors or default values
 $name = $name ?? $user->getName() ?? '';
-$phone = $phone ?? $user->getPhone() ?? '';
+$phone = $phone ?? format_phone($user->getPhone()) ?? '';
 $email = $email ?? $user->getEmail() ?? '';
 $username = $username ?? $user->getUsername() ?? '';
 ?>

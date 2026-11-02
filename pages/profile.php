@@ -65,7 +65,7 @@ if ($user->isActive() === false): ?>
             <h2>Здравей, <?php echo htmlspecialchars($user->getName()); ?>!</h2>
             <p><strong>@</strong><?php echo htmlspecialchars($user->getUsername() ?: 'n/a');?></p>
             <p><strong>E-мейл:</strong> <?php echo htmlspecialchars($user->getEmail()); ?></p>
-            <p><strong>Телефон:</strong> <?php echo htmlspecialchars($user->getPhone() ?? 'N/A'); ?></p>
+            <p><strong>Телефон:</strong> <?php echo htmlspecialchars($user->getPhone() ? format_phone($user->getPhone()) : 'N/A'); ?></p>
 
 	        <?php if ($user->isAdmin()): ?>
                 <p><strong>Role:</strong> Admin</p>
